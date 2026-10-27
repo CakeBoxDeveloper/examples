@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <div class="hero__inner">
+
+      <!-- COL LO -->
+      <div class="hero__col hero__col--lo">
+        <article class="card">
+          <div class="card__header"></div>
+          <div class="card__img-wrap">
+            <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+          </div>
+        </article>
+      </div>
+
+      <!-- COL LI: 2 карточки -->
+      <div class="hero__col hero__col--li">
+        <article class="card">
+          <div class="card__header"></div>
+          <div class="card__img-wrap">
+            <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+          </div>
+        </article>
+        <article class="card">
+          <div class="card__header"></div>
+          <div class="card__img-wrap">
+            <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+          </div>
+        </article>
+      </div>
+
+      <!-- CENTER -->
+      <div class="hero__center">
+        <div class="hero__laptop-wrap">
+          <img
+            class="hero__laptop"
+            src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Laptop.webp?raw=true"
+            alt="Laptop"
+            draggable="false"
+          />
+        </div>
+        <h1 class="hero__title">
+          Дизайн&nbsp;&amp;&nbsp;разработка<br />
+          <span class="accent">цифровых продуктов</span>
+        </h1>
+        <p class="hero__sub">UI/UX · Web · 3D · Motion</p>
+        <button class="btn btn--scroll" id="scrollBtn">
+          Листать дальше
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M7 2v10M2 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- COL RI: 2 карточки -->
+      <div class="hero__col hero__col--ri">
+        <article class="card">
+          <div class="card__header"></div>
+          <div class="card__img-wrap">
+            <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+          </div>
+        </article>
+        <article class="card">
+          <div class="card__header"></div>
+          <div class="card__img-wrap">
+            <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+          </div>
+        </article>
+      </div>
+
+      <!-- COL RO -->
+      <div class="hero__col hero__col--ro">
+        <article class="card">
+          <div class="card__header"></div>
+          <div class="card__img-wrap">
+            <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+          </div>
+        </article>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       CASES
+  ═══════════════════════════════════════ -->
+  <section class="cases" id="cases">
+    <div class="col">
+      <div class="cases__header">
+        <img
+          class="cases__emoji"
+          src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Card%20Index%20Dividers.webp?raw=true"
+          alt="" aria-hidden="true" width="40" height="40"
+        />
+        <h2 class="section-title">Все кейсы</h2>
+      </div>
+
+      <div class="cases__box">
+        <ul class="cases__list">
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">Massage Landing</h3>
+              <span class="case-item__cat">Лендинг</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">Classic Club</h3>
+              <span class="case-item__cat">Веб-сайт</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">Glassmassage</h3>
+              <span class="case-item__cat">Лендинг</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">MsBot</h3>
+              <span class="case-item__cat">Telegram-бот</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">Match 3</h3>
+              <span class="case-item__cat">Игра</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">3D Store</h3>
+              <span class="case-item__cat">3D / Motion</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">Transfer</h3>
+              <span class="case-item__cat">Веб-приложение</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">LACAR Brand</h3>
+              <span class="case-item__cat">Фирменный стиль</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">ClaudeBot</h3>
+              <span class="case-item__cat">AI-бот</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+          <li class="case-item">
+            <div class="case-item__meta">
+              <h3 class="case-item__title">MSS Identity</h3>
+              <span class="case-item__cat">Брендинг</span>
+            </div>
+            <button class="btn btn--ghost case-item__btn">Подробнее</button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- CTA -->
+      <div class="cases__cta">
+        <button class="btn btn--scroll" id="orderBtn">
+          Заказать разработку
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M7 2v10M2 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       CONTACT FORM
+  ═══════════════════════════════════════ -->
+  <section class="contact" id="contact">
+    <div class="col">
+
+      <div class="cases__header">
+        <img
+          class="cases__emoji"
+          src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
+          alt="" aria-hidden="true" width="40" height="40"
+        />
+        <h2 class="section-title">Заявка на разработку</h2>
+      </div>
+
+      <form class="cform" id="contactForm" novalidate>
+
+        <!-- Тип дизайна -->
+        <fieldset class="cform__group">
+          <legend class="cform__legend">Что нужно сделать</legend>
+          <div class="cform__checks">
+            <label class="cform__check"><input type="checkbox" name="type" value="web" /><span>Веб-сайт</span></label>
+            <label class="cform__check"><input type="checkbox" name="type" value="ad" /><span>Реклама</span></label>
+            <label class="cform__check"><input type="checkbox" name="type" value="print" /><span>Полиграфия</span></label>
+            <label class="cform__check"><input type="checkbox" name="type" value="motion" /><span>Моушн</span></label>
+            <label class="cform__check"><input type="checkbox" name="type" value="video" /><span>Видео</span></label>
+            <label class="cform__check"><input type="checkbox" name="type" value="3d" /><span>3D</span></label>
+          </div>
+        </fieldset>
+
+        <!-- Бюджет -->
+        <div class="cform__group">
+          <label class="cform__label" for="budget">Примерный бюджет</label>
+          <div class="cform__select-wrap">
+            <select class="cform__select" id="budget" name="budget">
+              <option value="" disabled selected>Выберите диапазон</option>
+              <option value="under10">до 10 000 ₽</option>
+              <option value="10-30">10 000 — 30 000 ₽</option>
+              <option value="30-80">30 000 — 80 000 ₽</option>
+              <option value="80-200">80 000 — 200 000 ₽</option>
+              <option value="over200">от 200 000 ₽</option>
+              <option value="discuss">Обсудим</option>
+            </select>
+            <svg class="cform__select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Пожелания -->
+        <div class="cform__group">
+          <label class="cform__label" for="comment">Пожелания и детали</label>
+          <textarea class="cform__textarea" id="comment" name="comment" rows="4" placeholder="Опишите задачу, референсы, сроки…"></textarea>
+        </div>
+
+        <!-- Контакты -->
+        <div class="cform__row">
+          <div class="cform__group">
+            <label class="cform__label" for="name">Имя</label>
+            <input class="cform__input" type="text" id="name" name="name" placeholder="Ваше имя" autocomplete="name" />
+          </div>
+          <div class="cform__group">
+            <label class="cform__label" for="contact">Telegram / WhatsApp / email</label>
+            <input class="cform__input" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
+          </div>
+        </div>
+
+        <!-- Как связаться -->
+        <fieldset class="cform__group">
+          <legend class="cform__legend">Предпочтительный способ связи</legend>
+          <div class="cform__checks">
+            <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
+            <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
+            <label class="cform__check"><input type="radio" name="channel" value="email" /><span>Email</span></label>
+            <label class="cform__check"><input type="radio" name="channel" value="call" /><span>Звонок</span></label>
+          </div>
+        </fieldset>
+
+        <button type="submit" class="btn btn--primary cform__submit">
+          Отправить заявку
+        </button>
+
+      </form>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
