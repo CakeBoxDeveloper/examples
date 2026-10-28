@@ -204,71 +204,156 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
-  padding: 0 20px;
   position: relative;
+  /* Заполняет весь слайд */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Заголовок: текст слева, иконка справа */
+.cases__box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #161a2a;
+  border-bottom: 1px solid var(--border);
+}
+.cases__box-header img {
+  width: 32px; height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.cases__box-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 /* Скроллируемый список */
 .cases__list {
   display: flex;
   flex-direction: column;
-  max-height: 360px;
+  flex: 1;           /* заполняет оставшуюся высоту бокса */
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  min-height: 0;
 }
 .cases__list::-webkit-scrollbar { display: none; }
 
-/* Fade сверху и снизу */
-.cases__box::before,
-.cases__box::after {
-  content: '';
+/* Fade — абсолютные поверх списка, на всю ширину бокса */
+.cases__fade-top,
+.cases__fade-bot {
   position: absolute;
   left: 0; right: 0;
-  height: 52px;
+  height: 56px;
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
   transition: opacity 0.25s ease;
 }
-.cases__box::before {
-  top: 0;
-  border-radius: 14px 14px 0 0;
-  background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%);
+.cases__fade-top {
+  top: 57px; /* ниже заголовка */
+  background: linear-gradient(to bottom, var(--bg-card), transparent);
   opacity: 0;
 }
-.cases__box::after {
+.cases__fade-bot {
   bottom: 0;
-  border-radius: 0 0 14px 14px;
-  background: linear-gradient(to top, var(--bg-card) 0%, transparent 100%);
+  background: linear-gradient(to top, var(--bg-card), transparent);
   opacity: 1;
 }
-.cases__box.scrolled::before { opacity: 1; }
-.cases__box.at-bottom::after { opacity: 0; }
 
+/* Разделители на полную ширину */
 .case-item {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 18px 0;
+  gap: 16px; padding: 16px 20px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
+  transition: background var(--ease);
 }
 .case-item:first-child { border-top: none; }
 .case-item:last-child  { border-bottom: none; }
+.case-item:hover { background: rgba(77,140,255,0.04); }
 .case-item:hover .case-item__title { color: var(--accent); }
 
 .case-item__meta { display: flex; flex-direction: column; gap: 3px; }
+.case-item__title { font-size: 1rem; font-weight: 700; transition: color var(--ease); }
+.case-item__cat   { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+.case-item__btn   { flex-shrink: 0; font-size: 0.7rem; padding: 6px 14px; }
 
-.case-item__title {
-  font-size: 1rem; font-weight: 700;
-  transition: color var(--ease);
+/* ── КАРУСЕЛЬ (Classic Club pattern) ── */
+.ck-carousel {
+  width: 100%;
+  padding: 0 0 28px;
 }
-.case-item__cat {
-  font-size: 0.6rem; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--text-muted);
-}
-.case-item__btn { flex-shrink: 0; font-size: 0.7rem; padding: 6px 14px; }
 
-.cases__cta { margin-top: 40px; }
+/* Абсолютное позиционирование — все слайды в одном месте */
+.ck-track {
+  position: relative;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ck-slide {
+  position: absolute;
+  width: min(480px, 90vw);
+  height: 420px;
+  transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity   500ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  background: var(--bg-alt);
+  border-radius: 14px;
+  overflow: hidden;
+  isolation: isolate;
+  /* Flex чтобы cases__box заполнял всю высоту */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Активный — по центру */
+.ck-slide[data-pos="0"] {
+  transform: translateX(0) scale(1);
+  z-index: 10;
+  cursor: default;
+  opacity: 1;
+}
+/* Правый */
+.ck-slide[data-pos="1"] {
+  transform: translateX(52%) scale(0.82);
+  z-index: 5;
+  opacity: 1;
+}
+/* Левый */
+.ck-slide[data-pos="-1"] {
+  transform: translateX(-52%) scale(0.82);
+  z-index: 5;
+  opacity: 1;
+}
+/* Скрытые */
+.ck-slide[data-pos="hide"] {
+  transform: scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+/* Debug colors */
+.ck-slide:nth-child(1) { background: #2e0a3a; }
+.ck-slide:nth-child(2) { background: #0a1a3a; }
+.ck-slide:nth-child(3) { background: #0a3a1a; }
+.ck-slide:nth-child(4) { background: #3a1a0a; }
+.ck-slide.keep-visible {
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+.ck-dots { display: none; } /* прогрессбар убираем */
+
+.cases__cta { margin-top: 32px; }
 
 @media (max-width: 480px) {
   .case-item__btn { display: none; }
@@ -277,6 +362,12 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
     flex-shrink: 0; transition: color var(--ease), transform var(--ease);
   }
   .case-item:hover::after { color: var(--accent); transform: translateX(4px); }
+}
+
+@media (max-width: 600px) {
+  .ck-slide[data-pos="1"]  { transform: translateX(60%) scale(0.75); }
+  .ck-slide[data-pos="-1"] { transform: translateX(-60%) scale(0.75); }
+  .ck-track { height: 380px; }
 }
 
 /* ═══════════════════════
