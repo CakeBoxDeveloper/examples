@@ -10,8 +10,9 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
 
 /* ═══════════════════════════════════════
    CASES CAROUSEL — infinite loop без рывков
-   3 повторения × N слайдов. Стартуем в центральной группе.
+   6 повторений × N слайдов. Стартуем в центральной группе.
    Перебалансировка происходит пока трек стоит — незаметно.
+   Анимация expand запускается после того как трек доехал.
 ═══════════════════════════════════════ */
 (function () {
   const track = document.getElementById('casesTrack');
@@ -21,9 +22,8 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   const N = origSlides.length;
   if (N < 2) return;
 
-  /* 3 копии: [0..N-1] | [N..2N-1] | [2N..3N-1]
-     Стартуем в центральной группе */
   const REPS = 6;
+  const MID  = Math.floor(REPS / 2);
   track.innerHTML = '';
   for (let r = 0; r < REPS; r++) {
     origSlides.forEach((s, i) => {
@@ -34,7 +34,8 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   }
 
   const allSlides = Array.from(track.querySelectorAll('.ck-slide'));
-  let curIdx = N; // стартуем на первом слайде центральной группы
+  let curIdx = MID * N;
+  let pendingExpand = null; // слайд ожидающий expand после transitionend
 
   function slideW()  { return allSlides[0].offsetWidth; }
   function gapW()    { return parseFloat(getComputedStyle(track).gap) || 20; }
@@ -51,48 +52,87 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
     track.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.2,1)';
     track.style.transform = `translateX(${-targetX(idx)}px)`;
   }
-  function setActive(idx) {
-    allSlides.forEach(s => s.classList.remove('is-active', 'ck-slide--expanded'));
-    allSlides[idx].classList.add('is-active', 'ck-slide--expanded');
-    curIdx = idx;
-    initFade(allSlides[idx]);
-  }
-  function goTo(idx, animated = true) {
-    if (animated) slideTo(idx); else jumpTo(idx);
-    setActive(idx);
+
+  /* Сбросить анимацию предыдущего активного */
+  function collapse(slide) {
+    slide.classList.remove('ck-slide--expanded');
+    slide.querySelectorAll('.case-item').forEach(el => {
+      el.style.transitionDelay = '0s';
+    });
+    setTimeout(() => {
+      slide.querySelectorAll('.case-item').forEach(el => {
+        el.style.transitionDelay = '';
+      });
+    }, 300);
   }
 
-  /* Перебалансировка: если вышли за пределы центральной группы,
-     тихо прыгаем на эквивалент в центре — только пока трек не анимируется */
+  /* expand — чистый CSS, никакого FLIP */
+  function expand(slide) {
+    slide.classList.add('ck-slide--expanded');
+    initFade(slide);
+  }
+
+  function setActive(idx, doExpand = false) {
+    /* collapse предыдущего */
+    const prev = allSlides.find(s => s.classList.contains('is-active'));
+    if (prev && prev !== allSlides[idx]) collapse(prev);
+
+    allSlides.forEach(s => s.classList.remove('is-active'));
+    allSlides[idx].classList.add('is-active');
+    curIdx = idx;
+
+    if (doExpand) {
+      expand(allSlides[idx]);
+    } else {
+      pendingExpand = allSlides[idx];
+    }
+  }
+
   let animating = false;
+
   track.addEventListener('transitionend', e => {
     if (e.propertyName !== 'transform') return;
     animating = false;
+
+    /* Запускаем expand на слайде который ждал */
+    if (pendingExpand) {
+      expand(pendingExpand);
+      pendingExpand = null;
+    }
+
     rebalance();
   });
 
   function rebalance() {
     if (animating) return;
     if (curIdx < N || curIdx >= 2 * N) {
-      /* realIdx слайда который сейчас активен */
       const realIdx = ((curIdx % N) + N) % N;
-      /* эквивалент в центральной группе */
-      const newIdx = N + realIdx;
+      const newIdx  = N + realIdx;
+      /* перед прыжком — переносим expand на новый слайд если нужно */
+      const wasExpanded = allSlides[curIdx].classList.contains('ck-slide--expanded');
+      allSlides[curIdx].classList.remove('is-active', 'ck-slide--expanded');
+      allSlides[newIdx].classList.add('is-active');
+      if (wasExpanded) allSlides[newIdx].classList.add('ck-slide--expanded');
       jumpTo(newIdx);
-      setActive(newIdx);
+      curIdx = newIdx;
     }
   }
 
-  function prev() { animating = true; goTo(curIdx - 1); }
-  function next() { animating = true; goTo(curIdx + 1); }
+  function goTo(idx, animated = true) {
+    if (animated) { animating = true; slideTo(idx); } else jumpTo(idx);
+    setActive(idx, !animated);
+  }
+
+  function prev() { goTo(curIdx - 1); }
+  function next() { goTo(curIdx + 1); }
 
   /* Drag */
   let dragStartX = null, dragDeltaX = 0, baseTranslate = 0;
 
   track.addEventListener('pointerdown', e => {
     if (e.button !== 0) return;
-    dragStartX   = e.clientX;
-    dragDeltaX   = 0;
+    dragStartX    = e.clientX;
+    dragDeltaX    = 0;
     baseTranslate = -targetX(curIdx);
     track.style.transition = 'none';
     track.setPointerCapture(e.pointerId);
@@ -122,7 +162,11 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
     if (e.key === 'ArrowRight') next();
   });
 
-  requestAnimationFrame(() => goTo(curIdx, false));
+  /* Инит — expand сразу без ожидания трека */
+  requestAnimationFrame(() => {
+    jumpTo(curIdx);
+    setActive(curIdx, true);
+  });
 })();
 
 /* ═══════════════════════════════════════

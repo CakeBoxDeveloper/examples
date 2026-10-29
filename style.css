@@ -200,13 +200,21 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
    CASES SECTION
 ═══════════════════════ */
 .cases {
-  padding: 80px 0 72px; /* 72px под кнопку-оверлей */
+  height: 100svh;
+  padding: 0;
   background: var(--bg-alt);
   border-top: 1px solid var(--border);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-.cases__header { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; }
+.cases__header { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; padding-inline: var(--pg); }
 .cases__emoji  { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+
+/* Карусель на всю ширину внутри cases */
+.cases .ck-carousel { width: 100%; }
 
 /* Box around the list */
 .cases__box {
@@ -338,9 +346,9 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   border: 1px solid var(--border);
   position: relative;
   cursor: pointer;
-  transition: border-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
-  opacity: 0.55;
-  transform: scale(0.96);
+  transition: border-color 0.38s ease, opacity 0.38s ease, transform 0.38s cubic-bezier(0.4,0,0.2,1);
+  opacity: 0.5;
+  transform: scale(0.85);
   user-select: none;
 }
 .ck-slide.is-active {
@@ -359,7 +367,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   gap: 14px; padding: 24px;
   background: var(--bg-card);
   z-index: 2;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
   pointer-events: none;
 }
 .ck-preview__img {
@@ -377,25 +385,44 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   opacity: 0;
 }
 
-/* ── ck-content — плашка + список, видны на активном слайде ── */
+/* ── ck-content — плашка + список ── */
 .ck-content {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
 }
 
-/* Плашка */
+/* Плашка: рисуется слева→направо + overflow hidden обрезает въезжающие элементы */
 .ck-content__header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px;
   background: #161a2a;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  /* скрыта у неактивных — перекрыта превью (z-index 2) */
+  clip-path: inset(0 100% 0 0);
+  overflow: hidden;
+  transition: clip-path 0.38s cubic-bezier(0.4,0,0.2,1);
 }
-.ck-content__title { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em; }
-.ck-content__header img { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
+.ck-slide--expanded .ck-content__header {
+  clip-path: inset(0 0% 0 0);
+}
 
-/* ── Список ── */
+/* Надпись въезжает слева, иконка справа */
+.ck-content__title {
+  font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) 0.1s;
+}
+.ck-content__header img {
+  width: 32px; height: 32px; object-fit: contain; flex-shrink: 0;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) 0.1s;
+}
+.ck-slide--expanded .ck-content__title,
+.ck-slide--expanded .ck-content__header img {
+  transform: translateX(0);
+}
+
+/* ── Список — каскадное появление после плашки (+150ms) ── */
 .cases__list {
   display: flex; flex-direction: column;
   flex: 1; overflow-y: auto;
@@ -409,12 +436,22 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   gap: 16px; padding: 16px 20px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  transition: background var(--ease);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: background var(--ease), opacity 0.24s ease, transform 0.24s ease;
 }
 .case-item:first-child { border-top: none; }
 .case-item:last-child  { border-bottom: none; }
 .case-item:hover { background: rgba(77,140,255,0.04); }
 .case-item:hover .case-item__title { color: var(--accent); }
+
+/* Каскад: 150ms (плашка) + задержка по строке */
+.ck-slide--expanded .case-item:nth-child(1) { opacity:1; transform:none; transition-delay: 0.15s; }
+.ck-slide--expanded .case-item:nth-child(2) { opacity:1; transform:none; transition-delay: 0.22s; }
+.ck-slide--expanded .case-item:nth-child(3) { opacity:1; transform:none; transition-delay: 0.29s; }
+.ck-slide--expanded .case-item:nth-child(4) { opacity:1; transform:none; transition-delay: 0.36s; }
+.ck-slide--expanded .case-item:nth-child(5) { opacity:1; transform:none; transition-delay: 0.43s; }
+.ck-slide--expanded .case-item:nth-child(6) { opacity:1; transform:none; transition-delay: 0.50s; }
 
 /* Fade сверху/снизу */
 .cases__fade-top,
@@ -478,9 +515,19 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
    CONTACT FORM
 ═══════════════════════ */
 .contact {
-  padding: 80px 0 100px;
+  min-height: 100svh;
+  padding: 100px 0;
   border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;        /* перекрывает кнопку cases которая position:absolute */
+  background: var(--bg);
 }
+
+.contact .col { width: 100%; }
 
 .cform {
   display: flex; flex-direction: column; gap: 28px;
