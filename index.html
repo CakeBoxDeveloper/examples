@@ -58,10 +58,10 @@
           <span class="accent">цифровых продуктов</span>
         </h1>
         <p class="hero__sub">UI/UX · Web · 3D · Motion</p>
-        <button class="btn btn--gradient" id="scrollBtn">
-          <div class="lottie-arrow" id="lottieArrow1L"></div>
+        <button class="section-scroll-btn" id="scrollBtnOld" style="display:none">
+          <div class="lottie-arrow"></div>
           <span>Листать дальше</span>
-          <div class="lottie-arrow" id="lottieArrow1R"></div>
+          <div class="lottie-arrow"></div>
         </button>
       </div>
 
@@ -92,6 +92,13 @@
       </div>
 
     </div>
+
+    <!-- Оверлей-кнопка внизу hero -->
+    <button class="section-scroll-btn" id="scrollBtn">
+      <div class="lottie-arrow" id="lottieArrow1L"></div>
+      <span>Листать дальше</span>
+      <div class="lottie-arrow" id="lottieArrow1R"></div>
+    </button>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -109,23 +116,20 @@
       </div>
     </div>
 
-    <!-- Карусель таблиц -->
+    <!-- Карусель — горизонтальная лента -->
     <div class="ck-carousel" id="casesCarousel">
       <div class="ck-track" id="casesTrack">
 
         <!-- 1. Web-разработка -->
         <div class="ck-slide">
-          <!-- Превью (боковое состояние) -->
           <div class="ck-preview">
-            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Desktop%20Computer.webp?raw=true" alt="" />
+            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Laptop.webp?raw=true" alt="" />
             <span class="ck-preview__label" data-flip-label>Web-разработка</span>
-            <img class="ck-preview__icon" data-flip-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Laptop.webp?raw=true" alt="" width="32" height="32" />
           </div>
-          <!-- Контент (центральное состояние) -->
           <div class="ck-content">
             <div class="ck-content__header">
               <span class="ck-content__title" data-flip-target-label>Web-разработка</span>
-              <img data-flip-target-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Laptop.webp?raw=true" alt="" width="32" height="32" />
+              <img data-flip-target-icon src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Laptop.webp" alt="" width="32" height="32" />
             </div>
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
@@ -143,14 +147,13 @@
         <!-- 2. 3D модели -->
         <div class="ck-slide">
           <div class="ck-preview">
-            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Printer.webp?raw=true" alt="" />
+            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Activity/Crystal%20Ball.webp?raw=true" alt="" />
             <span class="ck-preview__label" data-flip-label>3D модели</span>
-            <img class="ck-preview__icon" data-flip-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Printer.webp?raw=true" alt="" width="32" height="32" />
           </div>
           <div class="ck-content">
             <div class="ck-content__header">
               <span class="ck-content__title" data-flip-target-label>3D модели</span>
-              <img data-flip-target-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Printer.webp?raw=true" alt="" width="32" height="32" />
+              <img data-flip-target-icon src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Printer.webp" alt="" width="32" height="32" />
             </div>
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
@@ -168,14 +171,13 @@
         <!-- 3. Графика -->
         <div class="ck-slide">
           <div class="ck-preview">
-            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Artist%20Palette.webp?raw=true" alt="" />
+            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Activity/Artist%20Palette.webp?raw=true" alt="" />
             <span class="ck-preview__label" data-flip-label>Графика</span>
-            <img class="ck-preview__icon" data-flip-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Artist%20Palette.webp?raw=true" alt="" width="32" height="32" />
           </div>
           <div class="ck-content">
             <div class="ck-content__header">
               <span class="ck-content__title" data-flip-target-label>Графика</span>
-              <img data-flip-target-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Artist%20Palette.webp?raw=true" alt="" width="32" height="32" />
+              <img data-flip-target-icon src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Artist%20Palette.webp" alt="" width="32" height="32" />
             </div>
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
@@ -192,14 +194,13 @@
         <!-- 4. Полиграфия -->
         <div class="ck-slide">
           <div class="ck-preview">
-            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Bookmark%20Tabs.webp?raw=true" alt="" />
+            <img class="ck-preview__img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Newspaper.webp?raw=true" alt="" />
             <span class="ck-preview__label" data-flip-label>Полиграфия</span>
-            <img class="ck-preview__icon" data-flip-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Bookmark%20Tabs.webp?raw=true" alt="" width="32" height="32" />
           </div>
           <div class="ck-content">
             <div class="ck-content__header">
               <span class="ck-content__title" data-flip-target-label>Полиграфия</span>
-              <img data-flip-target-icon src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Bookmark%20Tabs.webp?raw=true" alt="" width="32" height="32" />
+              <img data-flip-target-icon src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Bookmark%20Tabs.webp" alt="" width="32" height="32" />
             </div>
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
@@ -216,14 +217,12 @@
       <div class="ck-dots" id="casesDots"></div>
     </div><!-- /carousel -->
 
-    <!-- CTA — sticky к нижнему краю секции -->
-    <div class="cases__cta col">
-      <button class="btn btn--gradient" id="orderBtn">
-        <div class="lottie-arrow" id="lottieArrow2L"></div>
-        <span>Заказать разработку</span>
-        <div class="lottie-arrow" id="lottieArrow2R"></div>
-      </button>
-    </div>
+    <!-- Оверлей-кнопка внизу cases -->
+    <button class="section-scroll-btn" id="orderBtn">
+      <div class="lottie-arrow" id="lottieArrow2L"></div>
+      <span>Заказать разработку</span>
+      <div class="lottie-arrow" id="lottieArrow2R"></div>
+    </button>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -313,19 +312,5 @@
   </section>
 
   <script src="app.js"></script>
-  <script>
-    const LOTTIE_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Scroll%20down.json';
-    ['lottieArrow1L','lottieArrow1R','lottieArrow2L','lottieArrow2R'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      lottie.loadAnimation({
-        container: el,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: LOTTIE_URL
-      });
-    });
-  </script>
 </body>
 </html>

@@ -9,202 +9,124 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
 });
 
 /* ═══════════════════════════════════════
-   CASES CAROUSEL — Classic Club style
-   All slides shift simultaneously by one position
+   CASES CAROUSEL — infinite loop без рывков
+   3 повторения × N слайдов. Стартуем в центральной группе.
+   Перебалансировка происходит пока трек стоит — незаметно.
 ═══════════════════════════════════════ */
 (function () {
   const track = document.getElementById('casesTrack');
   if (!track) return;
 
-  const slides = Array.from(track.querySelectorAll('.ck-slide'));
-  const total  = slides.length;
-  let active   = 0;
+  const origSlides = Array.from(track.querySelectorAll('.ck-slide'));
+  const N = origSlides.length;
+  if (N < 2) return;
+
+  /* 3 копии: [0..N-1] | [N..2N-1] | [2N..3N-1]
+     Стартуем в центральной группе */
+  const REPS = 6;
+  track.innerHTML = '';
+  for (let r = 0; r < REPS; r++) {
+    origSlides.forEach((s, i) => {
+      const c = s.cloneNode(true);
+      c.dataset.realIdx = i;
+      track.appendChild(c);
+    });
+  }
+
+  const allSlides = Array.from(track.querySelectorAll('.ck-slide'));
+  let curIdx = N; // стартуем на первом слайде центральной группы
+
+  function slideW()  { return allSlides[0].offsetWidth; }
+  function gapW()    { return parseFloat(getComputedStyle(track).gap) || 20; }
+  function targetX(idx) {
+    const cw = track.parentElement.offsetWidth;
+    return idx * (slideW() + gapW()) - (cw - slideW()) / 2;
+  }
+
+  function jumpTo(idx) {
+    track.style.transition = 'none';
+    track.style.transform = `translateX(${-targetX(idx)}px)`;
+  }
+  function slideTo(idx) {
+    track.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.2,1)';
+    track.style.transform = `translateX(${-targetX(idx)}px)`;
+  }
+  function setActive(idx) {
+    allSlides.forEach(s => s.classList.remove('is-active', 'ck-slide--expanded'));
+    allSlides[idx].classList.add('is-active', 'ck-slide--expanded');
+    curIdx = idx;
+    initFade(allSlides[idx]);
+  }
+  function goTo(idx, animated = true) {
+    if (animated) slideTo(idx); else jumpTo(idx);
+    setActive(idx);
+  }
+
+  /* Перебалансировка: если вышли за пределы центральной группы,
+     тихо прыгаем на эквивалент в центре — только пока трек не анимируется */
   let animating = false;
-  const DUR = 1050;
-
-  /* ── FLIP: label и icon летят из превью в плашку ── */
-  function flipExpand(slide) {
-    const label  = slide.querySelector('[data-flip-label]');
-    const icon   = slide.querySelector('[data-flip-icon]');
-    const tLabel = slide.querySelector('[data-flip-target-label]');
-    const tIcon  = slide.querySelector('[data-flip-target-icon]');
-
-    if (!label || !tLabel) {
-      slide.classList.add('ck-slide--expanded');
-      initFade(slide);
-      return;
-    }
-
-    /* FIRST — позиции ДО expand (плашка ещё не видна) */
-    const r1L = label.getBoundingClientRect();
-    const r1I = icon ? icon.getBoundingClientRect() : null;
-
-    /* Добавляем expanded — плашка начинает рисоваться */
-    requestAnimationFrame(() => {
-      slide.classList.add('ck-slide--expanded');
-
-      /* LAST — позиции ПОСЛЕ expand */
-      const r2L = tLabel.getBoundingClientRect();
-      const r2I = tIcon ? tIcon.getBoundingClientRect() : null;
-
-      /* Скрываем targets пока летит клон */
-      tLabel.style.opacity = '0';
-      if (tIcon) tIcon.style.opacity = '0';
-
-      const FLIP_DUR = 380;
-
-      const makeGhost = (src, r1, r2) => {
-        const el = src.cloneNode(true);
-        const cs = getComputedStyle(src);
-        Object.assign(el.style, {
-          position: 'fixed',
-          left: r1.left + 'px', top: r1.top + 'px',
-          width: r1.width + 'px', height: r1.height + 'px',
-          margin: '0', zIndex: '9999', pointerEvents: 'none',
-          transition: 'none',
-          fontSize: cs.fontSize, fontWeight: cs.fontWeight, color: cs.color,
-          transformOrigin: '0 0',
-        });
-        document.body.appendChild(el);
-
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          const dx = r2.left - r1.left;
-          const dy = r2.top  - r1.top;
-          const sx = r2.width  / r1.width;
-          const sy = r2.height / r1.height;
-          el.style.transition = `transform ${FLIP_DUR}ms cubic-bezier(0.4,0,0.2,1)`;
-          el.style.transform  = `translate(${dx}px,${dy}px) scale(${sx},${sy})`;
-          el.addEventListener('transitionend', () => {
-            el.remove();
-            tLabel.style.opacity = '';
-            if (tIcon) tIcon.style.opacity = '';
-          }, { once: true });
-        }));
-      };
-
-      makeGhost(label, r1L, r2L);
-      if (r1I && r2I) makeGhost(icon, r1I, r2I);
-
-      initFade(slide);
-    });
-  }
-
-  function expand(slide) { flipExpand(slide); }
-
-  function collapse(slide) {
-    slide.querySelectorAll('.case-item').forEach(el => { el.style.transitionDelay = '0s'; });
-    slide.classList.remove('ck-slide--expanded');
-    setTimeout(() => {
-      slide.querySelectorAll('.case-item').forEach(el => { el.style.transitionDelay = ''; });
-    }, 350);
-  }
-
-  /* positions[i] хранит текущую позицию каждого слайда: 0, 1, -1, 'hide' */
-  const positions = slides.map((_, i) => {
-    if (i === 0) return '0';
-    if (i === 1) return '1';
-    if (i === total - 1) return '-1';
-    return 'hide';
+  track.addEventListener('transitionend', e => {
+    if (e.propertyName !== 'transform') return;
+    animating = false;
+    rebalance();
   });
 
-  function applyPositions(animate) {
-    slides.forEach((slide, i) => {
-      if (!animate) slide.style.transition = 'none';
-      slide.setAttribute('data-pos', String(positions[i]));
-    });
-    if (!animate) {
-      track.offsetHeight;
-      slides.forEach(s => { s.style.transition = ''; });
-    }
-  }
-
-  function shift(dir) {
-    /* dir = +1 (→ следующий становится центром) или -1 (← предыдущий) */
-    /* Кто сейчас center/left/right/hide */
-    const centerIdx = positions.indexOf('0');
-    const rightIdx  = positions.indexOf('1');
-    const leftIdx   = positions.indexOf('-1');
-
-    /* keep-visible чтобы не мигало при смене */
-    slides.forEach(s => {
-      if (s.getAttribute('data-pos') !== 'hide') s.classList.add('keep-visible');
-    });
-
-    /* Collapse current center */
-    collapse(slides[centerIdx]);
-
-    if (dir === 1) {
-      /* → Нажали правый. Правый → центр, центр → лево, лево → hide, hide → право */
-      const hideIdx = positions.findIndex((p, i) => p === 'hide' && i !== centerIdx && i !== rightIdx && i !== leftIdx);
-      positions[centerIdx] = '-1';
-      positions[rightIdx]  = '0';
-      positions[leftIdx]   = 'hide';
-      if (hideIdx !== -1) positions[hideIdx] = '1';
-      active = rightIdx;
-    } else {
-      /* ← Нажали левый. Левый → центр, центр → право, право → hide, hide → лево */
-      const hideIdx = positions.findIndex((p, i) => p === 'hide' && i !== centerIdx && i !== rightIdx && i !== leftIdx);
-      positions[centerIdx] = '1';
-      positions[leftIdx]   = '0';
-      positions[rightIdx]  = 'hide';
-      if (hideIdx !== -1) positions[hideIdx] = '-1';
-      active = leftIdx;
-    }
-
-    applyPositions(true);
-
-    animating = true;
-    setTimeout(() => {
-      slides.forEach(s => s.classList.remove('keep-visible'));
-      expand(slides[active]);
-      animating = false;
-    }, DUR + 20);
-  }
-
-  function render(animate) {
-    if (!animate) {
-      applyPositions(false);
-      expand(slides[active]);
-    }
-  }
-
-  /* Click side slide */
-  slides.forEach((slide, i) => {
-    slide.addEventListener('click', () => {
-      if (animating) return;
-      const pos = positions[i];
-      if (pos === '1')  { shift(1);  return; }
-      if (pos === '-1') { shift(-1); return; }
-    });
-  });
-
-  /* Touch swipe */
-  let tx = null, ty = null, t0 = 0;
-  track.addEventListener('touchstart', e => {
-    tx = e.touches[0].clientX; ty = e.touches[0].clientY; t0 = Date.now();
-  }, { passive: true });
-  track.addEventListener('touchend', e => {
-    if (tx === null) return;
-    const dx = tx - e.changedTouches[0].clientX;
-    const dy = ty - e.changedTouches[0].clientY;
-    if (!animating && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50 && Date.now() - t0 < 500) {
-      shift(dx > 0 ? 1 : -1);
-    }
-    tx = null;
-  }, { passive: true });
-
-  /* Keyboard */
-  document.addEventListener('keydown', e => {
+  function rebalance() {
     if (animating) return;
-    if (e.key === 'ArrowLeft')  shift(-1);
-    if (e.key === 'ArrowRight') shift(1);
+    if (curIdx < N || curIdx >= 2 * N) {
+      /* realIdx слайда который сейчас активен */
+      const realIdx = ((curIdx % N) + N) % N;
+      /* эквивалент в центральной группе */
+      const newIdx = N + realIdx;
+      jumpTo(newIdx);
+      setActive(newIdx);
+    }
+  }
+
+  function prev() { animating = true; goTo(curIdx - 1); }
+  function next() { animating = true; goTo(curIdx + 1); }
+
+  /* Drag */
+  let dragStartX = null, dragDeltaX = 0, baseTranslate = 0;
+
+  track.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    dragStartX   = e.clientX;
+    dragDeltaX   = 0;
+    baseTranslate = -targetX(curIdx);
+    track.style.transition = 'none';
+    track.setPointerCapture(e.pointerId);
+  });
+  track.addEventListener('pointermove', e => {
+    if (dragStartX === null) return;
+    dragDeltaX = e.clientX - dragStartX;
+    track.style.transform = `translateX(${baseTranslate + dragDeltaX}px)`;
+  });
+  track.addEventListener('pointerup', () => {
+    if (dragStartX === null) return;
+    dragStartX = null;
+    const threshold = slideW() * 0.2;
+    if      (dragDeltaX < -threshold) next();
+    else if (dragDeltaX >  threshold) prev();
+    else goTo(curIdx, true);
+  });
+  track.addEventListener('pointercancel', () => {
+    dragStartX = null; goTo(curIdx, true);
   });
 
-  render(false);
+  allSlides.forEach((slide, i) => {
+    slide.addEventListener('click', () => { if (i !== curIdx) goTo(i); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  prev();
+    if (e.key === 'ArrowRight') next();
+  });
+
+  requestAnimationFrame(() => goTo(curIdx, false));
 })();
 
 /* ═══════════════════════════════════════
-   FADE for each cases__list
+   FADE для cases__list (градиент при скролле)
 ═══════════════════════════════════════ */
 function initFade(slideEl) {
   const list    = slideEl?.querySelector('.cases__list');
@@ -212,24 +134,15 @@ function initFade(slideEl) {
   const fadeBot = slideEl?.querySelector('.cases__fade-bot');
   if (!list || !fadeTop || !fadeBot) return;
 
-  /* remove previous listener by cloning */
-  const newList = list.cloneNode(true);
-  list.parentNode.replaceChild(newList, list);
-
   function update() {
-    const { scrollTop, scrollHeight, clientHeight } = newList;
+    const { scrollTop, scrollHeight, clientHeight } = list;
     fadeTop.style.opacity = scrollTop > 4 ? '1' : '0';
     fadeBot.style.opacity = scrollTop + clientHeight >= scrollHeight - 4 ? '0' : '1';
   }
 
-  newList.addEventListener('scroll', update, { passive: true });
+  list.addEventListener('scroll', update, { passive: true });
   update();
 }
-
-/* Init fades for all slides on load */
-window.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.ck-slide').forEach(initFade);
-});
 
 /* ── Form toggle ── */
 document.querySelectorAll('.cform__check input').forEach((input) => {
@@ -247,7 +160,7 @@ document.querySelectorAll('.cform__check input').forEach((input) => {
 
 /* ── Hero fade-in ── */
 window.addEventListener('DOMContentLoaded', () => {
-  ['.hero__laptop-wrap', '.hero__title', '.hero__sub', '.btn--scroll'].forEach((sel, i) => {
+  ['.hero__laptop-wrap', '.hero__title', '.hero__sub'].forEach((sel, i) => {
     const el = document.querySelector(sel);
     if (!el) return;
     el.style.cssText += `opacity:0;transform:translateY(14px);transition:opacity .5s ease ${.1 + i * .1}s,transform .5s ease ${.1 + i * .1}s`;
@@ -255,5 +168,15 @@ window.addEventListener('DOMContentLoaded', () => {
       el.style.opacity = '1';
       el.style.transform = 'translateY(0)';
     }));
+  });
+});
+
+/* ── Lottie ── */
+const LOTTIE_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Scroll%20down.json';
+window.addEventListener('DOMContentLoaded', () => {
+  ['lottieArrow1L','lottieArrow1R','lottieArrow2L','lottieArrow2R'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || typeof lottie === 'undefined') return;
+    lottie.loadAnimation({ container: el, renderer: 'svg', loop: true, autoplay: true, path: LOTTIE_URL });
   });
 });
