@@ -19,10 +19,14 @@
 
       <!-- COL LO -->
       <div class="hero__col hero__col--lo">
-        <article class="card">
-          <div class="card__header"></div>
+        <article class="card card--beige">
+          <div class="card__header">Panacea</div>
           <div class="card__img-wrap">
-            <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/acdb4a50ed9862af719e764b04472ec7fbfaa33f/PanCardSVG.svg" alt="" />
+          </div>
+          <div class="card__wip">
+            <span class="card__wip-label">В разработке <span class="card__wip-ping"></span></span>
+            <div class="card__wip-bar"></div>
           </div>
         </article>
       </div>
@@ -34,11 +38,16 @@
           <div class="card__img-wrap">
             <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
           </div>
+          <button class="card__cta">Смотреть проект</button>
         </article>
         <article class="card">
           <div class="card__header"></div>
           <div class="card__img-wrap">
             <img src="https://placehold.co/300x400/101422/101422?text=." alt="" />
+          </div>
+          <div class="card__wip">
+            <span class="card__wip-label">В разработке <span class="card__wip-ping"></span></span>
+            <div class="card__wip-bar"></div>
           </div>
         </article>
       </div>
@@ -105,15 +114,11 @@
        CASES
   ═══════════════════════════════════════ -->
   <section class="cases" id="cases">
-    <div class="col">
-      <div class="cases__header">
-        <img
-          class="cases__emoji"
-          src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Card%20Index%20Dividers.webp?raw=true"
-          alt="" aria-hidden="true" width="40" height="40"
-        />
-        <h2 class="section-title">Все кейсы</h2>
-      </div>
+    <!-- Дисклеймер -->
+    <div class="cases__disclaimer">
+      <span>Работы из разных сфер:</span>
+      <span>веб · графика · 3D · полиграфия</span>
+      <span class="cases__disclaimer-note">часть проектов в процессе</span>
     </div>
 
     <!-- Карусель — горизонтальная лента -->
@@ -134,12 +139,12 @@
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
             <ul class="cases__list">
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Корпоративный сайт</h3><span class="case-item__cat">Веб-сайт</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Интернет-магазин</h3><span class="case-item__cat">E-commerce</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Лендинг для услуг</h3><span class="case-item__cat">Лендинг</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Telegram-бот</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Портфолио-сайт</h3><span class="case-item__cat">Сайт-визитка</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Дашборд аналитики</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Корпоративный сайт</h3><span class="case-item__cat">Веб-сайт</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Интернет-магазин</h3><span class="case-item__cat">E-commerce</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Лендинг для услуг</h3><span class="case-item__cat">Лендинг</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Telegram-бот</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Портфолио-сайт</h3><span class="case-item__cat">Сайт-визитка</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Дашборд аналитики</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             </ul>
           </div>
         </div>
@@ -158,12 +163,12 @@
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
             <ul class="cases__list">
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Механический корпус</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Крепёжный кронштейн</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Настольный органайзер</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Декоративная статуэтка</h3><span class="case-item__cat">3D / Motion</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Прототип устройства</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Промо-модель продукта</h3><span class="case-item__cat">3D / Визуализация</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Механический корпус</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Крепёжный кронштейн</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Настольный органайзер</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Декоративная статуэтка</h3><span class="case-item__cat">3D / Motion</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Прототип устройства</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Промо-модель продукта</h3><span class="case-item__cat">3D / Визуализация</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
             </ul>
           </div>
         </div>
@@ -182,11 +187,11 @@
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
             <ul class="cases__list">
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Фирменный стиль бренда</h3><span class="case-item__cat">Брендинг</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Иллюстрации для игры</h3><span class="case-item__cat">Game UI</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Визуальный стиль сервиса</h3><span class="case-item__cat">UI / Графика</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Иконки и пиктограммы</h3><span class="case-item__cat">Иконографика</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Интерфейс приложения</h3><span class="case-item__cat">UI / UX</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Фирменный стиль бренда</h3><span class="case-item__cat">Брендинг</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Иллюстрации для игры</h3><span class="case-item__cat">Game UI</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Визуальный стиль сервиса</h3><span class="case-item__cat">UI / Графика</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Иконки и пиктограммы</h3><span class="case-item__cat">Иконографика</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Интерфейс приложения</h3><span class="case-item__cat">UI / UX</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             </ul>
           </div>
         </div>
@@ -205,10 +210,10 @@
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
             <ul class="cases__list">
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Визитные карточки</h3><span class="case-item__cat">Полиграфия</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Рекламный буклет</h3><span class="case-item__cat">Брошюра</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Афиша мероприятия</h3><span class="case-item__cat">Постер</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
-              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Рекламный флаер</h3><span class="case-item__cat">Флаер</span></div><button class="btn btn--ghost case-item__btn">Подробнее</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Визитные карточки</h3><span class="case-item__cat">Полиграфия</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Рекламный буклет</h3><span class="case-item__cat">Брошюра</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Афиша мероприятия</h3><span class="case-item__cat">Постер</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Рекламный флаер</h3><span class="case-item__cat">Флаер</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
             </ul>
           </div>
         </div>
@@ -228,23 +233,24 @@
   <!-- ══════════════════════════════════════
        CONTACT FORM
   ═══════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════
+       CONTACT
+  ═══════════════════════════════════════ -->
   <section class="contact" id="contact">
-    <div class="col">
 
-      <div class="cases__header">
-        <img
-          class="cases__emoji"
-          src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
-          alt="" aria-hidden="true" width="40" height="40"
-        />
-        <h2 class="section-title">Заявка на разработку</h2>
+    <div class="contact__inner">
+      <div class="contact__head">
+        <div class="contact__head-title-row">
+          <img class="contact__emoji"
+            src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
+            alt="" aria-hidden="true" />
+          <h2 class="contact__title">Заявка на разработку</h2>
+        </div>
       </div>
 
       <form class="cform" id="contactForm" novalidate>
 
-        <!-- Тип дизайна -->
         <fieldset class="cform__group">
-          <legend class="cform__legend">Что нужно сделать</legend>
           <div class="cform__checks">
             <label class="cform__check"><input type="checkbox" name="type" value="web" /><span>Веб-сайт</span></label>
             <label class="cform__check"><input type="checkbox" name="type" value="ad" /><span>Реклама</span></label>
@@ -255,46 +261,11 @@
           </div>
         </fieldset>
 
-        <!-- Бюджет -->
         <div class="cform__group">
-          <label class="cform__label" for="budget">Примерный бюджет</label>
-          <div class="cform__select-wrap">
-            <select class="cform__select" id="budget" name="budget">
-              <option value="" disabled selected>Выберите диапазон</option>
-              <option value="under10">до 10 000 ₽</option>
-              <option value="10-30">10 000 — 30 000 ₽</option>
-              <option value="30-80">30 000 — 80 000 ₽</option>
-              <option value="80-200">80 000 — 200 000 ₽</option>
-              <option value="over200">от 200 000 ₽</option>
-              <option value="discuss">Обсудим</option>
-            </select>
-            <svg class="cform__select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <input class="cform__input" type="text" id="name" name="name" placeholder="Что разрабатываем / что нужно сделать" autocomplete="name" />
         </div>
 
-        <!-- Пожелания -->
-        <div class="cform__group">
-          <label class="cform__label" for="comment">Пожелания и детали</label>
-          <textarea class="cform__textarea" id="comment" name="comment" rows="4" placeholder="Опишите задачу, референсы, сроки…"></textarea>
-        </div>
-
-        <!-- Контакты -->
-        <div class="cform__row">
-          <div class="cform__group">
-            <label class="cform__label" for="name">Имя</label>
-            <input class="cform__input" type="text" id="name" name="name" placeholder="Ваше имя" autocomplete="name" />
-          </div>
-          <div class="cform__group">
-            <label class="cform__label" for="contact">Telegram / WhatsApp / email</label>
-            <input class="cform__input" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
-          </div>
-        </div>
-
-        <!-- Как связаться -->
         <fieldset class="cform__group">
-          <legend class="cform__legend">Предпочтительный способ связи</legend>
           <div class="cform__checks">
             <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
             <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
@@ -303,12 +274,23 @@
           </div>
         </fieldset>
 
+        <div class="cform__group">
+          <input class="cform__input" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
+        </div>
+
+        <div class="cform__group">
+          <textarea class="cform__textarea" id="comment" name="comment" rows="3" placeholder="Пожелания, референсы, сроки…"></textarea>
+        </div>
+
         <button type="submit" class="btn btn--primary cform__submit">
+          <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/bdbe9e1d0d06182689bebe0c47a75113961299f2/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" style="filter:brightness(0) invert(1); flex-shrink:0" />
           Отправить заявку
+          <span class="btn__shimmer"></span>
         </button>
 
       </form>
     </div>
+
   </section>
 
   <script src="app.js"></script>

@@ -47,9 +47,46 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   function jumpTo(idx) {
     track.style.transition = 'none';
     track.style.transform = `translateX(${-targetX(idx)}px)`;
+    /* Устанавливаем правильные стороны для всех слайдов */
+    allSlides.forEach((s, i) => {
+      s.style.transition = '';
+      if (i === idx) {
+        /* Активный — показываем контент (0°) */
+        s.style.transform = 'scale(1) rotateY(0deg)';
+      } else {
+        /* Пассивные — показываем preview (180°) */
+        s.style.transform = 'scale(0.85) rotateY(180deg)';
+      }
+    });
   }
+  
   function slideTo(idx) {
-    track.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.2,1)';
+    const direction = idx > curIdx ? 1 : -1;
+    
+    /* Уходящий АКТИВНЫЙ слайд: с 0° (content) к 180° (preview) */
+    if (allSlides[curIdx]) {
+      const outSlide = allSlides[curIdx];
+      outSlide.style.transition = 'transform 1.14s cubic-bezier(0.4,0,0.2,1)';
+      /* Всегда к 180° (по часовой) */
+      outSlide.style.transform = `scale(0.85) rotateY(180deg)`;
+    }
+    
+    /* Входящий слайд: с 180° (preview) к 0° (content) */
+    if (allSlides[idx]) {
+      const inSlide = allSlides[idx];
+      inSlide.style.transition = 'none';
+      inSlide.style.transform = `scale(0.85) rotateY(180deg)`;
+      
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          inSlide.style.transition = 'transform 1.14s cubic-bezier(0.4,0,0.2,1)';
+          /* К 0° через 360° (полный круг по часовой) */
+          inSlide.style.transform = `scale(1) rotateY(360deg)`;
+        });
+      });
+    }
+    
+    track.style.transition = 'transform 1.14s cubic-bezier(0.4,0,0.2,1)';
     track.style.transform = `translateX(${-targetX(idx)}px)`;
   }
 
@@ -75,7 +112,9 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   function setActive(idx, doExpand = false) {
     /* collapse предыдущего */
     const prev = allSlides.find(s => s.classList.contains('is-active'));
-    if (prev && prev !== allSlides[idx]) collapse(prev);
+    if (prev && prev !== allSlides[idx]) {
+      collapse(prev);
+    }
 
     allSlides.forEach(s => s.classList.remove('is-active'));
     allSlides[idx].classList.add('is-active');
@@ -92,7 +131,14 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
 
   track.addEventListener('transitionend', e => {
     if (e.propertyName !== 'transform') return;
+    if (e.target !== track) return; // игнорируем события от слайдов
+    
     animating = false;
+    
+    /* Убираем transition у всех слайдов, transform оставляем */
+    allSlides.forEach(s => {
+      s.style.transition = '';
+    });
 
     /* Запускаем expand на слайде который ждал */
     if (pendingExpand) {
