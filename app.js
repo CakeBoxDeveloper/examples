@@ -47,47 +47,11 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   function jumpTo(idx) {
     track.style.transition = 'none';
     track.style.transform = `translateX(${-targetX(idx)}px)`;
-    /* Устанавливаем правильные стороны для всех слайдов */
-    allSlides.forEach((s, i) => {
-      s.style.transition = '';
-      if (i === idx) {
-        /* Активный — 0° (content компенсирует = видно content) */
-        s.style.transform = 'scale(1) rotateY(0deg)';
-        s.classList.remove('is-flipped');
-      } else {
-        /* Пассивные — 180° (preview компенсирует -180° = видно preview) */
-        s.style.transform = 'scale(0.85) rotateY(180deg)';
-        s.classList.add('is-flipped');
-      }
-    });
+    allSlides.forEach(s => s.style.transition = '');
   }
   
   function slideTo(idx) {
-    /* Уходящий АКТИВНЫЙ слайд: с 0° к 180° */
-    if (allSlides[curIdx]) {
-      const outSlide = allSlides[curIdx];
-      outSlide.style.transition = 'transform 3.42s cubic-bezier(0.4,0,0.2,1)'; // было 1.14s
-      outSlide.style.transform = `scale(0.85) rotateY(180deg)`;
-      setTimeout(() => outSlide.classList.add('is-flipped'), 1710); // половина анимации (3420/2)
-    }
-    
-    /* Входящий слайд: с 180° к 360° (=0°) */
-    if (allSlides[idx]) {
-      const inSlide = allSlides[idx];
-      inSlide.style.transition = 'none';
-      inSlide.style.transform = `scale(0.85) rotateY(180deg)`;
-      inSlide.classList.add('is-flipped');
-      
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          inSlide.style.transition = 'transform 3.42s cubic-bezier(0.4,0,0.2,1)'; // было 1.14s
-          inSlide.style.transform = `scale(1) rotateY(360deg)`;
-          setTimeout(() => inSlide.classList.remove('is-flipped'), 1710); // половина анимации
-        });
-      });
-    }
-    
-    track.style.transition = 'transform 3.42s cubic-bezier(0.4,0,0.2,1)'; // было 1.14s
+    track.style.transition = 'transform 0.6s cubic-bezier(0.4,0,0.2,1)';
     track.style.transform = `translateX(${-targetX(idx)}px)`;
   }
 
@@ -132,16 +96,10 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
 
   track.addEventListener('transitionend', e => {
     if (e.propertyName !== 'transform') return;
-    if (e.target !== track) return; // игнорируем события от слайдов
+    if (e.target !== track) return;
     
     animating = false;
-    
-    /* Убираем transition у всех слайдов, transform оставляем */
-    allSlides.forEach(s => {
-      s.style.transition = '';
-    });
 
-    /* Запускаем expand на слайде который ждал */
     if (pendingExpand) {
       expand(pendingExpand);
       pendingExpand = null;
@@ -213,6 +171,14 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   requestAnimationFrame(() => {
     jumpTo(curIdx);
     setActive(curIdx, true);
+    
+    /* Применяем ленту для карточек "в разработке" */
+    document.querySelectorAll('.card__wip').forEach(wipCard => {
+      const imgWrap = wipCard.closest('.card').querySelector('.card__img-wrap');
+      if (imgWrap) {
+        imgWrap.classList.add('tape-pattern-1');
+      }
+    });
   });
 })();
 

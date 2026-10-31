@@ -169,15 +169,14 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--accent);
-  border-top: 1px solid var(--border);
+  background: var(--accent); /* СИНИЙ ФОН */
+  color: #1a3a6b; /* ТЕМНО-СИНИЙ ТЕКСТ */
+  border: none;
   cursor: pointer;
   transition: background var(--ease);
-  background: transparent;
-  border-left: none; border-right: none; border-bottom: none;
   width: 100%;
 }
-.card__cta:hover { background: var(--accent-glow); }
+.card__cta:hover { background: #3a70e0; }
 
 /* ── WIP плашка — на всю ширину снизу, как хедер ── */
 .card__wip {
@@ -247,14 +246,14 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   to   { background-position: 28.28px 0; }
 } */
 
-/* Аварийная лента поверх ВИДИМОЙ СЕРЕДИНЫ карточки (без кнопок) */
-.card__img-wrap::before,
-.card__img-wrap::after {
+/* Аварийная лента - зигзаг (3-4 линии) */
+.card__img-wrap.tape-pattern-1::before,
+.card__img-wrap.tape-pattern-1::after {
   content: '';
   position: absolute;
-  left: -100%;
-  width: 300%;
-  height: 14px;
+  left: -50%;
+  width: 200%;
+  height: 25px;
   background: repeating-linear-gradient(
     45deg,
     #f0c000 0px,
@@ -266,14 +265,14 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   pointer-events: none;
 }
 
-.card:has(.card__wip) .card__img-wrap::before {
-  top: 30%;
+.card__img-wrap.tape-pattern-1::before {
+  top: 20%;
   transform: rotate(-12deg);
 }
 
-.card:has(.card__wip) .card__img-wrap::after {
-  top: 65%;
-  transform: rotate(-12deg);
+.card__img-wrap.tape-pattern-1::after {
+  bottom: 20%;
+  transform: rotate(12deg);
 }
 
 .card:has(.card__wip):hover { box-shadow: inset 0 0 0 1px var(--border); }
@@ -363,13 +362,13 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 
 .card--mse .card__cta {
   border: none;
-  color: var(--accent); /* СИНЯЯ кнопка */
-  background: transparent;
+  background: var(--accent); /* СИНИЙ ФОН как плашка */
+  color: #1a3a6b; /* ТЕМНО-СИНИЙ ТЕКСТ */
 }
 
 .card--mse .card__cta:hover {
-  background: var(--accent-glow);
-  color: var(--accent);
+  background: #3a70e0;
+  color: #1a3a6b;
 }
 
 .card__img-wrap {
@@ -379,8 +378,13 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   min-height: 0;
   position: relative; /* для позиционирования ленты */
 }
-.card__img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
-.card:hover .card__img-wrap img { transform: scale(1.04); }
+.card__img-wrap img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+  transition: none; /* УБРАЛ transition чтобы не ломать анимацию */
+}
+/* УБРАЛ hover transform */
 
 /* ═══════════════════════
    HERO
@@ -467,29 +471,20 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 }
 
 .cases__disclaimer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  width: var(--ck-slide-w);
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 12px 18px;
-  margin-bottom: 24px;
+  padding: 18px 24px;
+  margin-bottom: 32px;
   text-align: center;
-  max-width: 220px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.55;
 }
-.cases__disclaimer span {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text);
-  line-height: 1.4;
-}
-.cases__disclaimer-note {
-  font-size: 0.65rem !important;
-  font-weight: 400 !important;
-  color: var(--text-muted) !important;
-  margin-top: 4px;
+.cases__disclaimer p {
+  margin: 0;
 }
 
 .cases__header { display: flex; align-items: center; gap: 12px; margin-bottom: 36px; padding-inline: var(--pg); }
@@ -676,22 +671,21 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   width: var(--ck-slide-w);
   height: 420px;
   border-radius: 14px;
-  overflow: visible;
-  background: transparent;
+  overflow: hidden;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   position: relative;
   cursor: pointer;
-  transition: border-color 0.38s ease, opacity 0.38s ease;
+  transition: border-color 0.38s ease, opacity 0.38s ease, transform 0.6s cubic-bezier(0.4,0,0.2,1);
   opacity: 0.5;
-  transform: scale(0.85) rotateY(0deg);
+  transform: scale(0.85);
   user-select: none;
-  transform-style: preserve-3d;
 }
 .ck-slide.is-active {
   cursor: default;
   border-color: var(--border-accent);
   opacity: 1;
-  overflow: hidden;
+  transform: scale(1);
 }
 .ck-dots { display: none; }
 
@@ -706,26 +700,15 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   padding: 24px;
   background: var(--bg-card);
   pointer-events: none;
-  /* ПРИГВОЖДАЕМ: компенсируем вращение слайда ПОЛНОСТЬЮ */
-  transform: rotateY(180deg);
-  transform-style: flat; /* НЕ preserve-3d - останавливаем каскад */
-  z-index: 1;
-}
-
-/* Контент preview НЕ компенсируем - он уже правильно ориентирован */
-.ck-preview > * {
-  /* УБРАЛИ transform: rotateY(180deg) */
-  transform: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  z-index: 2;
 }
 
 .ck-preview__img {
   width: 140px; 
   height: 140px;
   object-fit: contain;
-}
-
-.ck-preview__icon { 
-  display: none; 
 }
 
 .ck-preview__label {
@@ -740,45 +723,45 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   display: flex; 
   flex-direction: column;
   background: var(--bg-card);
-  /* ПРИГВОЖДАЕМ: НЕТ transform, остаётся на месте */
-  transform: none;
-  transform-style: flat;
-  z-index: 2;
-}
-
-/* Все дети content тоже видны и пригвождены */
-.ck-content * {
-  display: revert !important;
-}
-
-/* Когда слайд повёрнут - меняем z-index */
-.ck-slide.is-flipped .ck-preview {
-  z-index: 3;
-}
-
-.ck-slide.is-flipped .ck-content {
+  opacity: 0;
+  transition: opacity 0.3s ease;
   z-index: 1;
 }
 
-/* Плашка: рисуется слева→направо + overflow hidden обрезает въезжающие элементы */
+/* Активный слайд показывает content */
+.ck-slide.is-active .ck-preview {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ck-slide.is-active .ck-content {
+  opacity: 1;
+  z-index: 2;
+}
+
+/* Плашка: название слева, иконка справа */
 .ck-content__header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
   padding: 14px 20px;
   background: #161a2a;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  overflow: hidden;
-  /* УБРАНА АНИМАЦИЯ */
 }
 
-/* Надпись въезжает слева, иконка справа */
 .ck-content__title {
-  font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
-  /* УБРАНА АНИМАЦИЯ */
+  font-size: 0.95rem; 
+  font-weight: 700; 
+  letter-spacing: -0.01em;
 }
+
 .ck-content__header img {
-  width: 32px; height: 32px; object-fit: contain; flex-shrink: 0;
-  /* УБРАНА АНИМАЦИЯ */
+  width: 32px; 
+  height: 32px; 
+  object-fit: contain; 
+  flex-shrink: 0;
 }
 
 /* ── Список — каскадное появление после плашки (+150ms) ── */
@@ -791,19 +774,51 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 .cases__list::-webkit-scrollbar { display: none; }
 
 .case-item {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 16px 20px;
+  display: flex; 
+  align-items: stretch; 
+  justify-content: space-between;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  /* УБРАНА АНИМАЦИЯ - всегда видим */
-  opacity: 1;
-  transform: none;
   transition: background var(--ease);
+  min-height: 64px;
 }
 .case-item:first-child { border-top: none; }
 .case-item:last-child  { border-bottom: none; }
 .case-item:hover { background: rgba(77,140,255,0.04); }
 .case-item:hover .case-item__title { color: var(--accent); }
+
+.case-item__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.case-item__title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: color var(--ease);
+  line-height: 1.2;
+}
+
+.case-item__cat {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.case-item__btn {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  padding: 8px 12px;
+  align-self: center;
+}
 
 /* Fade сверху/снизу */
 .cases__fade-top,
@@ -811,7 +826,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   position: absolute; left:0; right:0; height:56px;
   pointer-events: none; z-index:3; transition: opacity 0.25s ease;
 }
-.cases__fade-top { top:57px; background: linear-gradient(to bottom, #161a2a, transparent); opacity:0; }
+.cases__fade-top { top:57px; background: linear-gradient(to bottom, #161a2a 0%, transparent 100%); opacity:0; }
 .cases__fade-bot { bottom:0; background: linear-gradient(to top, var(--bg-card), transparent); opacity:1; }
 
 .ck-dots { display: none; }
@@ -867,15 +882,15 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
    CONTACT
 ═══════════════════════ */
 .contact {
-  height: 100svh;
+  min-height: 100svh;
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: auto;
   position: relative;
   z-index: 10;
   background: var(--bg);
+  padding-block: 48px;
 }
 
 .contact__inner {
@@ -891,17 +906,24 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 
 .contact__head {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.contact__head-title-row {
-  display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
-.contact__emoji { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
-.contact__title { font-size: clamp(1.3rem, 3.5vw, 1.9rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.15; }
-.contact__sub   { font-size: 0.8rem; color: var(--text-muted); }
+
+.contact__title { 
+  font-size: clamp(1.3rem, 3.5vw, 1.9rem); 
+  font-weight: 700; 
+  letter-spacing: -0.03em; 
+  line-height: 1.15; 
+}
+
+.contact__emoji { 
+  width: 36px; 
+  height: 36px; 
+  object-fit: contain; 
+  flex-shrink: 0; 
+}
 
 .cform {
   display: flex; flex-direction: column; gap: 16px;
@@ -1024,4 +1046,47 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 @keyframes shimmer {
   0%   { left: -60%; }
   100% { left: 160%; }
+}
+
+
+
+
+/* ═══════════════════════
+   FORM ROW LAYOUT
+═══════════════════════ */
+.cform__group--row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cform__input--half {
+  grid-column: 1;
+}
+
+.cform__messenger-btns {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.cform__messenger-btns .cform__check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .cform__group--row {
+    grid-template-columns: 1fr;
+  }
+  
+  .cform__input--half {
+    grid-column: 1;
+  }
+  
+  .cform__messenger-btns {
+    grid-column: 1;
+  }
 }

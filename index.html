@@ -119,9 +119,7 @@
   <section class="cases" id="cases">
     <!-- Дисклеймер -->
     <div class="cases__disclaimer">
-      <span>Работы из разных сфер:</span>
-      <span>веб · графика · 3D · полиграфия</span>
-      <span class="cases__disclaimer-note">часть проектов в процессе</span>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
     </div>
 
     <!-- Карусель — горизонтальная лента -->
@@ -142,48 +140,12 @@
             <div class="cases__fade-top"></div>
             <div class="cases__fade-bot"></div>
             <ul class="cases__list">
-              <li class="case-item">
-  <div class="case-item__meta">
-    <h3 class="case-item__title">Корпоративный сайт</h3>
-    <span class="case-item__cat">Веб-сайт</span>
-    <button class="btn btn--nda case-item__btn">NDA</button>
-  </div>
-</li>
-<li class="case-item">
-  <div class="case-item__meta">
-    <h3 class="case-item__title">Интернет-магазин</h3>
-    <span class="case-item__cat">E-commerce</span>
-    <button class="btn btn--view case-item__btn">СМОТРЕТЬ</button>
-  </div>
-</li>
-<li class="case-item">
-  <div class="case-item__meta">
-    <h3 class="case-item__title">Лендинг для услуг</h3>
-    <span class="case-item__cat">Лендинг</span>
-    <button class="btn btn--view case-item__btn">СМОТРЕТЬ</button>
-  </div>
-</li>
-<li class="case-item">
-  <div class="case-item__meta">
-    <h3 class="case-item__title">Telegram-бот</h3>
-    <span class="case-item__cat">Веб-приложение</span>
-    <button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button>
-  </div>
-</li>
-<li class="case-item">
-  <div class="case-item__meta">
-    <h3 class="case-item__title">Портфолио-сайт</h3>
-    <span class="case-item__cat">Сайт-визитка</span>
-    <button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button>
-  </div>
-</li>
-<li class="case-item">
-  <div class="case-item__meta">
-    <h3 class="case-item__title">Дашборд аналитики</h3>
-    <span class="case-item__cat">Веб-приложение</span>
-    <button class="btn btn--nda case-item__btn">NDA</button>
-  </div>
-</li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Корпоративный сайт</h3><span class="case-item__cat">Веб-сайт</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Интернет-магазин</h3><span class="case-item__cat">E-commerce</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Лендинг для услуг</h3><span class="case-item__cat">Лендинг</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Telegram-бот</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Портфолио-сайт</h3><span class="case-item__cat">Сайт-визитка</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+              <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Дашборд аналитики</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             </ul>
           </div>
         </div>
@@ -279,12 +241,10 @@
 
     <div class="contact__inner">
       <div class="contact__head">
-        <div class="contact__head-title-row">
-          <img class="contact__emoji"
-            src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
-            alt="" aria-hidden="true" />
-          <h2 class="contact__title">Заявка на разработку</h2>
-        </div>
+        <h2 class="contact__title">Заявка на разработку</h2>
+        <img class="contact__emoji"
+          src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
+          alt="" aria-hidden="true" />
       </div>
 
       <form class="cform" id="contactForm" novalidate>
@@ -304,17 +264,14 @@
           <input class="cform__input" type="text" id="name" name="name" placeholder="Что разрабатываем / что нужно сделать" autocomplete="name" />
         </div>
 
-        <fieldset class="cform__group">
-          <div class="cform__checks">
+        <div class="cform__group cform__group--row">
+          <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
+          
+          <div class="cform__messenger-btns">
             <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
             <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
             <label class="cform__check"><input type="radio" name="channel" value="email" /><span>Email</span></label>
-            <label class="cform__check"><input type="radio" name="channel" value="call" /><span>Звонок</span></label>
           </div>
-        </fieldset>
-
-        <div class="cform__group">
-          <input class="cform__input" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
         </div>
 
         <div class="cform__group">
