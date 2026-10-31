@@ -51,42 +51,43 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
     allSlides.forEach((s, i) => {
       s.style.transition = '';
       if (i === idx) {
-        /* Активный — показываем контент (0°) */
+        /* Активный — 0° (content компенсирует = видно content) */
         s.style.transform = 'scale(1) rotateY(0deg)';
+        s.classList.remove('is-flipped');
       } else {
-        /* Пассивные — показываем preview (180°) */
+        /* Пассивные — 180° (preview компенсирует -180° = видно preview) */
         s.style.transform = 'scale(0.85) rotateY(180deg)';
+        s.classList.add('is-flipped');
       }
     });
   }
   
   function slideTo(idx) {
-    const direction = idx > curIdx ? 1 : -1;
-    
-    /* Уходящий АКТИВНЫЙ слайд: с 0° (content) к 180° (preview) */
+    /* Уходящий АКТИВНЫЙ слайд: с 0° к 180° */
     if (allSlides[curIdx]) {
       const outSlide = allSlides[curIdx];
-      outSlide.style.transition = 'transform 1.14s cubic-bezier(0.4,0,0.2,1)';
-      /* Всегда к 180° (по часовой) */
+      outSlide.style.transition = 'transform 3.42s cubic-bezier(0.4,0,0.2,1)'; // было 1.14s
       outSlide.style.transform = `scale(0.85) rotateY(180deg)`;
+      setTimeout(() => outSlide.classList.add('is-flipped'), 1710); // половина анимации (3420/2)
     }
     
-    /* Входящий слайд: с 180° (preview) к 0° (content) */
+    /* Входящий слайд: с 180° к 360° (=0°) */
     if (allSlides[idx]) {
       const inSlide = allSlides[idx];
       inSlide.style.transition = 'none';
       inSlide.style.transform = `scale(0.85) rotateY(180deg)`;
+      inSlide.classList.add('is-flipped');
       
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          inSlide.style.transition = 'transform 1.14s cubic-bezier(0.4,0,0.2,1)';
-          /* К 0° через 360° (полный круг по часовой) */
+          inSlide.style.transition = 'transform 3.42s cubic-bezier(0.4,0,0.2,1)'; // было 1.14s
           inSlide.style.transform = `scale(1) rotateY(360deg)`;
+          setTimeout(() => inSlide.classList.remove('is-flipped'), 1710); // половина анимации
         });
       });
     }
     
-    track.style.transition = 'transform 1.14s cubic-bezier(0.4,0,0.2,1)';
+    track.style.transition = 'transform 3.42s cubic-bezier(0.4,0,0.2,1)'; // было 1.14s
     track.style.transform = `translateX(${-targetX(idx)}px)`;
   }
 

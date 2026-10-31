@@ -185,7 +185,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   height: 44px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 .card__wip-label {
   flex: 1;
@@ -199,13 +200,15 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   text-transform: uppercase;
   color: #888;
   background: #1e1e1e;
+  z-index: 2;
+  position: relative;
 }
 
 /* Ping-кружок */
 .card__wip-ping {
   position: relative;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   flex-shrink: 0;
 }
 .card__wip-ping::before,
@@ -225,8 +228,8 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   100% { transform: scale(2.4); opacity: 0; }
 }
 
-/* Лоадбар — 20% уже (36% от общей высоты вместо 50%) */
-.card__wip-bar {
+/* Лоадбар — ЗАКОММЕНТИРОВАН */
+/* .card__wip-bar {
   height: 40%;
   background: repeating-linear-gradient(
     45deg,
@@ -242,6 +245,35 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 @keyframes wip-scroll {
   from { background-position: 0 0; }
   to   { background-position: 28.28px 0; }
+} */
+
+/* Аварийная лента поверх ВИДИМОЙ СЕРЕДИНЫ карточки (без кнопок) */
+.card__img-wrap::before,
+.card__img-wrap::after {
+  content: '';
+  position: absolute;
+  left: -100%;
+  width: 300%;
+  height: 14px;
+  background: repeating-linear-gradient(
+    45deg,
+    #f0c000 0px,
+    #f0c000 15px,
+    #222 15px,
+    #222 30px
+  );
+  z-index: 10;
+  pointer-events: none;
+}
+
+.card:has(.card__wip) .card__img-wrap::before {
+  top: 30%;
+  transform: rotate(-12deg);
+}
+
+.card:has(.card__wip) .card__img-wrap::after {
+  top: 65%;
+  transform: rotate(-12deg);
 }
 
 .card:has(.card__wip):hover { box-shadow: inset 0 0 0 1px var(--border); }
@@ -297,12 +329,47 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   align-items: center;
   justify-content: center;
   font-family: 'AnaloguePro', var(--font);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 1.1rem; /* увеличил с 0.85rem */
+  font-weight: 800; /* увеличил с 700 */
   letter-spacing: 0.01em;
   text-transform: none;
   color: #1a3a6b;
   width: 100%;
+}
+
+/* Чёрная карточка MSE */
+.card--mse {
+  background: #000;
+}
+
+.card--mse .card__header {
+  background: var(--accent); /* СИНЯЯ как везде */
+  color: #1a3a6b;
+  border-bottom: none;
+}
+
+.card--mse .card__img-wrap {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.card--mse .card__img-wrap img {
+  filter: brightness(0) invert(1); /* делает SVG белым */
+  object-fit: contain;
+}
+
+.card--mse .card__cta {
+  border: none;
+  color: var(--accent); /* СИНЯЯ кнопка */
+  background: transparent;
+}
+
+.card--mse .card__cta:hover {
+  background: var(--accent-glow);
+  color: var(--accent);
 }
 
 .card__img-wrap {
@@ -310,6 +377,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   overflow: hidden;
   background: var(--bg-alt);
   min-height: 0;
+  position: relative; /* для позиционирования ленты */
 }
 .card__img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .card:hover .card__img-wrap img { transform: scale(1.04); }
@@ -498,10 +566,55 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 }
 
 /* Разделители */
-.case-item__meta { display: flex; flex-direction: column; gap: 3px; }
-.case-item__title { font-size: 1rem; font-weight: 700; transition: color var(--ease); }
-.case-item__cat   { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
-.case-item__btn   { flex-shrink: 0; font-size: 0.7rem; padding: 6px 14px; }
+.case-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px; /* уменьшил padding так как всё в одну строку */
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  opacity: 1;
+  transform: none;
+  transition: background var(--ease);
+}
+.case-item:first-child { border-top: none; }
+.case-item:last-child { border-bottom: none; }
+.case-item:hover { background: rgba(77,140,255,0.04); }
+.case-item:hover .case-item__title { color: var(--accent); }
+
+.case-item__meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  width: 100%;
+}
+
+.case-item__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: color var(--ease);
+  flex: 0 0 auto; /* не растягивается */
+  white-space: nowrap; /* не переносится */
+}
+
+.case-item__cat {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex: 1 1 auto; /* занимает свободное место */
+  text-align: right; /* выравнивание вправо */
+  margin-right: 8px;
+}
+
+.case-item__btn {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  padding: 5px 12px;
+  margin-left: auto; /* прижимается к правому краю */
+}
 
 /* ── GRADIENT SCROLL BUTTON ── */
 .btn--gradient {
@@ -592,10 +705,17 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   gap: 14px;
   padding: 24px;
   background: var(--bg-card);
-  z-index: 1;
   pointer-events: none;
-  backface-visibility: hidden;
-  transform: rotateY(180deg); /* preview на обратной стороне */
+  /* ПРИГВОЖДАЕМ: компенсируем вращение слайда ПОЛНОСТЬЮ */
+  transform: rotateY(180deg);
+  transform-style: flat; /* НЕ preserve-3d - останавливаем каскад */
+  z-index: 1;
+}
+
+/* Контент preview НЕ компенсируем - он уже правильно ориентирован */
+.ck-preview > * {
+  /* УБРАЛИ transform: rotateY(180deg) */
+  transform: none;
 }
 
 .ck-preview__img {
@@ -619,15 +739,25 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   position: absolute; inset: 0;
   display: flex; 
   flex-direction: column;
-  backface-visibility: hidden;
-  /* НЕТ transform — content на "передней" стороне слайда */
-  z-index: 2;
   background: var(--bg-card);
+  /* ПРИГВОЖДАЕМ: НЕТ transform, остаётся на месте */
+  transform: none;
+  transform-style: flat;
+  z-index: 2;
 }
 
-/* Возвращаем видимость контента */
+/* Все дети content тоже видны и пригвождены */
 .ck-content * {
   display: revert !important;
+}
+
+/* Когда слайд повёрнут - меняем z-index */
+.ck-slide.is-flipped .ck-preview {
+  z-index: 3;
+}
+
+.ck-slide.is-flipped .ck-content {
+  z-index: 1;
 }
 
 /* Плашка: рисуется слева→направо + overflow hidden обрезает въезжающие элементы */
@@ -637,28 +767,18 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   background: #161a2a;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  clip-path: inset(0 100% 0 0);
   overflow: hidden;
-  transition: clip-path 0.38s cubic-bezier(0.4,0,0.2,1);
-}
-.ck-slide--expanded .ck-content__header {
-  clip-path: inset(0 0% 0 0);
+  /* УБРАНА АНИМАЦИЯ */
 }
 
 /* Надпись въезжает слева, иконка справа */
 .ck-content__title {
   font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
-  transform: translateX(-100%);
-  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) 0.1s;
+  /* УБРАНА АНИМАЦИЯ */
 }
 .ck-content__header img {
   width: 32px; height: 32px; object-fit: contain; flex-shrink: 0;
-  transform: translateX(100%);
-  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) 0.1s;
-}
-.ck-slide--expanded .ck-content__title,
-.ck-slide--expanded .ck-content__header img {
-  transform: translateX(0);
+  /* УБРАНА АНИМАЦИЯ */
 }
 
 /* ── Список — каскадное появление после плашки (+150ms) ── */
@@ -675,22 +795,15 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   gap: 16px; padding: 16px 20px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  opacity: 0;
-  transform: translateY(6px);
-  transition: background var(--ease), opacity 0.24s ease, transform 0.24s ease;
+  /* УБРАНА АНИМАЦИЯ - всегда видим */
+  opacity: 1;
+  transform: none;
+  transition: background var(--ease);
 }
 .case-item:first-child { border-top: none; }
 .case-item:last-child  { border-bottom: none; }
 .case-item:hover { background: rgba(77,140,255,0.04); }
 .case-item:hover .case-item__title { color: var(--accent); }
-
-/* Каскад: 150ms (плашка) + задержка по строке */
-.ck-slide--expanded .case-item:nth-child(1) { opacity:1; transform:none; transition-delay: 0.15s; }
-.ck-slide--expanded .case-item:nth-child(2) { opacity:1; transform:none; transition-delay: 0.22s; }
-.ck-slide--expanded .case-item:nth-child(3) { opacity:1; transform:none; transition-delay: 0.29s; }
-.ck-slide--expanded .case-item:nth-child(4) { opacity:1; transform:none; transition-delay: 0.36s; }
-.ck-slide--expanded .case-item:nth-child(5) { opacity:1; transform:none; transition-delay: 0.43s; }
-.ck-slide--expanded .case-item:nth-child(6) { opacity:1; transform:none; transition-delay: 0.50s; }
 
 /* Fade сверху/снизу */
 .cases__fade-top,
