@@ -9,10 +9,7 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
 });
 
 /* ═══════════════════════════════════════
-   CASES CAROUSEL — infinite loop без рывков
-   6 повторений × N слайдов. Стартуем в центральной группе.
-   Перебалансировка происходит пока трек стоит — незаметно.
-   Анимация expand запускается после того как трек доехал.
+   CASES CAROUSEL
 ═══════════════════════════════════════ */
 (function () {
   const track = document.getElementById('casesTrack');
@@ -22,6 +19,7 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   const N = origSlides.length;
   if (N < 2) return;
 
+  /* ── Бесконечная лента: 6 копий ── */
   const REPS = 6;
   const MID  = Math.floor(REPS / 2);
   track.innerHTML = '';
@@ -34,104 +32,186 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   }
 
   const allSlides = Array.from(track.querySelectorAll('.ck-slide'));
-  let curIdx = MID * N;
-  let pendingExpand = null; // слайд ожидающий expand после transitionend
+  let curIdx  = MID * N;
+  let busy    = false;        // блокируем повторные goTo во время анимации
+  let timers  = [];           // все активные таймауты — чистим при rebalance
 
-  function slideW()  { return allSlides[0].offsetWidth; }
-  function gapW()    { return parseFloat(getComputedStyle(track).gap) || 20; }
+  const T = 400; // ms — единый тайминг
+
+  /* ── Геометрия ── */
+  function slideW() { return allSlides[0].offsetWidth; }
+  function gapW()   { return parseFloat(getComputedStyle(track).gap) || 20; }
   function targetX(idx) {
     const cw = track.parentElement.offsetWidth;
     return idx * (slideW() + gapW()) - (cw - slideW()) / 2;
   }
 
+  /* ── Слои: мгновенное состояние ── */
+  function layerSet(slide, showContent) {
+    const pre = slide.querySelector('.ck-preview');
+    const con = slide.querySelector('.ck-content');
+    if (!pre || !con) return;
+    pre.style.transition = 'none';
+    con.style.transition = 'none';
+    if (showContent) {
+      pre.style.opacity = '0'; pre.style.filter = 'blur(8px)';
+      con.style.opacity = '1'; con.style.filter = 'blur(0px)';
+    } else {
+      pre.style.opacity = '1'; pre.style.filter = 'blur(0px)';
+      con.style.opacity = '0'; con.style.filter = 'blur(8px)';
+    }
+  }
+
+  /* ── Слои: анимированный переход ── */
+  function layerAnim(slide, showContent, delayMs = 0) {
+    const pre = slide.querySelector('.ck-preview');
+    const con = slide.querySelector('.ck-content');
+    if (!pre || !con) return;
+    const d = delayMs / 1000;
+    const tr = `opacity ${T/1000}s cubic-bezier(0.4,0,0.2,1) ${d}s, filter ${T/1000}s cubic-bezier(0.4,0,0.2,1) ${d}s`;
+    pre.style.transition = tr;
+    con.style.transition = tr;
+    if (showContent) {
+      pre.style.opacity = '0'; pre.style.filter = 'blur(8px)';
+      con.style.opacity = '1'; con.style.filter = 'blur(0px)';
+    } else {
+      pre.style.opacity = '1'; pre.style.filter = 'blur(0px)';
+      con.style.opacity = '0'; con.style.filter = 'blur(8px)';
+    }
+  }
+
+  /* ── Позиция трека без анимации ── */
   function jumpTo(idx) {
     track.style.transition = 'none';
-    track.style.transform = `translateX(${-targetX(idx)}px)`;
-    allSlides.forEach(s => s.style.transition = '');
-  }
-  
-  function slideTo(idx) {
-    track.style.transition = 'transform 0.6s cubic-bezier(0.4,0,0.2,1)';
-    track.style.transform = `translateX(${-targetX(idx)}px)`;
+    track.style.transform  = `translateX(${-targetX(idx)}px)`;
   }
 
-  /* Сбросить анимацию предыдущего активного */
-  function collapse(slide) {
-    slide.classList.remove('ck-slide--expanded');
-    slide.querySelectorAll('.case-item').forEach(el => {
-      el.style.transitionDelay = '0s';
+  /* ── Инит: всем слайдам правильное начальное состояние ── */
+  function initAll() {
+    allSlides.forEach((s, i) => {
+      s.style.transition = 'none';
+      s.style.opacity    = i === curIdx ? '1'        : '0.5';
+      s.style.transform  = i === curIdx ? 'scale(1)' : 'scale(0.85)';
+      s.classList.toggle('is-active', i === curIdx);
+      layerSet(s, i === curIdx);
     });
-    setTimeout(() => {
-      slide.querySelectorAll('.case-item').forEach(el => {
-        el.style.transitionDelay = '';
-      });
-    }, 300);
   }
 
-  /* expand — чистый CSS, никакого FLIP */
-  function expand(slide) {
-    slide.classList.add('ck-slide--expanded');
-    initFade(slide);
+  /* ── Главный переход ── */
+  function goTo(idx) {
+    if (idx === curIdx || busy) return;
+    busy = true;
+
+    const outIdx = curIdx;
+    const inIdx  = idx;
+    curIdx = inIdx;
+
+    const outSlide = allSlides[outIdx];
+    const inSlide  = allSlides[inIdx];
+
+    outSlide.classList.remove('is-active');
+    inSlide.classList.add('is-active');
+
+    const outPre = outSlide.querySelector('.ck-preview');
+    const outCon = outSlide.querySelector('.ck-content');
+    const inPre  = inSlide.querySelector('.ck-preview');
+    const inCon  = inSlide.querySelector('.ck-content');
+
+    /* Начальные состояния мгновенно */
+    layerSet(outSlide, true);   // уходящий: контент виден
+    layerSet(inSlide, false);   // входящий: превью видно, чёткое
+
+    const trSlide = `transform ${T/1000}s cubic-bezier(0.4,0,0.2,1), opacity ${T/1000}s cubic-bezier(0.4,0,0.2,1)`;
+    const trLayer = `opacity ${T/1000}s cubic-bezier(0.4,0,0.2,1), filter ${T/1000}s cubic-bezier(0.4,0,0.2,1)`;
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+
+      /* ── Фаза 1: уходящий блюрит контент + входящий едет в центр (превью блюрится одновременно) ── */
+
+      /* Уходящий: контент блюрится */
+      if (outCon) { outCon.style.transition = trLayer; outCon.style.opacity = '0'; outCon.style.filter = 'blur(8px)'; }
+
+      /* Трек едет */
+      track.style.transition = `transform ${T/1000}s cubic-bezier(0.4,0,0.2,1)`;
+      track.style.transform  = `translateX(${-targetX(inIdx)}px)`;
+
+      /* Уходящий скейлится вниз */
+      outSlide.style.transition = trSlide;
+      outSlide.style.transform  = 'scale(0.85)';
+      outSlide.style.opacity    = '0.5';
+
+      /* Входящий скейлится вверх — превью одновременно блюрится и исчезает */
+      inSlide.style.transition = trSlide;
+      inSlide.style.transform  = 'scale(1)';
+      inSlide.style.opacity    = '1';
+      if (inPre) { inPre.style.transition = trLayer; inPre.style.opacity = '0'; inPre.style.filter = 'blur(8px)'; }
+
+      /* ── Фаза 2 (после T): уходящий — превью; входящий — контент из блюра ── */
+      const t1 = setTimeout(() => {
+
+        /* Уходящий: превью появляется */
+        if (outPre) { outPre.style.transition = trLayer; outPre.style.opacity = '1'; outPre.style.filter = 'blur(0px)'; }
+
+        /* Входящий: контент появляется из блюра */
+        if (inCon)  { inCon.style.transition  = trLayer; inCon.style.opacity  = '1'; inCon.style.filter  = 'blur(0px)'; }
+
+        const t2 = setTimeout(() => {
+          busy = false;
+          initFade(inSlide);
+          rebalance();
+        }, T);
+        timers.push(t2);
+      }, T);
+
+      timers.push(t1);
+    }));
   }
 
-  function setActive(idx, doExpand = false) {
-    /* collapse предыдущего */
-    const prev = allSlides.find(s => s.classList.contains('is-active'));
-    if (prev && prev !== allSlides[idx]) {
-      collapse(prev);
-    }
-
-    allSlides.forEach(s => s.classList.remove('is-active'));
-    allSlides[idx].classList.add('is-active');
-    curIdx = idx;
-
-    if (doExpand) {
-      expand(allSlides[idx]);
-    } else {
-      pendingExpand = allSlides[idx];
-    }
-  }
-
-  let animating = false;
-
-  track.addEventListener('transitionend', e => {
-    if (e.propertyName !== 'transform') return;
-    if (e.target !== track) return;
-    
-    animating = false;
-
-    if (pendingExpand) {
-      expand(pendingExpand);
-      pendingExpand = null;
-    }
-
-    rebalance();
-  });
-
+  /* ── Rebalance: незаметный прыжок в центр ── */
   function rebalance() {
-    if (animating) return;
     if (curIdx < N || curIdx >= 2 * N) {
       const realIdx = ((curIdx % N) + N) % N;
       const newIdx  = N + realIdx;
-      /* перед прыжком — переносим expand на новый слайд если нужно */
-      const wasExpanded = allSlides[curIdx].classList.contains('ck-slide--expanded');
-      allSlides[curIdx].classList.remove('is-active', 'ck-slide--expanded');
-      allSlides[newIdx].classList.add('is-active');
-      if (wasExpanded) allSlides[newIdx].classList.add('ck-slide--expanded');
+
+      const from = allSlides[curIdx];
+      const to   = allSlides[newIdx];
+
+      /* Сначала копируем состояние на новый клон */
+      ['ck-preview', 'ck-content'].forEach(cls => {
+        const f = from.querySelector('.' + cls);
+        const t = to.querySelector('.' + cls);
+        if (!f || !t) return;
+        t.style.transition = 'none';
+        t.style.opacity    = f.style.opacity;
+        t.style.filter     = f.style.filter;
+      });
+      to.style.transition = 'none';
+      to.style.transform  = from.style.transform;
+      to.style.opacity    = from.style.opacity;
+
+      from.classList.remove('is-active');
+      to.classList.add('is-active');
       jumpTo(newIdx);
       curIdx = newIdx;
+
+      /* Потом сбрасываем все остальные клоны того же realIdx */
+      allSlides.forEach((s, i) => {
+        if (i === newIdx) return;
+        if (parseInt(s.dataset.realIdx) === realIdx) {
+          s.classList.remove('is-active');
+          s.style.transition = 'none';
+          s.style.transform  = 'scale(0.85)';
+          s.style.opacity    = '0.5';
+          layerSet(s, false);
+        }
+      });
+
+      /* Гарантируем что активный показывает контент */
+      layerSet(to, true);
     }
   }
 
-  function goTo(idx, animated = true) {
-    if (animated) { animating = true; slideTo(idx); } else jumpTo(idx);
-    setActive(idx, !animated);
-  }
-
-  function prev() { goTo(curIdx - 1); }
-  function next() { goTo(curIdx + 1); }
-
-  /* Drag */
+  /* ── Drag ── */
   let dragStartX = null, dragDeltaX = 0, baseTranslate = 0;
 
   track.addEventListener('pointerdown', e => {
@@ -151,39 +231,44 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
     if (dragStartX === null) return;
     dragStartX = null;
     const threshold = slideW() * 0.2;
-    if      (dragDeltaX < -threshold) next();
-    else if (dragDeltaX >  threshold) prev();
-    else goTo(curIdx, true);
+    if      (dragDeltaX < -threshold) goTo(curIdx + 1);
+    else if (dragDeltaX >  threshold) goTo(curIdx - 1);
+    else {
+      track.style.transition = `transform ${T/1000}s cubic-bezier(0.4,0,0.2,1)`;
+      track.style.transform  = `translateX(${-targetX(curIdx)}px)`;
+    }
   });
   track.addEventListener('pointercancel', () => {
-    dragStartX = null; goTo(curIdx, true);
+    dragStartX = null;
+    track.style.transition = `transform ${T/1000}s cubic-bezier(0.4,0,0.2,1)`;
+    track.style.transform  = `translateX(${-targetX(curIdx)}px)`;
   });
 
   allSlides.forEach((slide, i) => {
     slide.addEventListener('click', () => { if (i !== curIdx) goTo(i); });
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft')  prev();
-    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft')  goTo(curIdx - 1);
+    if (e.key === 'ArrowRight') goTo(curIdx + 1);
   });
 
-  /* Инит — expand сразу без ожидания трека */
+  /* ── Инит ── */
   requestAnimationFrame(() => {
     jumpTo(curIdx);
-    setActive(curIdx, true);
-    
-    /* Применяем ленту для карточек "в разработке" */
-    document.querySelectorAll('.card__wip').forEach(wipCard => {
+    initAll();
+    initFade(allSlides[curIdx]);
+
+    document.querySelectorAll('.card__wip').forEach((wipCard, i) => {
       const imgWrap = wipCard.closest('.card').querySelector('.card__img-wrap');
       if (imgWrap) {
-        imgWrap.classList.add('tape-pattern-1');
+        imgWrap.classList.add(i % 2 === 0 ? 'tape-pattern-1' : 'tape-pattern-2');
       }
     });
   });
 })();
 
 /* ═══════════════════════════════════════
-   FADE для cases__list (градиент при скролле)
+   FADE для cases__list
 ═══════════════════════════════════════ */
 function initFade(slideEl) {
   const list    = slideEl?.querySelector('.cases__list');
@@ -226,6 +311,100 @@ window.addEventListener('DOMContentLoaded', () => {
       el.style.transform = 'translateY(0)';
     }));
   });
+});
+
+/* ── Wire canvas ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById('wireCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const target = document.getElementById('wireTarget');
+  const dots   = Array.from(document.querySelectorAll('.hero .wire-dot'));
+
+  function resize() {
+    const hero = canvas.parentElement;
+    canvas.width  = hero.offsetWidth;
+    canvas.height = hero.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function getCenter(el) {
+    const heroRect = canvas.parentElement.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return {
+      x: r.left - heroRect.left + r.width  / 2,
+      y: r.top  - heroRect.top  + r.height / 2,
+    };
+  }
+
+  /* Hex → rgba с alpha */
+  function hexAlpha(hex, a) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!target) { requestAnimationFrame(draw); return; }
+
+    const T = getCenter(target);
+
+    dots.forEach(dot => {
+      const heroRect = canvas.parentElement.getBoundingClientRect();
+      const r = dot.getBoundingClientRect();
+      /* Точка привязки — верх карточки, по центру */
+      const D = {
+        x: r.left - heroRect.left + r.width / 2,
+        y: r.top  - heroRect.top  + r.height / 2,
+      };
+      const color = dot.dataset.wireColor || '#4d8cff';
+
+      const plugH = 20;
+      const plugW = 8;
+
+      /* Низ штекера — откуда начинается провод */
+      const wireStart = { x: D.x, y: D.y + plugH };
+
+      const dx   = T.x - wireStart.x;
+      const sagY = Math.abs(dx) * 0.65 + 100;
+
+      const cx1 = wireStart.x;        // вертикально вниз от штекера
+      const cy1 = wireStart.y + sagY; // далеко вниз
+
+      const cx2 = T.x;                // вертикально над целью
+      const cy2 = T.y - sagY * 0.6;  // далеко вверх от цели
+
+      /* Градиент */
+      const grad = ctx.createLinearGradient(wireStart.x, wireStart.y, T.x, T.y);
+      grad.addColorStop(0,   hexAlpha(color, 0.95));
+      grad.addColorStop(0.5, hexAlpha(color, 0.6));
+      grad.addColorStop(1,   hexAlpha(color, 0.2));
+
+      /* Провод */
+      ctx.beginPath();
+      ctx.moveTo(wireStart.x, wireStart.y);
+      ctx.bezierCurveTo(cx1, cy1, cx2, cy2, T.x, T.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = 4.5;
+      ctx.lineCap     = 'round';
+      ctx.stroke();
+
+      /* Штекер — прямоугольник вертикально вниз от верха карточки */
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(D.x - plugW / 2, D.y, plugW, plugH, 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
 });
 
 /* ── Lottie ── */
