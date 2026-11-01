@@ -1111,12 +1111,12 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   margin-top: 0;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 14px 14px 0 0;
+  border-top: none;
+  border-radius: 0;
   border-bottom: none;
   padding: 20px;
   position: relative;
 }
-
 .cform__group {
   display: flex; flex-direction: column; gap: 8px;
   border: none; padding: 0; margin: 0;
@@ -1202,6 +1202,36 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 }
 
 /* Submit */
+.cform__wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.cform__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--accent);
+  border-radius: 14px 14px 0 0;
+  flex-shrink: 0;
+}
+
+.cform__title {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.contact__emoji {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .cform__submit {
   align-self: flex-start;
   width: 100%;
@@ -1214,38 +1244,6 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   justify-content: center;
   gap: 8px;
   border-radius: 0 0 14px 14px;
-}
-
-/* Волнистый отрыв квитанции */
-.cform__receipt-tear {
-  width: 100%;
-  height: 16px;
-  background: var(--bg-card);
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.cform__receipt-tear::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: -4px;
-  right: -4px;
-  height: 20px;
-  background: var(--bg);
-  /* волнистый верхний край через радиальные градиенты */
-  -webkit-mask-image: radial-gradient(ellipse 8px 8px at 8px 0%, transparent 100%, black 100%),
-    radial-gradient(ellipse 8px 8px at 24px 0%, black 100%, transparent 100%);
-  -webkit-mask-size: 16px 8px;
-  -webkit-mask-repeat: repeat-x;
-  -webkit-mask-position: 0 0;
-  mask-image: radial-gradient(ellipse 8px 8px at 8px 0%, transparent 100%, black 100%),
-    radial-gradient(ellipse 8px 8px at 24px 0%, black 100%, transparent 100%);
-  mask-size: 16px 8px;
-  mask-repeat: repeat-x;
-  mask-position: 0 0;
 }
 
 /* Шиммер */

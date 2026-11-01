@@ -245,14 +245,15 @@
   <section class="contact" id="contact">
 
     <div class="contact__inner">
-      <div class="contact__head">
-        <h2 class="contact__title">Заявка на разработку</h2>
-        <img class="contact__emoji"
-          src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
-          alt="" aria-hidden="true" />
-      </div>
 
-      <form class="cform" id="contactForm" novalidate>
+      <div class="cform__wrap">
+        <div class="cform__header">
+          <h2 class="cform__title">Заявка на разработку</h2>
+          <img class="contact__emoji"
+            src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
+            alt="" aria-hidden="true" />
+        </div>
+        <form class="cform" id="contactForm" novalidate>
 
         <fieldset class="cform__group">
           <div class="cform__checks">
@@ -285,13 +286,13 @@
 
       </form>
 
-      <div class="cform__receipt-tear" aria-hidden="true"></div>
-
       <button type="submit" form="contactForm" class="btn btn--primary cform__submit">
         <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/bdbe9e1d0d06182689bebe0c47a75113961299f2/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" style="filter:brightness(0) invert(1); flex-shrink:0" />
         Отправить заявку
         <span class="btn__shimmer"></span>
       </button>
+
+      </div>
     </div>
 
   </section>
