@@ -39,6 +39,22 @@
   --pg:  20px;
 }
 
+/* ── Светлая тема ── */
+body.theme-light {
+  --bg:          #f0f1f5;
+  --bg-alt:      #e8e9ef;
+  --bg-card:     #dfe1ea;
+
+  --text:        #1a1c26;
+  --text-muted:  #5a6070;
+  --text-dim:    #9098aa;
+
+  --border:        rgba(0, 0, 0, 0.09);
+  --border-accent: rgba(77, 140, 255, 0.4);
+}
+
+body.theme-light .ck-slide.is-active { opacity: 1; }
+
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; overflow-x: clip; }
 body {
@@ -125,6 +141,12 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 .lottie-arrow {
   width: 32px; height: 32px; flex-shrink: 0;
   filter: invert(50%) sepia(80%) saturate(500%) hue-rotate(195deg) brightness(110%);
+}
+body.theme-light .lottie-arrow {
+  filter: invert(30%) sepia(80%) saturate(500%) hue-rotate(195deg) brightness(90%);
+}
+body.theme-light .section-scroll-btn {
+  color: var(--text);
 }
 
 /* ═══════════════════════
@@ -578,7 +600,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 }
 
 @media (max-width: 860px) {
-  .hero { height: auto; min-height: 100svh; padding: 72px var(--pg) 48px; }
+  .hero { height: auto; min-height: 100svh; padding: 72px var(--pg) 80px; }
   .hero__inner { flex-direction: column; gap: 28px; }
   .hero__col { display: none; }
   .hero__center { width: 100%; max-width: 300px; }
@@ -1016,7 +1038,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 
 .ck-dots { display: none; }
 /* ── КНОПКА-ОВЕРЛЕЙ (нижняя граница секции) ── */
-/* Кнопка-оверлей — position absolute внутри своей секции */
+/* Kнопка-оверлей — position absolute внутри своей секции */
 .section-scroll-btn {
   position: absolute;
   bottom: 0;
@@ -1031,7 +1053,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   font: inherit;
   color: var(--text);
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   cursor: pointer;
@@ -1053,14 +1075,41 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 .cases__cta { display: none; }
 .btn--gradient { display: none; }
 
-@media (max-width: 480px) {
-  .case-item__btn { display: none; }
-}
+/* case-item__btn видим на всех размерах */
 @media (max-width: 860px) {
-  :root { --ck-gap: 12px; }
-  .ck-slide { height: 340px; }
-  .ck-preview__img { width: 90px; height: 90px; }
-  .ck-preview__label { font-size: 0.8rem; }
+  /* Карусель — один слайд на весь экран */
+  :root {
+    --ck-gap:     0px;
+    --ck-slide-w: 100vw;
+  }
+  .ck-carousel {
+    padding-block: 0;
+    margin-block: 0;
+    overflow-x: clip;
+    overflow-y: clip;
+  }
+  .ck-slide {
+    height: calc(100svh - 120px);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  .ck-slide.is-active {
+    border-color: var(--border);
+  }
+  .ck-track {
+    touch-action: pan-y;
+  }
+  .ck-preview__img  { width: 110px; height: 110px; }
+  .ck-preview__label { font-size: 0.95rem; }
+
+  /* Contact-стек — нормальная ширина на мобиле */
+  .cstack {
+    width: min(calc(100vw - 40px), 400px);
+  }
+  .cstack__card[data-pos="left"]  { transform: translateX(-60px) translateY(36px) scale(0.88); }
+  .cstack__card[data-pos="right"] { transform: translateX(60px)  translateY(36px) scale(0.88); }
+  .contact { overflow: hidden; }
 }
 
 /* ═══════════════════════
@@ -1299,11 +1348,11 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   .cform__group--row {
     grid-template-columns: 1fr;
   }
-  
+
   .cform__input--half {
     grid-column: 1;
   }
-  
+
   .cform__messenger-btns {
     grid-column: 1;
   }
@@ -1429,18 +1478,18 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   z-index: 5;
   transform: translateX(-120px) translateY(44px) scale(0.827);
   transform-origin: top center;
-  opacity: 0.65;
+  opacity: 1;
   cursor: pointer;
 }
 .cstack__card[data-pos="right"] {
   z-index: 5;
   transform: translateX(120px) translateY(44px) scale(0.827);
   transform-origin: top center;
-  opacity: 0.65;
+  opacity: 1;
   cursor: pointer;
 }
-.cstack__card[data-pos="left"]:hover  { opacity: 0.85; }
-.cstack__card[data-pos="right"]:hover { opacity: 0.85; }
+.cstack__card[data-pos="left"]:hover  { opacity: 1; }
+.cstack__card[data-pos="right"]:hover { opacity: 1; }
 
 /* Жёлтая нижняя плашка доната */
 .cform__submit--yellow {
@@ -1654,3 +1703,44 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 }
 
 /* (3D cylinder shadows removed) */
+
+/* ═══════════════════════
+   КНОПКА ТЕМЫ (временная)
+═══════════════════════ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-accent);
+}
+
+/* ═══════════════════════
+   ОРБИТАЛЬНЫЙ CANVAS (contact)
+═══════════════════════ */
+.orbit-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.contact__inner {
+  position: relative;
+  z-index: 1;
+}

@@ -38,6 +38,11 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
 
   const T = 400; // ms — единый тайминг
 
+  /* Opacity для неактивного слайда — в светлой теме выше */
+  function dimOpacity() {
+    return document.body.classList.contains('theme-light') ? '0.82' : '0.5';
+  }
+
   /* ── Геометрия ── */
   function slideW() { return allSlides[0].offsetWidth; }
   function gapW()   { return parseFloat(getComputedStyle(track).gap) || 20; }
@@ -90,7 +95,7 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   function initAll() {
     allSlides.forEach((s, i) => {
       s.style.transition = 'none';
-      s.style.opacity    = i === curIdx ? '1'        : '0.5';
+      s.style.opacity    = i === curIdx ? '1' : dimOpacity();
       s.style.transform  = i === curIdx ? 'scale(1)' : 'scale(0.85)';
       s.classList.toggle('is-active', i === curIdx);
       layerSet(s, i === curIdx);
@@ -138,7 +143,7 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
       /* Уходящий скейлится вниз */
       outSlide.style.transition = trSlide;
       outSlide.style.transform  = 'scale(0.85)';
-      outSlide.style.opacity    = '0.5';
+      outSlide.style.opacity    = dimOpacity();
 
       /* Входящий скейлится вверх — превью одновременно блюрится и исчезает */
       inSlide.style.transition = trSlide;
@@ -201,7 +206,7 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
           s.classList.remove('is-active');
           s.style.transition = 'none';
           s.style.transform  = 'scale(0.85)';
-          s.style.opacity    = '0.5';
+          s.style.opacity    = dimOpacity();
           layerSet(s, false);
         }
       });
@@ -532,3 +537,243 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 
+
+/* ── Theme toggle ── */
+(function () {
+  const btn  = document.getElementById('themeToggle');
+  const body = document.body;
+  const KEY  = 'portfolio-theme';
+
+  // Иконки: солнце (светлая) и луна (тёмная)
+  const SUN  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const MOON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`;
+
+  function apply(theme) {
+    if (theme === 'light') {
+      body.classList.add('theme-light');
+      btn.innerHTML = MOON;
+      btn.title = 'Тёмная тема';
+    } else {
+      body.classList.remove('theme-light');
+      btn.innerHTML = SUN;
+      btn.title = 'Светлая тема';
+    }
+  }
+
+  const saved = localStorage.getItem(KEY) || 'dark';
+  apply(saved);
+
+  btn.addEventListener('click', () => {
+    const next = body.classList.contains('theme-light') ? 'dark' : 'light';
+    localStorage.setItem(KEY, next);
+    apply(next);
+  });
+})();
+
+/* ═══════════════════════════════════════
+   ORBIT CANVAS — плитки на орбитах по всей области contact
+═══════════════════════════════════════ */
+(function () {
+  const canvas = document.getElementById('orbitCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const LOGOS = [
+    { src: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/acdb4a50ed9862af719e764b04472ec7fbfaa33f/PanCardSVG.svg',          bg: '#3a2800' },
+    { src: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg', bg: '#3d0f1a' },
+    { src: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/PrismLogo2.svg',           bg: '#1a0505' },
+    { src: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/LC.svg',                   bg: '#0a1a10' },
+    { src: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/Glitch.svg',               bg: '#00008f' },
+    { src: 'https://raw.githubusercontent.com/CakeBoxDeveloper/MSE/c3a01dd59275d25a96184e99df50a8dc3dd27667/MSESVG.svg',                   bg: '#000000' },
+  ];
+
+  const TILE_SIZE  = 54;   // размер плитки px (квадрат)
+  const ORBIT_R    = 28;   // радиус орбиты вокруг точки спавна px
+  const ORBIT_SPD  = 0.00035; // радиан/мс — медленно
+  const SWAY_AMP   = 15 * Math.PI / 180; // ±15° в радианах
+  const SWAY_SPD   = 0.0008; // частота качания, радиан/мс
+  const COLS       = 4;
+  const ROWS       = 3;
+
+  const images = LOGOS.map(l => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = l.src;
+    return { img, bg: l.bg };
+  });
+
+  /* Размер канваса = размер секции */
+  function resize() {
+    const sec = canvas.parentElement;
+    canvas.width  = sec.offsetWidth;
+    canvas.height = sec.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* Равномерная сетка точек спавна по всей области */
+  function buildTiles() {
+    const tiles = [];
+    let idx = 0;
+    for (let row = 0; row < ROWS; row++) {
+      for (let col = 0; col < COLS; col++) {
+        const W = canvas.width  || 800;
+        const H = canvas.height || 600;
+        // Спавн в ячейку сетки с небольшим случайным смещением
+        const cellW = W / COLS;
+        const cellH = H / ROWS;
+        const ox = cellW * col + cellW * 0.2 + Math.random() * cellW * 0.6;
+        const oy = cellH * row + cellH * 0.2 + Math.random() * cellH * 0.6;
+        // z-глубина: случайная [0..1]
+        const z = 0.3 + Math.random() * 0.7;
+        tiles.push({
+          ox, oy,           // центр орбиты (фиксирован)
+          phase: Math.random() * Math.PI * 2,  // начальная фаза орбиты
+          phaseRot: Math.random() * Math.PI * 2, // начальный угол Z-вращения
+          swayPhase: Math.random() * Math.PI * 2, // фаза качания (чтобы не синхронно)
+          orbitDir: Math.random() < 0.5 ? 1 : -1, // направление по орбите
+          z,
+          logoIdx: idx % LOGOS.length,
+        });
+        idx++;
+      }
+    }
+    return tiles;
+  }
+
+  let tiles = buildTiles();
+  window.addEventListener('resize', () => { tiles = buildTiles(); });
+
+  function drawRoundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  /* Рисуем SVG вписанным в квадрат с сохранением пропорций */
+  function drawLogo(img, cx, cy, size) {
+    if (!img.complete || !img.naturalWidth) return;
+    const iw = img.naturalWidth;
+    const ih = img.naturalHeight;
+    const scale = Math.min(size / iw, size / ih);
+    const dw = iw * scale;
+    const dh = ih * scale;
+    ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+  }
+
+  let lastTs = null;
+
+  function render(ts) {
+    if (lastTs === null) lastTs = ts;
+    const dt = Math.min(ts - lastTs, 50); // cap delta чтобы не прыгало при вкладке
+    lastTs = ts;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Сортировка по глубине: дальние (z малый) сначала
+    const sorted = [...tiles].sort((a, b) => a.z - b.z);
+
+    sorted.forEach(t => {
+      t.phase     += ORBIT_SPD * dt * t.orbitDir;
+      t.swayPhase += SWAY_SPD  * dt;
+      const rotZ = t.phaseRot + Math.sin(t.swayPhase) * SWAY_AMP;
+
+      const ts_size = TILE_SIZE * (0.6 + t.z * 0.55); // дальние меньше
+      const pad  = ts_size * 0.18;
+      const r    = ts_size * 0.2; // скругление углов
+
+      // Позиция на орбите — строго круговая, без наклона по X
+      const px = t.ox + Math.cos(t.phase) * ORBIT_R * (0.5 + t.z * 0.8);
+      const py = t.oy + Math.sin(t.phase) * ORBIT_R * (0.5 + t.z * 0.8);
+
+      const { img, bg } = images[t.logoIdx];
+      const half = ts_size / 2;
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(rotZ);
+
+      // Тень
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur  = 8 + t.z * 8;
+
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = bg;
+      drawRoundRect(-half, -half, ts_size, ts_size, r);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Клипаем логотип по форме плитки
+      ctx.clip();
+      const logoArea = ts_size - pad * 2;
+      ctx.translate(-half + pad + logoArea / 2, -half + pad + logoArea / 2);
+      drawLogo(img, 0, 0, logoArea);
+
+      ctx.restore();
+
+      /* ── DEBUG: оси вращения ── */
+      const axisLen = half * 1.3;
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(rotZ);
+
+      // X — красная (горизонталь плитки)
+      ctx.beginPath();
+      ctx.moveTo(-axisLen, 0); ctx.lineTo(axisLen, 0);
+      ctx.strokeStyle = '#ff3333'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#ff3333'; ctx.font = 'bold 9px monospace';
+      ctx.fillText('X', axisLen + 3, 4);
+
+      // Y — зелёная (вертикаль плитки)
+      ctx.beginPath();
+      ctx.moveTo(0, -axisLen); ctx.lineTo(0, axisLen);
+      ctx.strokeStyle = '#33ff66'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#33ff66';
+      ctx.fillText('Y', 4, -axisLen - 3);
+
+      ctx.restore();
+
+      // Z — синяя (ось перпендикулярная экрану — точка + кружок в центре плитки)
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.beginPath();
+      ctx.arc(0, 0, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#4d8cff'; ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, half * 0.55, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(77,140,255,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = '#4d8cff'; ctx.font = 'bold 9px monospace';
+      ctx.fillText('Z', 7, -7);
+      ctx.restore();
+
+      // Точка спавна — жёлтый крест
+      ctx.save();
+      ctx.translate(t.ox, t.oy);
+      ctx.strokeStyle = '#f0c000'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(6, 0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, -6); ctx.lineTo(0, 6); ctx.stroke();
+      // Орбита — пунктир
+      ctx.beginPath();
+      ctx.arc(0, 0, ORBIT_R * (0.5 + t.z * 0.8), 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(240,192,0,0.25)'; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.restore();
+    });
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+})();
