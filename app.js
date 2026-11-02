@@ -530,3 +530,46 @@ window.addEventListener('DOMContentLoaded', () => {
     wrap.appendChild(p);
   }
 })();
+
+/* ═══════════════════════════════════════
+   TTM CARD — шахматный паттерн через canvas
+═══════════════════════════════════════ */
+(function () {
+  const wrap = document.querySelector('.card__img-wrap--pink');
+  if (!wrap) return;
+
+  const ICON_SIZE = 28;  // размер иконки px
+  const GAP       = 24;  // отступ между иконками px
+  const STEP      = ICON_SIZE + GAP; // шаг сетки
+
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg';
+
+  img.onload = function () {
+    // Рисуем тайл: STEP*2 x STEP*2 для шахматного порядка
+    const tileSize = STEP * 2;
+    const c = document.createElement('canvas');
+    c.width  = tileSize;
+    c.height = tileSize;
+    const ctx = c.getContext('2d');
+
+    ctx.globalAlpha = 0.13;
+    // Позиция 1: (0, 0)
+    ctx.drawImage(img, GAP / 2, GAP / 2, ICON_SIZE, ICON_SIZE);
+    // Позиция 2: шахматный сдвиг (STEP, STEP)
+    ctx.drawImage(img, GAP / 2 + STEP, GAP / 2 + STEP, ICON_SIZE, ICON_SIZE);
+
+    const url = c.toDataURL();
+    const pseudo = wrap.querySelector('.ttm-pattern-canvas');
+    const el = pseudo || document.createElement('div');
+    el.className = 'ttm-pattern-canvas';
+    el.style.cssText = `
+      position:absolute; inset:0; pointer-events:none; z-index:1;
+      background-image: url(${url});
+      background-size: ${tileSize}px ${tileSize}px;
+      background-repeat: repeat;
+    `;
+    if (!pseudo) wrap.appendChild(el);
+  };
+})();

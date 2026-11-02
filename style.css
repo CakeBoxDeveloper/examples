@@ -1324,15 +1324,9 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   content: '';
   position: absolute;
   inset: 0;
-  background-image:
-    url("https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg"),
-    url("https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg");
-  background-size: 48px 48px, 48px 48px;
-  background-position: 0 0, 24px 24px;
-  background-repeat: repeat, repeat;
-  opacity: 0.12;
-  filter: brightness(0) saturate(100%) invert(45%) sepia(20%) saturate(300%) hue-rotate(300deg) brightness(130%);
   pointer-events: none;
+  z-index: 1;
+  /* фон задаётся JS через canvas */
 }
 
 .card__img-wrap--pink img {
