@@ -416,3 +416,117 @@ window.addEventListener('DOMContentLoaded', () => {
     lottie.loadAnimation({ container: el, renderer: 'svg', loop: true, autoplay: true, path: LOTTIE_URL });
   });
 });
+
+/* ═══════════════════════════════════════
+   CONTACT STACK — веер по бокам
+═══════════════════════════════════════ */
+(function () {
+  const stack = document.querySelector('.cstack');
+  if (!stack) return;
+
+  const cards = Array.from(stack.querySelectorAll('.cstack__card'));
+  if (cards.length < 2) return;
+
+  // Порядок позиций при activeIdx:
+  // 3 карточки: [0,1,2] — одна center, одна left, одна right
+  // При смене активной — анимируем как тасование
+
+  let order = [0, 1, 2]; // order[0]=left, order[1]=center, order[2]=right
+  // Изначально карточка с --active — center
+  const initActive = cards.findIndex(c => c.classList.contains('cstack__card--active'));
+  // Строим order: center = initActive
+  if (initActive === 0)      order = [1, 0, 2];
+  else if (initActive === 1) order = [0, 1, 2];
+  else                       order = [0, 2, 1];
+
+  const POS = ['left', 'center', 'right'];
+
+  function applyLayout() {
+    order.forEach((cardIdx, posIdx) => {
+      const card = cards[cardIdx];
+      card.dataset.pos = POS[posIdx];
+      card.classList.toggle('cstack__card--active', POS[posIdx] === 'center');
+    });
+  }
+
+  function updateHeight() { /* высота фиксирована в CSS */ }
+
+  // Клик по левой — она едет в центр, центральная → right, правая → left
+  // Клик по правой — она едет в центр, центральная → left, левая → right
+  cards.forEach((card) => {
+    card.addEventListener('click', function () {
+      const pos = this.dataset.pos;
+      if (pos === 'center') return;
+
+      if (pos === 'left') {
+        // left→center, center→right, right→left
+        order = [order[2], order[0], order[1]];
+      } else {
+        // right→center, center→left, left→right
+        order = [order[1], order[2], order[0]];
+      }
+      applyLayout();
+      setTimeout(updateHeight, 520);
+    });
+  });
+
+  // Копирование реквизитов
+  stack.addEventListener('click', function (e) {
+    const btn = e.target.closest('.donate__copy');
+    if (!btn) return;
+    e.stopPropagation();
+    const text = btn.dataset.copy;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1500);
+    });
+  });
+
+  // Инициализация
+  window.addEventListener('load', () => { applyLayout(); updateHeight(); });
+  window.addEventListener('resize', updateHeight);
+  applyLayout();
+  setTimeout(updateHeight, 100);
+})();
+
+/* ═══════════════════════════════════════
+   LACAR DRIVE — партикли от логотипа
+═══════════════════════════════════════ */
+(function () {
+  const wrap = document.querySelector('.card__img-wrap--lacar');
+  if (!wrap) return;
+
+  const COUNT = 18;
+
+  for (let i = 0; i < COUNT; i++) {
+    const p = document.createElement('span');
+    p.className = 'lacar-particle';
+
+    // Размер 1.8–4.2px (на 40% меньше исходных 3–7px)
+    const size = 1.8 + Math.random() * 2.4;
+    p.style.width  = size + 'px';
+    p.style.height = size + 'px';
+
+    // Стартовая позиция — рядом с центром (±15%)
+    const sx = 42 + Math.random() * 16; // 42–58%
+    const sy = 42 + Math.random() * 16;
+    p.style.left = sx + '%';
+    p.style.top  = sy + '%';
+    p.style.transform = 'translate(-50%, -50%)';
+
+    // Направление полёта — в любую сторону, 40–110px
+    const angle = Math.random() * Math.PI * 2;
+    const dist  = 40 + Math.random() * 70;
+    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+
+    // Скорость и задержка — на 30% медленнее
+    const dur   = 3.25 + Math.random() * 3.25;
+    const delay = Math.random() * dur;
+    p.style.setProperty('--dur',   dur   + 's');
+    p.style.setProperty('--delay', delay + 's');
+
+    wrap.appendChild(p);
+  }
+})();

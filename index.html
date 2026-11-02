@@ -43,9 +43,9 @@
           <span class="wire-dot" data-wire-color="#4d8cff" aria-hidden="true"></span>
         </article>
         <article class="card card--nda">
-          <div class="card__header card__header--nda">Glass SPA</div>
-          <div class="card__img-wrap">
-            <img src="https://placehold.co/300x400/1a0a0a/ff5252?text=🔒" alt="" />
+          <div class="card__header card__header--nda">Prism Terminal</div>
+          <div class="card__img-wrap card__img-wrap--prism">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/PrismLogo2.svg" alt="Prism Terminal" />
           </div>
           <div class="card__nda-label">НЕ МОГУ ПОКАЗАТЬ</div>
           <span class="wire-dot" data-wire-color="#ff5252" aria-hidden="true"></span>
@@ -62,11 +62,11 @@
             draggable="false"
           />
         </div>
-        <h1 class="hero__title">
+        <h1 class="hero__title" style="display:none">
           Дизайн&nbsp;&amp;&nbsp;разработка<br />
           <span class="accent">цифровых продуктов</span>
         </h1>
-        <p class="hero__sub">UI/UX · Web · 3D · Motion</p>
+        <p class="hero__sub" style="display:none">UI/UX · Web · 3D · Motion</p>
         <button class="section-scroll-btn" id="scrollBtnOld" style="display:none">
           <div class="lottie-arrow"></div>
           <span>Листать дальше</span>
@@ -77,9 +77,9 @@
       <!-- COL RI: 2 карточки -->
       <div class="hero__col hero__col--ri">
         <article class="card">
-          <div class="card__header">3D Store</div>
-          <div class="card__img-wrap">
-            <img src="https://placehold.co/300x400/101422/4d8cff?text=🧊" alt="" />
+          <div class="card__header">Lacar Drive</div>
+          <div class="card__img-wrap card__img-wrap--lacar">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/LC.svg" alt="Lacar Drive" />
           </div>
           <button class="card__cta">Смотреть проект</button>
           <span class="wire-dot" data-wire-color="#4d8cff" aria-hidden="true"></span>
@@ -246,53 +246,113 @@
 
     <div class="contact__inner">
 
-      <div class="cform__wrap">
-        <div class="cform__header">
-          <h2 class="cform__title">Заявка на разработку</h2>
-          <img class="contact__emoji"
-            src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
-            alt="" aria-hidden="true" />
-        </div>
-        <form class="cform" id="contactForm" novalidate>
+      <div class="cstack">
 
-        <fieldset class="cform__group">
-          <div class="cform__checks">
-            <label class="cform__check"><input type="checkbox" name="type" value="web" /><span>Веб-сайт</span></label>
-            <label class="cform__check"><input type="checkbox" name="type" value="ad" /><span>Реклама</span></label>
-            <label class="cform__check"><input type="checkbox" name="type" value="print" /><span>Полиграфия</span></label>
-            <label class="cform__check"><input type="checkbox" name="type" value="motion" /><span>Моушн</span></label>
-            <label class="cform__check"><input type="checkbox" name="type" value="video" /><span>Видео</span></label>
-            <label class="cform__check"><input type="checkbox" name="type" value="3d" /><span>3D</span></label>
-          </div>
-        </fieldset>
-
-        <div class="cform__group">
-          <input class="cform__input" type="text" id="name" name="name" placeholder="Что разрабатываем / что нужно сделать" autocomplete="name" />
-        </div>
-
-        <div class="cform__group cform__group--row">
-          <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
-          
-          <div class="cform__messenger-btns">
-            <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
-            <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
-            <label class="cform__check"><input type="radio" name="channel" value="email" /><span>Email</span></label>
+        <!-- КАРТОЧКА 2: Обратная связь (задний план) -->
+        <div class="cstack__card" data-card="feedback">
+          <div class="cform__wrap">
+            <div class="cform__header cform__header--green">
+              <h2 class="cform__title">Обратная связь</h2>
+              <img class="contact__emoji"
+                src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Outbox%20Tray.webp?raw=true"
+                alt="" aria-hidden="true" />
+            </div>
+            <form class="cform" id="feedbackForm" novalidate>
+              <div class="cform__group">
+                <input class="cform__input" type="text" name="fb_contact" placeholder="@username или почта" autocomplete="off" />
+              </div>
+              <div class="cform__group">
+                <textarea class="cform__textarea" name="fb_message" rows="5" placeholder="Ваше сообщение…"></textarea>
+              </div>
+            </form>
+            <button type="submit" form="feedbackForm" class="btn btn--primary cform__submit cform__submit--green">
+              Отправить
+              <span class="btn__shimmer"></span>
+            </button>
           </div>
         </div>
 
-        <div class="cform__group">
-          <textarea class="cform__textarea" id="comment" name="comment" rows="3" placeholder="Пожелания, референсы, сроки…"></textarea>
+        <!-- КАРТОЧКА 3: Поддержка open-source (задний план) -->
+        <div class="cstack__card" data-card="donate">
+          <div class="cform__wrap">
+            <div class="cform__header cform__header--yellow">
+              <h2 class="cform__title cform__title--dark">Поддержать open-source</h2>
+              <img class="contact__emoji"
+                src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Money%20With%20Wings.webp?raw=true"
+                alt="" aria-hidden="true" />
+            </div>
+            <div class="cform cform--donate">
+              <p class="donate__desc">Все мои open-source проекты бесплатны. Если хочешь ускорить выход — можно поддержать донатом.</p>
+              <div class="donate__list">
+                <div class="donate__item">
+                  <span class="donate__label">Tinkoff</span>
+                  <span class="donate__value">2200 7007 XXXX XXXX</span>
+                  <button class="donate__copy" data-copy="2200700700000000" aria-label="Скопировать">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                </div>
+                <div class="donate__item">
+                  <span class="donate__label">USDT TRC-20</span>
+                  <span class="donate__value donate__value--mono">TXxx…xxxx</span>
+                  <button class="donate__copy" data-copy="TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" aria-label="Скопировать">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="cform__submit cform__submit--yellow">Поддержать</div>
+          </div>
         </div>
 
-      </form>
+        <!-- КАРТОЧКА 1: Заявка на разработку (передний план) -->
+        <div class="cstack__card cstack__card--active" data-card="order">
+          <div class="cform__wrap">
+            <div class="cform__header">
+              <h2 class="cform__title">Заявка на разработку</h2>
+              <img class="contact__emoji"
+                src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true"
+                alt="" aria-hidden="true" />
+            </div>
+            <form class="cform" id="contactForm" novalidate>
 
-      <button type="submit" form="contactForm" class="btn btn--primary cform__submit">
-        <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/bdbe9e1d0d06182689bebe0c47a75113961299f2/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" style="filter:brightness(0) invert(1); flex-shrink:0" />
-        Отправить заявку
-        <span class="btn__shimmer"></span>
-      </button>
+              <fieldset class="cform__group">
+                <div class="cform__checks">
+                  <label class="cform__check"><input type="checkbox" name="type" value="web" /><span>Веб-сайт</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="ad" /><span>Реклама</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="print" /><span>Полиграфия</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="motion" /><span>Моушн</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="video" /><span>Видео</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="3d" /><span>3D</span></label>
+                </div>
+              </fieldset>
 
-      </div>
+              <div class="cform__group">
+                <input class="cform__input" type="text" id="name" name="name" placeholder="Что разрабатываем / что нужно сделать" autocomplete="name" />
+              </div>
+
+              <div class="cform__group cform__group--row">
+                <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
+                <div class="cform__messenger-btns">
+                  <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
+                  <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
+                  <label class="cform__check"><input type="radio" name="channel" value="email" /><span>Email</span></label>
+                </div>
+              </div>
+
+              <div class="cform__group">
+                <textarea class="cform__textarea" id="comment" name="comment" rows="3" placeholder="Пожелания, референсы, сроки…"></textarea>
+              </div>
+
+            </form>
+            <button type="submit" form="contactForm" class="btn btn--primary cform__submit">
+              <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/bdbe9e1d0d06182689bebe0c47a75113961299f2/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" style="filter:brightness(0) invert(1); flex-shrink:0" />
+              Отправить заявку
+              <span class="btn__shimmer"></span>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /cstack -->
     </div>
 
   </section>

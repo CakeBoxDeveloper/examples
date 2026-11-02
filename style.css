@@ -325,6 +325,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   height: 100%;
   pointer-events: none;
   z-index: 0;
+  display: none;
 }
 
 /* Wire dots на карточках — невидимые якоря сверху по центру */
@@ -532,10 +533,11 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   height: 100svh;
   display: flex; align-items: center; justify-content: center;
   padding-inline: var(--pg);
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   position: relative;
   padding-top: 48px;
-  padding-bottom: 48px; /* равный отступ сверху и снизу */
+  padding-bottom: 48px;
 }
 
 .hero__inner {
@@ -657,9 +659,9 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 7px;
+  padding: 1px 5px;
   border-radius: 4px;
-  font-size: 0.78rem;
+  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   flex-shrink: 0;
@@ -1072,17 +1074,13 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   z-index: 10;
   background: var(--bg);
   padding-block: 48px;
+  overflow: visible;
 }
 
 .contact__inner {
   width: 100%;
-  max-width: var(--col);
-  margin-inline: auto;
-  padding-inline: var(--pg);
   padding-block: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  overflow: visible;
 }
 
 .contact__head {
@@ -1313,18 +1311,39 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
    КАРТОЧКА «ЧАС ДЛЯ СЕБЕ» — тёплый кремово-персиковый фон
 ═══════════════════════ */
 .card__img-wrap--pink {
-  background: linear-gradient(145deg, #fce4ec, #f8bbd0);
+  background-color: #3d0f1a;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Шахматный паттерн из SVG */
+.card__img-wrap--pink::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg"),
+    url("https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg");
+  background-size: 48px 48px, 48px 48px;
+  background-position: 0 0, 24px 24px;
+  background-repeat: repeat, repeat;
+  opacity: 0.12;
+  filter: brightness(0) saturate(100%) invert(45%) sepia(20%) saturate(300%) hue-rotate(300deg) brightness(130%);
+  pointer-events: none;
+}
+
 .card__img-wrap--pink img {
   width: auto;
   height: auto;
   max-width: 65%;
   max-height: 65%;
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(25%) sepia(20%) saturate(500%) hue-rotate(300deg) brightness(50%);
+  position: relative;
+  z-index: 2;
+  filter: brightness(0) saturate(100%) invert(80%) sepia(30%) saturate(400%) hue-rotate(300deg) brightness(110%);
 }
 
 /* ═══════════════════════
@@ -1344,3 +1363,305 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   object-fit: contain;
   filter: brightness(0) invert(1);
 }
+
+/* ═══════════════════════
+   СТЕК КАРТОЧЕК CONTACT
+═══════════════════════ */
+.contact {
+  min-height: 100svh;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  background: var(--bg);
+  padding-block: 48px;
+  overflow: visible;
+}
+
+.contact__inner {
+  width: 100%;
+  padding-block: 32px;
+}
+
+.cstack {
+  position: relative;
+  width: var(--ck-slide-w);
+  margin-inline: auto;
+  height: 510px;
+}
+
+.cstack__card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 510px; /* фиксированная высота для всех карточек */
+  border-radius: 14px;
+  will-change: transform, opacity;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.45s ease,
+              box-shadow 0.45s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transform-origin: top center;
+}
+
+/* cform__wrap внутри карточки тоже должен заполнять всю высоту */
+.cstack__card .cform__wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cstack__card .cform {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.cstack__card .cform::-webkit-scrollbar { display: none; }
+
+.cstack__card .cform--donate {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.cstack__card .cform--donate::-webkit-scrollbar { display: none; }
+
+.cstack__card[data-pos="center"] {
+  z-index: 10;
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  cursor: default;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+}
+.cstack__card[data-pos="left"] {
+  z-index: 5;
+  transform: translateX(-120px) translateY(44px) scale(0.827);
+  transform-origin: top center;
+  opacity: 0.65;
+  cursor: pointer;
+}
+.cstack__card[data-pos="right"] {
+  z-index: 5;
+  transform: translateX(120px) translateY(44px) scale(0.827);
+  transform-origin: top center;
+  opacity: 0.65;
+  cursor: pointer;
+}
+.cstack__card[data-pos="left"]:hover  { opacity: 0.85; }
+.cstack__card[data-pos="right"]:hover { opacity: 0.85; }
+
+/* Жёлтая нижняя плашка доната */
+.cform__submit--yellow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 15px 28px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #f0c000;
+  color: #1a1a1a;
+  border-radius: 0 0 14px 14px;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--ease);
+}
+.cform__submit--yellow:hover { background: #d4a800; }
+
+/* Плашка зелёная (обратная связь) */
+.cform__header--green {
+  background: #1db954;
+}
+
+/* Плашка жёлтая (поддержка) */
+.cform__header--yellow {
+  background: #f0c000;
+}
+.cform__title--dark {
+  color: #1a1a1a;
+}
+
+/* Кнопка зелёная */
+.cform__submit--green {
+  background: #1db954;
+}
+.cform__submit--green:hover {
+  background: #17a348;
+}
+
+/* Донат-блок */
+.cform--donate {
+  border-radius: 0;
+  border-top: none;
+  border-bottom: none;
+}
+
+.donate__desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.donate__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.donate__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+
+.donate__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  width: 90px;
+}
+
+.donate__value {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.donate__value--mono {
+  font-family: monospace;
+  font-size: 0.78rem;
+}
+
+.donate__copy {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: none;
+  cursor: pointer;
+  transition: border-color var(--ease), color var(--ease), background var(--ease);
+}
+.donate__copy:hover {
+  border-color: var(--border-accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.donate__copy.copied {
+  border-color: #1db954;
+  color: #1db954;
+}
+
+/* ═══════════════════════
+   КАРТОЧКА «LACAR DRIVE»
+═══════════════════════ */
+.card__img-wrap--lacar {
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.card__img-wrap--lacar img {
+  width: auto;
+  height: auto;
+  max-width: 70%;
+  max-height: 70%;
+  object-fit: contain;
+  /* жёлто-оранжевый цвет */
+  filter: brightness(0) saturate(100%) invert(65%) sepia(90%) saturate(600%) hue-rotate(5deg) brightness(105%);
+  position: relative;
+  z-index: 2;
+}
+
+/* Партикли */
+.lacar-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffdd44, #ff8800);
+  pointer-events: none;
+  z-index: 1;
+  animation: lacar-fly var(--dur, 3s) ease-out var(--delay, 0s) infinite;
+  opacity: 0;
+}
+
+@keyframes lacar-fly {
+  0%   { transform: translate(0, 0) scale(0.6);  opacity: 0; }
+  15%  { opacity: 0.9; }
+  80%  { opacity: 0.3; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0.15); opacity: 0; }
+}
+
+/* ═══════════════════════
+   КАРТОЧКА «PRISM TERMINAL»
+═══════════════════════ */
+.card__img-wrap--prism {
+  background: #1a0505;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Диагональный бегущий паттерн из SVG */
+.card__img-wrap--prism::before {
+  content: '';
+  position: absolute;
+  inset: -100%;
+  width: 300%;
+  height: 300%;
+  background-image: url("https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/PrismLogo2.svg");
+  background-size: 110px 50px;
+  background-repeat: repeat;
+  opacity: 0.18;
+  filter: brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(340deg) brightness(130%);
+  transform: rotate(-45deg);
+  animation: prism-diagonal 8s linear infinite;
+}
+
+@keyframes prism-diagonal {
+  0%   { background-position: 0 0; }
+  100% { background-position: 110px 50px; }
+}
+
+.card__img-wrap--prism img {
+  width: auto;
+  height: auto;
+  max-width: 65%;
+  max-height: 65%;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  /* красный цвет SVG */
+  filter: brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(340deg) brightness(130%);
+}
+
+/* Тёмно-красный текст на плашках */
+.card--nda .card__header--nda {
+  color: #5a0a0a !important;
+}
+.card--nda .card__nda-label {
+  color: #5a0a0a;
+}
+
+/* (3D cylinder shadows removed) */
