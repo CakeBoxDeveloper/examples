@@ -1740,6 +1740,16 @@ body.theme-light .section-scroll-btn {
   pointer-events: none;
   z-index: 0;
 }
+
+/* ── DOM-плитки (model-viewer) ── */
+.orbit-tiles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  perspective: 800px;
+  overflow: hidden;
+}
 .contact__inner {
   position: relative;
   z-index: 1;
