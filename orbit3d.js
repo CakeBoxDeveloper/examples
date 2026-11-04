@@ -16,11 +16,11 @@
   const COLS = 4, ROWS = 3;
   const ORBIT_R    = 40;
   const ORBIT_SPD  = 0.00035;
-  const SWAY_AMP   = 12 * Math.PI / 180;
-  const SWAY_SPD   = 0.0007;
-  const TILT_AMP   = 8  * Math.PI / 180;
-  const TILT_X_SPD = 0.0005;
-  const TILT_Y_SPD = 0.00043;
+  const SWAY_AMP   = 18 * Math.PI / 180;
+  const SWAY_SPD   = 0.0006;
+  const TILT_AMP   = 22  * Math.PI / 180;
+  const TILT_X_SPD = 0.00045;
+  const TILT_Y_SPD = 0.00038;
 
   /* ── Загружаем GLB ── */
   function loadPlate(plate) {
