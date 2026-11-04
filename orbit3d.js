@@ -2,6 +2,8 @@
 (async function () {
   if (typeof THREE === 'undefined') { console.warn('THREE not loaded'); return; }
 
+  const BASE = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/';
+
   const PLATES = [
     { file: 'MSE.glb',    rotX:  Math.PI/2,  rotY: 0 },
     { file: 'MSE.glb',    rotX: -Math.PI/2,  rotY: 0 },
@@ -61,8 +63,8 @@
         });
       }
 
-      var remote = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/' + plate.file;
-      tryLoad(plate.file, remote);
+      var remote = BASE + plate.file;
+      tryLoad(remote, null);
     });
   }
 
@@ -187,7 +189,7 @@
 /* DEBUG — удали после настройки */
 window._debugPlate = function() {
   if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') return;
-  new THREE.GLTFLoader().load('MSE.glb', function(gltf) {
+  new THREE.GLTFLoader().load('https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/MSE.glb', function(gltf) {
     gltf.scene.traverse(function(child) {
       if (child.isMesh) {
         child.geometry.computeBoundingBox();
