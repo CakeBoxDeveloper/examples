@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GLB Viewer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1a1a1a; font-family: sans-serif; color: #ccc; }
+    header { padding: 12px 20px; display: flex; gap: 10px; align-items: center; background: #111; }
+    header label { font-size: 13px; }
+    select { background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; font-size: 13px; cursor: pointer; }
+    model-viewer {
+      width: 100vw;
+      height: calc(100vh - 48px);
+      display: block;
+      --progress-bar-color: #888;
+    }
+  </style>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+</head>
+<body>
+  <header>
+    <label>Model:</label>
+    <select id="picker">
+      <option value="MSE.glb">MSE.glb</option>
+      <option value="Plate.glb">Plate.glb</option>
+      <option value="Prism.glb">Prism.glb</option>
+      <option value="Glitch.glb">Glitch.glb</option>
+    </select>
+    <label style="margin-left:20px">BG:</label>
+    <select id="bgpicker">
+      <option value="#1a1a1a">Dark</option>
+      <option value="#ffffff">White</option>
+      <option value="#333355">Blue-dark</option>
+    </select>
+  </header>
+
+  <model-viewer
+    id="mv"
+    src="MSE.glb"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    environment-image="neutral"
+    exposure="1"
+    style="background: #1a1a1a;"
+  ></model-viewer>
+
+  <script>
+    const mv = document.getElementById('mv');
+    document.getElementById('picker').addEventListener('change', e => {
+      mv.src = e.target.value;
+    });
+    document.getElementById('bgpicker').addEventListener('change', e => {
+      mv.style.background = e.target.value;
+      document.body.style.background = e.target.value;
+    });
+  </script>
+</body>
+</html>

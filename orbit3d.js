@@ -5,12 +5,12 @@
   const BASE = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/';
 
   const PLATES = [
-    { file: 'MSE.glb',    rotX:  Math.PI/2,  rotY: 0 },
-    { file: 'MSE.glb',    rotX: -Math.PI/2,  rotY: 0 },
-    { file: 'MSE.glb',    rotX:  Math.PI/2,  rotY: Math.PI },
-    { file: 'MSE.glb',    rotX: -Math.PI/2,  rotY: Math.PI },
-    { file: 'Glitch.glb', rotX: -Math.PI/2,  rotY: 0 },
-    { file: 'Prism.glb',  rotX: -Math.PI/2,  rotY: 0 },
+    { file: 'MSE.glb',    rotY: 0 },
+    { file: 'MSE.glb',    rotY: 0 },
+    { file: 'MSE.glb',    rotY: Math.PI },
+    { file: 'MSE.glb',    rotY: Math.PI },
+    { file: 'Glitch.glb', rotY: 0 },
+    { file: 'Prism.glb',  rotY: 0 },
   ];
 
   const COLS = 4, ROWS = 3;
@@ -22,7 +22,7 @@
   const TILT_X_SPD = 0.0005;
   const TILT_Y_SPD = 0.00043;
 
-  /* ── Загружаем GLB — берём первый меш, нормализуем геометрию ── */
+  /* ── Загружаем GLB ── */
   function loadPlate(plate) {
     return new Promise(function(resolve) {
       if (typeof THREE.GLTFLoader === 'undefined') { resolve(null); return; }
@@ -30,33 +30,52 @@
 
       function tryLoad(src, fallbackSrc) {
         loader.load(src, function(gltf) {
-          var result = null;
+          var meshes = [];
+          gltf.scene.updateMatrixWorld(true);
           gltf.scene.traverse(function(child) {
-            if (!result && child.isMesh) {
+            if (child.isMesh) {
               var geom = child.geometry.clone();
-              var mat  = child.material.clone ? child.material.clone() : child.material;
-
-              // Центрируем
-              geom.computeBoundingBox();
-              var center = new THREE.Vector3();
-              geom.boundingBox.getCenter(center);
-              geom.translate(-center.x, -center.y, -center.z);
-
-              // Нормализуем в единичный куб
-              geom.computeBoundingBox();
-              var size = new THREE.Vector3();
-              geom.boundingBox.getSize(size);
-              var maxDim = Math.max(size.x, size.y, size.z) || 1;
-              geom.scale(1/maxDim, 1/maxDim, 1/maxDim);
-
-              // Поворот
-              geom.applyMatrix4(new THREE.Matrix4().makeRotationX(plate.rotX));
-              if (plate.rotY) geom.applyMatrix4(new THREE.Matrix4().makeRotationY(plate.rotY));
-
-              result = { geom: geom, mat: mat };
+              geom.applyMatrix4(child.matrixWorld);
+              var mat;
+              if (Array.isArray(child.material)) {
+                mat = child.material.map(function(m) { return m.clone ? m.clone() : m; });
+              } else {
+                mat = child.material.clone ? child.material.clone() : child.material;
+              }
+              meshes.push({ geom: geom, mat: mat });
             }
           });
-          resolve(result);
+
+          if (meshes.length === 0) { resolve(null); return; }
+
+          // Считаем общий bbox
+          var box = new THREE.Box3();
+          meshes.forEach(function(item) {
+            item.geom.computeBoundingBox();
+            box.union(item.geom.boundingBox);
+          });
+          var center = new THREE.Vector3();
+          box.getCenter(center);
+          var size = new THREE.Vector3();
+          box.getSize(size);
+          var maxDim = Math.max(size.x, size.y, size.z) || 1;
+
+          // Центрируем и нормализуем
+          var tCenter = new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z);
+          var tScale  = new THREE.Matrix4().makeScale(1/maxDim, 1/maxDim, 1/maxDim);
+          var final   = new THREE.Matrix4().multiply(tScale).multiply(tCenter);
+
+          var group = new THREE.Group();
+          meshes.forEach(function(item) {
+            item.geom.applyMatrix4(final);
+            var m = new THREE.Mesh(item.geom, item.mat);
+            group.add(m);
+          });
+
+          group.userData.maxDim = 1;
+          if (plate.rotY) group.rotation.y = plate.rotY;
+
+          resolve(group);
         }, null, function() {
           if (fallbackSrc) tryLoad(fallbackSrc, null);
           else resolve(null);
@@ -113,7 +132,7 @@
 
       var mesh;
       if (data) {
-        mesh = new THREE.Mesh(data.geom.clone(), data.mat);
+        mesh = data.clone();
       } else {
         var colors = [0x111111, 0x3d0f1a, 0x1a0505, 0x000000, 0x0000ff, 0x000000];
         mesh = new THREE.Mesh(
@@ -122,14 +141,20 @@
         );
       }
       mesh.castShadow = true;
+      if (mesh.isGroup) {
+        mesh.traverse(function(c) { if (c.isMesh) c.castShadow = true; });
+      }
 
       var z  = 0.3 + Math.random() * 0.7;
-      var ts = 42 + z * 22; // размер в px (ортокамера 1unit=1px)
-      mesh.scale.set(ts, ts, ts);
+      var ts = 42 + z * 22;
+      var md = (mesh.userData && mesh.userData.maxDim) ? mesh.userData.maxDim : 1;
+      var s  = ts / md;
+      mesh.scale.set(s, s, s);
       scene.add(mesh);
 
       tiles.push({
         mesh: mesh, col: col, row: row, z: z,
+        baseRotX:   data ? -Math.PI / 2 : 0,
         phase:      Math.random() * Math.PI * 2,
         phaseRot:   (Math.random() - 0.5) * Math.PI / 6,
         swayPhase:  Math.random() * Math.PI * 2,
@@ -175,7 +200,7 @@
         t.z * 20 - 10
       );
       t.mesh.rotation.z = t.phaseRot + Math.sin(t.swayPhase) * SWAY_AMP;
-      t.mesh.rotation.x = Math.sin(t.tiltXPhase) * TILT_AMP;
+      t.mesh.rotation.x = t.baseRotX + Math.sin(t.tiltXPhase) * TILT_AMP;
       t.mesh.rotation.y = Math.sin(t.tiltYPhase) * TILT_AMP;
     });
 
@@ -185,21 +210,3 @@
   requestAnimationFrame(animate);
 
 })();
-
-/* DEBUG — удали после настройки */
-window._debugPlate = function() {
-  if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') return;
-  new THREE.GLTFLoader().load('https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/MSE.glb', function(gltf) {
-    gltf.scene.traverse(function(child) {
-      if (child.isMesh) {
-        child.geometry.computeBoundingBox();
-        var b = child.geometry.boundingBox;
-        var s = new THREE.Vector3(); b.getSize(s);
-        var c = new THREE.Vector3(); b.getCenter(c);
-        console.log('MSE.glb mesh:', child.name);
-        console.log('  size:', s.x.toFixed(3), s.y.toFixed(3), s.z.toFixed(3));
-        console.log('  center:', c.x.toFixed(3), c.y.toFixed(3), c.z.toFixed(3));
-      }
-    });
-  });
-};
