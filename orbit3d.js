@@ -159,7 +159,7 @@
   dir.castShadow = true;
   dir.shadow.mapSize.set(512, 512);
   scene.add(dir);
-  var rim = new THREE.DirectionalLight(0x8899ff, 0.35);
+  var rim = new THREE.DirectionalLight(0x88ff99, 0.35);
   rim.position.set(-200, -100, 100);
   scene.add(rim);
 

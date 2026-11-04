@@ -12,19 +12,19 @@
 }
 
 :root {
-  --bg:          #08090f;
-  --bg-alt:      #0c0e1a;
-  --bg-card:     #101422;
+  --bg:          #080f09;
+  --bg-alt:      #0c1a0e;
+  --bg-card:     #101f12;
 
-  --accent:      #4d8cff;
-  --accent-glow: rgba(77, 140, 255, 0.2);
+  --accent:      #4daf6a;
+  --accent-glow: rgba(77, 175, 106, 0.2);
 
   --text:        #ffffff;
-  --text-muted:  #8891aa;
-  --text-dim:    #4a5268;
+  --text-muted:  #88aa8e;
+  --text-dim:    #4a6850;
 
   --border:        rgba(255, 255, 255, 0.07);
-  --border-accent: rgba(77, 140, 255, 0.35);
+  --border-accent: rgba(77, 175, 106, 0.35);
 
   --r:    6.5px;
   --font: 'Inter', system-ui, sans-serif;
@@ -50,7 +50,7 @@ body.theme-light {
   --text-dim:    #9098aa;
 
   --border:        rgba(0, 0, 0, 0.09);
-  --border-accent: rgba(77, 140, 255, 0.4);
+  --border-accent: rgba(77, 175, 106, 0.4);
 }
 
 body.theme-light .ck-slide.is-active { opacity: 1; }
@@ -98,7 +98,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   background: var(--accent); color: #fff;
   padding: 14px 28px; font-size: 0.78rem;
 }
-.btn--primary:hover { background: #3a70e0; }
+.btn--primary:hover { background: #3a9458; }
 
 /* Case button variants */
 .btn--nda {
@@ -120,13 +120,13 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   border-color: rgba(255, 193, 7, 0.6);
 }
 .btn--view {
-  border: 1px solid rgba(77, 140, 255, 0.4);
-  color: #4d8cff;
-  background: rgba(77, 140, 255, 0.05);
+  border: 1px solid rgba(77, 175, 106, 0.4);
+  color: #4daf6a;
+  background: rgba(77, 175, 106, 0.05);
 }
 .btn--view:hover {
-  background: rgba(77, 140, 255, 0.15);
-  border-color: rgba(77, 140, 255, 0.6);
+  background: rgba(77, 175, 106, 0.15);
+  border-color: rgba(77, 175, 106, 0.6);
 }
 
 .btn--scroll {
@@ -755,7 +755,7 @@ body.theme-light .section-scroll-btn {
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  background: #161a2a;
+  background: #111f13;
   border-bottom: 1px solid var(--border);
 }
 .cases__box-header img {
@@ -1411,7 +1411,7 @@ body.theme-light .section-scroll-btn {
    КАРТОЧКА «АРХИВ» — тёмно-синий фон, SVG белый
 ═══════════════════════ */
 .card__img-wrap--blue {
-  background: #0000ff;
+  background: #004d20;
   display: flex;
   align-items: center;
   justify-content: center;
