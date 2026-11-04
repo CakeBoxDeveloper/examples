@@ -1,15 +1,14 @@
-/* orbit3d.js — UMD, THREE r128, каждый GLB со своей текстурой */
+/* orbit3d.js — UMD, THREE r128 */
 (async function () {
   if (typeof THREE === 'undefined') { console.warn('THREE not loaded'); return; }
 
-  /* Каждый GLB содержит запечённую текстуру */
   const PLATES = [
-    'Plate_panacea.glb',
-    'Plate_ttm.glb',
-    'Plate_prism.glb',
-    'Plate_lacar.glb',
-    'Plate_glitch.glb',
-    'Plate_mse.glb',
+    { file: 'MSE.glb',    rotX:  Math.PI/2,  rotY: 0 },
+    { file: 'MSE.glb',    rotX: -Math.PI/2,  rotY: 0 },
+    { file: 'MSE.glb',    rotX:  Math.PI/2,  rotY: Math.PI },
+    { file: 'MSE.glb',    rotX: -Math.PI/2,  rotY: Math.PI },
+    { file: 'Glitch.glb', rotX: -Math.PI/2,  rotY: 0 },
+    { file: 'Prism.glb',  rotX: -Math.PI/2,  rotY: 0 },
   ];
 
   const COLS = 4, ROWS = 3;
@@ -21,47 +20,49 @@
   const TILT_X_SPD = 0.0005;
   const TILT_Y_SPD = 0.00043;
 
-  /* ── Загружаем GLB, возвращаем { geom, mat } ── */
-  function loadPlate(url) {
+  /* ── Загружаем GLB — берём первый меш, нормализуем геометрию ── */
+  function loadPlate(plate) {
     return new Promise(function(resolve) {
       if (typeof THREE.GLTFLoader === 'undefined') { resolve(null); return; }
       var loader = new THREE.GLTFLoader();
-      loader.load(url, function(gltf) {
-        var result = null;
-        gltf.scene.traverse(function(child) {
-          if (!result && child.isMesh) {
-            var geom = child.geometry.clone();
-            var mat  = child.material.clone ? child.material.clone() : child.material;
 
-            /* Нормализуем геометрию */
-            geom.computeBoundingBox();
-            var box    = geom.boundingBox;
-            var center = new THREE.Vector3(); box.getCenter(center);
-            var size   = new THREE.Vector3(); box.getSize(size);
-            var maxDim = Math.max(size.x, size.y, size.z) || 1;
-            geom.translate(-center.x, -center.y, -center.z);
-            geom.scale(1/maxDim, 1/maxDim, 1/maxDim);
+      function tryLoad(src, fallbackSrc) {
+        loader.load(src, function(gltf) {
+          var result = null;
+          gltf.scene.traverse(function(child) {
+            if (!result && child.isMesh) {
+              var geom = child.geometry.clone();
+              var mat  = child.material.clone ? child.material.clone() : child.material;
 
-            /* Поворачиваем лицом к камере */
-            geom.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+              // Центрируем
+              geom.computeBoundingBox();
+              var center = new THREE.Vector3();
+              geom.boundingBox.getCenter(center);
+              geom.translate(-center.x, -center.y, -center.z);
 
-            result = { geom: geom, mat: mat };
-          }
+              // Нормализуем в единичный куб
+              geom.computeBoundingBox();
+              var size = new THREE.Vector3();
+              geom.boundingBox.getSize(size);
+              var maxDim = Math.max(size.x, size.y, size.z) || 1;
+              geom.scale(1/maxDim, 1/maxDim, 1/maxDim);
+
+              // Поворот
+              geom.applyMatrix4(new THREE.Matrix4().makeRotationX(plate.rotX));
+              if (plate.rotY) geom.applyMatrix4(new THREE.Matrix4().makeRotationY(plate.rotY));
+
+              result = { geom: geom, mat: mat };
+            }
+          });
+          resolve(result);
+        }, null, function() {
+          if (fallbackSrc) tryLoad(fallbackSrc, null);
+          else resolve(null);
         });
-        resolve(result);
-      }, null, function(err) {
-        console.warn('Failed to load', url, err);
-        resolve(null);
-      });
-    });
-  }
+      }
 
-  /* Фоллбэк материал если GLB не загрузился */
-  function fallbackMat(idx) {
-    var colors = [0xe8ddd0, 0x3d0f1a, 0x1a0505, 0x000000, 0x0000ff, 0x000000];
-    return new THREE.MeshStandardMaterial({
-      color: colors[idx % colors.length],
-      roughness: 0.3, metalness: 0.1
+      var remote = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/' + plate.file;
+      tryLoad(plate.file, remote);
     });
   }
 
@@ -89,22 +90,17 @@
   /* ── Сцена + свет ── */
   var scene = new THREE.Scene();
   scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-
   var dir = new THREE.DirectionalLight(0xffffff, 1.5);
   dir.position.set(200, 300, 400);
   dir.castShadow = true;
   dir.shadow.mapSize.set(512, 512);
   scene.add(dir);
-
   var rim = new THREE.DirectionalLight(0x8899ff, 0.35);
   rim.position.set(-200, -100, 100);
   scene.add(rim);
 
-  /* ── Загружаем все GLB параллельно ── */
+  /* ── Загружаем GLB ── */
   var plateData = await Promise.all(PLATES.map(loadPlate));
-
-  /* ── Фоллбэк геометрия ── */
-  var fallbackGeom = new THREE.BoxGeometry(1, 0.12, 1);
 
   /* ── Строим плитки ── */
   var tiles = [];
@@ -113,14 +109,20 @@
       var idx  = (row * COLS + col) % PLATES.length;
       var data = plateData[idx];
 
-      var geom = data ? data.geom.clone() : fallbackGeom.clone();
-      var mat  = data ? data.mat         : fallbackMat(idx);
-
-      var mesh = new THREE.Mesh(geom, mat);
+      var mesh;
+      if (data) {
+        mesh = new THREE.Mesh(data.geom.clone(), data.mat);
+      } else {
+        var colors = [0x111111, 0x3d0f1a, 0x1a0505, 0x000000, 0x0000ff, 0x000000];
+        mesh = new THREE.Mesh(
+          new THREE.BoxGeometry(1, 0.12, 1),
+          new THREE.MeshStandardMaterial({ color: colors[idx % colors.length] })
+        );
+      }
       mesh.castShadow = true;
 
       var z  = 0.3 + Math.random() * 0.7;
-      var ts = 42 + z * 22;
+      var ts = 42 + z * 22; // размер в px (ортокамера 1unit=1px)
       mesh.scale.set(ts, ts, ts);
       scene.add(mesh);
 
@@ -170,7 +172,7 @@
         cy + Math.sin(t.phase) * r,
         t.z * 20 - 10
       );
-      t.mesh.rotation.z = t.phaseRot + Math.sin(t.swayPhase)  * SWAY_AMP;
+      t.mesh.rotation.z = t.phaseRot + Math.sin(t.swayPhase) * SWAY_AMP;
       t.mesh.rotation.x = Math.sin(t.tiltXPhase) * TILT_AMP;
       t.mesh.rotation.y = Math.sin(t.tiltYPhase) * TILT_AMP;
     });
@@ -181,3 +183,21 @@
   requestAnimationFrame(animate);
 
 })();
+
+/* DEBUG — удали после настройки */
+window._debugPlate = function() {
+  if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') return;
+  new THREE.GLTFLoader().load('MSE.glb', function(gltf) {
+    gltf.scene.traverse(function(child) {
+      if (child.isMesh) {
+        child.geometry.computeBoundingBox();
+        var b = child.geometry.boundingBox;
+        var s = new THREE.Vector3(); b.getSize(s);
+        var c = new THREE.Vector3(); b.getCenter(c);
+        console.log('MSE.glb mesh:', child.name);
+        console.log('  size:', s.x.toFixed(3), s.y.toFixed(3), s.z.toFixed(3));
+        console.log('  center:', c.x.toFixed(3), c.y.toFixed(3), c.z.toFixed(3));
+      }
+    });
+  });
+};

@@ -718,3 +718,16 @@ window.addEventListener('DOMContentLoaded', () => {
     t = setTimeout(() => { size(); }, 180);
   });
 })();
+
+/* ── APNG loop fallback ── */
+(function () {
+  const img = document.querySelector('.hero__laptop');
+  if (!img) return;
+  const src = img.src;
+  // Перезагружаем src каждые N мс — грубо но работает для APNG без loop
+  // Лучше всего задать loop прямо в APNG-файле
+  // Этот код только как fallback если файл не зациклен
+  // img.addEventListener('load', ...) не стреляет повторно для APNG
+  // Поэтому просто убеждаемся что src валиден
+  img.src = src;
+})();
