@@ -4,13 +4,25 @@
 
   const BASE = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/';
 
+  // Цвета: [фон (slot 0 — Base/Cube), лого (slot 1 — SVG/Logo)]
+  // slot определяется порядком материала в массиве child.material[]
+  // или по имени если меш один с мультиматериалом
+  const PALETTE = {
+    'MSE.glb':    { bg: '#0a0a0a', logo: '#ffffff' },
+    'LC.glb':     { bg: '#0a0a0a', logo: '#f0c000' },
+    'TTM.glb':    { bg: '#1a4a6b', logo: '#ffffff' },
+    'Panacea.glb':{ bg: '#e8ddd0', logo: '#3d2a1a' },
+    'Prism.glb':  { bg: '#2a0a10', logo: '#cc2233' },
+    'Glitch.glb': { bg: '#0a1a3a', logo: '#ffffff' },
+  };
+
   const PLATES = [
-    { file: 'MSE.glb',    rotY: 0 },
-    { file: 'MSE.glb',    rotY: 0 },
-    { file: 'MSE.glb',    rotY: Math.PI },
-    { file: 'MSE.glb',    rotY: Math.PI },
-    { file: 'Glitch.glb', rotY: 0 },
-    { file: 'Prism.glb',  rotY: 0 },
+    { file: 'MSE.glb'     },
+    { file: 'LC.glb'      },
+    { file: 'TTM.glb'     },
+    { file: 'Panacea.glb' },
+    { file: 'Prism.glb'   },
+    { file: 'Glitch.glb'  },
   ];
 
   const COLS = 4, ROWS = 3;
@@ -21,6 +33,34 @@
   const TILT_AMP   = 22  * Math.PI / 180;
   const TILT_X_SPD = 0.00045;
   const TILT_Y_SPD = 0.00038;
+
+  // Применяем палитру к мешам группы
+  // Логика: у каждой модели 2 меша (фон и лого), сортируем по bbox-площади:
+  // больший меш = фон, меньший = лого
+  function applyPalette(meshes, palette) {
+    if (!palette || meshes.length === 0) return;
+
+    // Считаем площадь bbox каждого меша
+    var sized = meshes.map(function(item) {
+      item.geom.computeBoundingBox();
+      var s = new THREE.Vector3();
+      item.geom.boundingBox.getSize(s);
+      return { item: item, area: s.x * s.z };
+    });
+    sized.sort(function(a, b) { return b.area - a.area; });
+
+    // Первый (большой) = фон, остальные = лого
+    sized.forEach(function(entry, i) {
+      var mats = Array.isArray(entry.item.mat) ? entry.item.mat : [entry.item.mat];
+      var color = i === 0 ? palette.bg : palette.logo;
+      mats.forEach(function(m) {
+        if (!m) return;
+        m.color.set(color);
+        m.roughness = 0.88;
+        m.metalness = 0.04;
+      });
+    });
+  }
 
   /* ── Загружаем GLB ── */
   function loadPlate(plate) {
@@ -48,6 +88,9 @@
 
           if (meshes.length === 0) { resolve(null); return; }
 
+          // Красим по палитре
+          applyPalette(meshes, PALETTE[plate.file]);
+
           // Считаем общий bbox
           var box = new THREE.Box3();
           meshes.forEach(function(item) {
@@ -73,7 +116,6 @@
           });
 
           group.userData.maxDim = 1;
-          if (plate.rotY) group.rotation.y = plate.rotY;
 
           resolve(group);
         }, null, function() {
@@ -83,7 +125,8 @@
       }
 
       var remote = BASE + plate.file;
-      tryLoad(remote, null);
+      var local  = './' + plate.file;
+      tryLoad(remote, local);
     });
   }
 
@@ -134,12 +177,18 @@
       if (data) {
         mesh = data.clone();
       } else {
-        var colors = [0x111111, 0x3d0f1a, 0x1a0505, 0x000000, 0x0000ff, 0x000000];
-        mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(1, 0.12, 1),
-          new THREE.MeshStandardMaterial({ color: colors[idx % colors.length] })
-        );
+        // Модель не загрузилась — берём MSE как fallback
+        var fallbackData = plateData[0] || null;
+        for (var fi = 0; fi < plateData.length; fi++) {
+          if (plateData[fi]) { fallbackData = plateData[fi]; break; }
+        }
+        if (fallbackData) {
+          mesh = fallbackData.clone();
+        } else {
+          continue;
+        }
       }
+      // baseRotX всегда -π/2 для GLB-плиток — независимо от источника клона
       mesh.castShadow = true;
       if (mesh.isGroup) {
         mesh.traverse(function(c) { if (c.isMesh) c.castShadow = true; });
@@ -154,9 +203,9 @@
 
       tiles.push({
         mesh: mesh, col: col, row: row, z: z,
-        baseRotX:   data ? -Math.PI / 2 : 0,
+        baseRotX:   -Math.PI / 2,
         phase:      Math.random() * Math.PI * 2,
-        phaseRot:   (Math.random() - 0.5) * Math.PI / 6,
+        phaseRot:   (Math.random() - 0.5) * Math.PI / 18,
         swayPhase:  Math.random() * Math.PI * 2,
         tiltXPhase: Math.random() * Math.PI * 2,
         tiltYPhase: Math.random() * Math.PI * 2,

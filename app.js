@@ -731,3 +731,35 @@ window.addEventListener('DOMContentLoaded', () => {
   // Поэтому просто убеждаемся что src валиден
   img.src = src;
 })();
+
+/* ═══════════════════════════════════════
+   HERO CHAT — Lottie анимация
+═══════════════════════════════════════ */
+(function () {
+  var el = document.getElementById('heroLottie');
+  if (!el || typeof lottie === 'undefined') return;
+
+  lottie.loadAnimation({
+    container: el,
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    // Публичная лотти-анимация — печатающий индикатор (typing dots)
+    path: 'https://assets10.lottiefiles.com/packages/lf20_usmfx6bp.json'
+  });
+})();
+
+/* ═══════════════════════════════════════
+   HERO CHAT — Lottie typing indicator
+═══════════════════════════════════════ */
+(function () {
+  var el = document.getElementById('heroLottie');
+  if (!el || typeof lottie === 'undefined') return;
+  lottie.loadAnimation({
+    container: el,
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'https://assets4.lottiefiles.com/packages/lf20_iqon5gsh.json'
+  });
+})();

@@ -78,24 +78,55 @@
 
       <!-- CENTER -->
       <div class="hero__center">
-        <div class="hero__laptop-wrap" id="wireTarget">
-          <img
-            class="hero__laptop"
-            src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Laptop.apng"
-            alt="Laptop"
-            draggable="false"
-          />
+        <div class="hero__chat" id="wireTarget">
+
+          <!-- Тело: пустое состояние -->
+          <div class="hero__chat-body">
+            <img class="hero__chat-icon" src="https://www.svgrepo.com/download/481626/flower.svg" alt="" aria-hidden="true" />
+            <p class="hero__chat-empty">Начните переписку<br/>с умной мысли<span class="hero__chat-cursor" aria-hidden="true"></span></p>
+          </div>
+
+          <!-- Футер: селектор + инпут -->
+          <div class="hero__chat-footer">
+
+            <!-- Строка: модель + usage -->
+            <div class="hero__chat-model-row">
+              <button class="hero__chat-model" aria-label="Выбрать модель">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                <span>Edelweiss</span>
+                <svg class="hero__chat-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="hero__chat-usage" title="65% использовано">
+                <svg class="hero__chat-ring" viewBox="0 0 28 28" aria-hidden="true">
+                  <circle class="hero__chat-ring-bg" cx="14" cy="14" r="11"/>
+                  <circle class="hero__chat-ring-fill" cx="14" cy="14" r="11"/>
+                </svg>
+                <span class="hero__chat-usage-label">65%</span>
+              </div>
+            </div>
+
+            <!-- Инпут -->
+            <div class="hero__chat-input-wrap">
+              <input
+                class="hero__chat-input"
+                type="text"
+                placeholder="Что по плану?"
+                readonly
+                aria-label="Поле ввода чата"
+              />
+              <div class="hero__chat-input-actions">
+                <button class="hero__chat-action-btn" aria-label="Прикрепить файл">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                </button>
+                <button class="hero__chat-action-btn hero__chat-action-btn--send" aria-label="Отправить">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
         </div>
-        <h1 class="hero__title" style="display:none">
-          Дизайн&nbsp;&amp;&nbsp;разработка<br />
-          <span class="accent">цифровых продуктов</span>
-        </h1>
-        <p class="hero__sub" style="display:none">UI/UX · Web · 3D · Motion</p>
-        <button class="section-scroll-btn" id="scrollBtnOld" style="display:none">
-          <div class="lottie-arrow"></div>
-          <span>Листать дальше</span>
-          <div class="lottie-arrow"></div>
-        </button>
       </div>
 
       <!-- COL RI + COL RO (закомментировано)
