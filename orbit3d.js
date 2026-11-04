@@ -1,189 +1,183 @@
-/* orbit3d.js — model-viewer плитки, работает через file:// */
-(function () {
+/* orbit3d.js — UMD, THREE r128, каждый GLB со своей текстурой */
+(async function () {
+  if (typeof THREE === 'undefined') { console.warn('THREE not loaded'); return; }
 
-  const LOGOS = [
-    { color: '#e8ddd0', logo: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/acdb4a50ed9862af719e764b04472ec7fbfaa33f/PanCardSVG.svg',          filter: '' },
-    { color: '#3d0f1a', logo: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg', filter: 'brightness(0) saturate(100%) invert(80%) sepia(30%) saturate(400%) hue-rotate(300deg) brightness(110%)' },
-    { color: '#1a0505', logo: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/PrismLogo2.svg',           filter: 'brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(800%) hue-rotate(340deg) brightness(130%)' },
-    { color: '#000000', logo: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/LC.svg',                   filter: 'brightness(0) saturate(100%) invert(85%) sepia(60%) saturate(600%) hue-rotate(5deg) brightness(105%)' },
-    { color: '#0000ff', logo: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/Glitch.svg',               filter: 'brightness(0) invert(1)' },
-    { color: '#000000', logo: 'https://raw.githubusercontent.com/CakeBoxDeveloper/MSE/c3a01dd59275d25a96184e99df50a8dc3dd27667/MSESVG.svg',                   filter: 'brightness(0) invert(1)' },
+  /* Каждый GLB содержит запечённую текстуру */
+  const PLATES = [
+    'Plate_panacea.glb',
+    'Plate_ttm.glb',
+    'Plate_prism.glb',
+    'Plate_lacar.glb',
+    'Plate_glitch.glb',
+    'Plate_mse.glb',
   ];
 
-  const COLS       = 4;
-  const ROWS       = 3;
-  const TILE_SIZE  = 68;
-  const ORBIT_R    = 32;
+  const COLS = 4, ROWS = 3;
+  const ORBIT_R    = 40;
   const ORBIT_SPD  = 0.00035;
-  const SWAY_AMP   = 12;
+  const SWAY_AMP   = 12 * Math.PI / 180;
   const SWAY_SPD   = 0.0007;
-  const TILT_AMP   = 8;
+  const TILT_AMP   = 8  * Math.PI / 180;
   const TILT_X_SPD = 0.0005;
   const TILT_Y_SPD = 0.00043;
 
-  const GLB = 'Plate.glb';
+  /* ── Загружаем GLB, возвращаем { geom, mat } ── */
+  function loadPlate(url) {
+    return new Promise(function(resolve) {
+      if (typeof THREE.GLTFLoader === 'undefined') { resolve(null); return; }
+      var loader = new THREE.GLTFLoader();
+      loader.load(url, function(gltf) {
+        var result = null;
+        gltf.scene.traverse(function(child) {
+          if (!result && child.isMesh) {
+            var geom = child.geometry.clone();
+            var mat  = child.material.clone ? child.material.clone() : child.material;
 
-  function init() {
-    const container = document.getElementById('orbitTiles');
-    if (!container) return;
-    buildTiles(container);
-  }
+            /* Нормализуем геометрию */
+            geom.computeBoundingBox();
+            var box    = geom.boundingBox;
+            var center = new THREE.Vector3(); box.getCenter(center);
+            var size   = new THREE.Vector3(); box.getSize(size);
+            var maxDim = Math.max(size.x, size.y, size.z) || 1;
+            geom.translate(-center.x, -center.y, -center.z);
+            geom.scale(1/maxDim, 1/maxDim, 1/maxDim);
 
-  function buildTiles(container) {
-    const tiles = [];
-    let idx = 0;
+            /* Поворачиваем лицом к камере */
+            geom.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
 
-    for (let row = 0; row < ROWS; row++) {
-      for (let col = 0; col < COLS; col++) {
-        const logo = LOGOS[idx % LOGOS.length];
-
-        /* Обёртка — даёт перспективу для CSS 3D */
-        const wrap = document.createElement('div');
-        wrap.style.cssText = [
-          'position:absolute',
-          'width:'  + TILE_SIZE + 'px',
-          'height:' + TILE_SIZE + 'px',
-          'transform-style:preserve-3d',
-          'will-change:transform',
-          'border-radius:12px',
-          'overflow:hidden',
-          'box-shadow:0 8px 24px rgba(0,0,0,0.5)',
-        ].join(';');
-
-        /* model-viewer — 3D форма плитки */
-        const mv = document.createElement('model-viewer');
-        mv.setAttribute('src', GLB);
-        mv.setAttribute('alt', '');
-        /* phi=90deg — смотрим строго спереди */
-        mv.setAttribute('camera-orbit',      '0deg 90deg 105%');
-        mv.setAttribute('field-of-view',     '22deg');
-        mv.setAttribute('environment-image', 'neutral');
-        mv.setAttribute('exposure',          '1.5');
-        mv.setAttribute('shadow-intensity',  '0');
-        mv.setAttribute('interaction-prompt','none');
-        mv.setAttribute('disable-zoom',      '');
-        mv.style.cssText = [
-          'position:absolute',
-          'inset:0',
-          'width:100%',
-          'height:100%',
-          'background:' + logo.color,
-          '--progress-bar-height:0px',
-          '--progress-bar-color:transparent',
-        ].join(';');
-
-        /* Красим материал под цвет карточки после загрузки */
-        mv.addEventListener('load', (function(color) {
-          return function() {
-            try {
-              var model = this.model;
-              if (!model) return;
-              var hex = color.replace('#','');
-              var r = parseInt(hex.slice(0,2),16)/255;
-              var g = parseInt(hex.slice(2,4),16)/255;
-              var b = parseInt(hex.slice(4,6),16)/255;
-              model.materials.forEach(function(mat) {
-                mat.pbrMetallicRoughness.setBaseColorFactor([r,g,b,1]);
-                mat.pbrMetallicRoughness.setRoughnessFactor(0.25);
-                mat.pbrMetallicRoughness.setMetallicFactor(0.1);
-              });
-            } catch(e) {}
-          };
-        })(logo.color));
-
-        /* SVG-логотип поверх */
-        const img = document.createElement('img');
-        img.src = logo.logo;
-        img.crossOrigin = 'anonymous';
-        img.style.cssText = [
-          'position:absolute',
-          'inset:0',
-          'width:64%',
-          'height:64%',
-          'margin:auto',
-          'top:0','left:0','right:0','bottom:0',
-          'object-fit:contain',
-          'pointer-events:none',
-          'z-index:2',
-          logo.filter ? 'filter:' + logo.filter : '',
-        ].join(';');
-
-        wrap.appendChild(mv);
-        wrap.appendChild(img);
-        container.appendChild(wrap);
-
-        const z = 0.3 + Math.random() * 0.7;
-        tiles.push({
-          el:         wrap,
-          mv:         mv,
-          col, row, z,
-          baseScale:  0.65 + z * 0.5,
-          phase:      Math.random() * Math.PI * 2,
-          baseRotZ:   (Math.random() - 0.5) * 20,
-          swayPhase:  Math.random() * Math.PI * 2,
-          tiltXPhase: Math.random() * Math.PI * 2,
-          tiltYPhase: Math.random() * Math.PI * 2,
-          orbitDir:   Math.random() < 0.5 ? 1 : -1,
+            result = { geom: geom, mat: mat };
+          }
         });
-        idx++;
-      }
-    }
-
-    animate(container, tiles);
-  }
-
-  function animate(container, tiles) {
-    let lastTs = null;
-    const half = TILE_SIZE / 2;
-
-    function tick(ts) {
-      if (lastTs === null) lastTs = ts;
-      const dt = Math.min(ts - lastTs, 50);
-      lastTs = ts;
-
-      const W = container.offsetWidth  || 800;
-      const H = container.offsetHeight || 600;
-      const cellW = W / COLS;
-      const cellH = H / ROWS;
-
-      tiles.forEach(t => {
-        t.phase      += ORBIT_SPD  * dt * t.orbitDir;
-        t.swayPhase  += SWAY_SPD   * dt;
-        t.tiltXPhase += TILT_X_SPD * dt;
-        t.tiltYPhase += TILT_Y_SPD * dt;
-
-        const cx = cellW * t.col + cellW * 0.5;
-        const cy = cellH * t.row + cellH * 0.5;
-        const r  = ORBIT_R * (0.6 + t.z * 0.7);
-
-        const px = cx + Math.cos(t.phase) * r - half;
-        const py = cy + Math.sin(t.phase) * r - half;
-
-        const rotZ = t.baseRotZ + Math.sin(t.swayPhase)  * SWAY_AMP;
-        const rotX = Math.sin(t.tiltXPhase) * TILT_AMP;
-        const rotY = Math.sin(t.tiltYPhase) * TILT_AMP;
-        const sc   = t.baseScale;
-
-        t.el.style.left      = px.toFixed(1) + 'px';
-        t.el.style.top       = py.toFixed(1) + 'px';
-        t.el.style.zIndex    = Math.round(t.z * 9);
-        t.el.style.transform = `scale(${sc}) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateZ(${rotZ.toFixed(2)}deg)`;
-
-        /* Двигаем камеру model-viewer для живого 3D:
-           theta — горизонтальный поворот (Y), phi — вертикальный (X)
-           база phi=90deg (смотрим спереди), отклоняем на ±TILT_AMP */
-        t.mv.cameraOrbit = `${rotY.toFixed(2)}deg ${(90 - rotX).toFixed(2)}deg 105%`;
+        resolve(result);
+      }, null, function(err) {
+        console.warn('Failed to load', url, err);
+        resolve(null);
       });
-
-      requestAnimationFrame(tick);
-    }
-
-    requestAnimationFrame(tick);
+    });
   }
 
+  /* Фоллбэк материал если GLB не загрузился */
+  function fallbackMat(idx) {
+    var colors = [0xe8ddd0, 0x3d0f1a, 0x1a0505, 0x000000, 0x0000ff, 0x000000];
+    return new THREE.MeshStandardMaterial({
+      color: colors[idx % colors.length],
+      roughness: 0.3, metalness: 0.1
+    });
+  }
+
+  /* ── Ждём DOM ── */
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+    await new Promise(r => document.addEventListener('DOMContentLoaded', r));
   }
+
+  var canvas = document.getElementById('orbitCanvas');
+  if (!canvas) return;
+  var sec = canvas.parentElement;
+
+  /* ── Renderer ── */
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+  renderer.setSize(sec.offsetWidth, sec.offsetHeight);
+
+  /* ── Ортокамера ── */
+  var W = sec.offsetWidth, H = sec.offsetHeight;
+  var cam = new THREE.OrthographicCamera(-W/2, W/2, H/2, -H/2, 1, 1000);
+  cam.position.z = 500;
+
+  /* ── Сцена + свет ── */
+  var scene = new THREE.Scene();
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+
+  var dir = new THREE.DirectionalLight(0xffffff, 1.5);
+  dir.position.set(200, 300, 400);
+  dir.castShadow = true;
+  dir.shadow.mapSize.set(512, 512);
+  scene.add(dir);
+
+  var rim = new THREE.DirectionalLight(0x8899ff, 0.35);
+  rim.position.set(-200, -100, 100);
+  scene.add(rim);
+
+  /* ── Загружаем все GLB параллельно ── */
+  var plateData = await Promise.all(PLATES.map(loadPlate));
+
+  /* ── Фоллбэк геометрия ── */
+  var fallbackGeom = new THREE.BoxGeometry(1, 0.12, 1);
+
+  /* ── Строим плитки ── */
+  var tiles = [];
+  for (var row = 0; row < ROWS; row++) {
+    for (var col = 0; col < COLS; col++) {
+      var idx  = (row * COLS + col) % PLATES.length;
+      var data = plateData[idx];
+
+      var geom = data ? data.geom.clone() : fallbackGeom.clone();
+      var mat  = data ? data.mat         : fallbackMat(idx);
+
+      var mesh = new THREE.Mesh(geom, mat);
+      mesh.castShadow = true;
+
+      var z  = 0.3 + Math.random() * 0.7;
+      var ts = 42 + z * 22;
+      mesh.scale.set(ts, ts, ts);
+      scene.add(mesh);
+
+      tiles.push({
+        mesh: mesh, col: col, row: row, z: z,
+        phase:      Math.random() * Math.PI * 2,
+        phaseRot:   (Math.random() - 0.5) * Math.PI / 6,
+        swayPhase:  Math.random() * Math.PI * 2,
+        tiltXPhase: Math.random() * Math.PI * 2,
+        tiltYPhase: Math.random() * Math.PI * 2,
+        orbitDir:   Math.random() < 0.5 ? 1 : -1,
+      });
+    }
+  }
+
+  /* ── Resize ── */
+  window.addEventListener('resize', function() {
+    var w = sec.offsetWidth, h = sec.offsetHeight;
+    renderer.setSize(w, h);
+    cam.left = -w/2; cam.right  =  w/2;
+    cam.top  =  h/2; cam.bottom = -h/2;
+    cam.updateProjectionMatrix();
+  });
+
+  /* ── Анимация ── */
+  var lastTs = null;
+  function animate(ts) {
+    if (lastTs === null) lastTs = ts;
+    var dt = Math.min(ts - lastTs, 50);
+    lastTs = ts;
+
+    var W2 = sec.offsetWidth, H2 = sec.offsetHeight;
+    var cellW = W2 / COLS, cellH = H2 / ROWS;
+
+    tiles.forEach(function(t) {
+      t.phase      += ORBIT_SPD  * dt * t.orbitDir;
+      t.swayPhase  += SWAY_SPD   * dt;
+      t.tiltXPhase += TILT_X_SPD * dt;
+      t.tiltYPhase += TILT_Y_SPD * dt;
+
+      var cx = cellW * t.col + cellW * 0.5 - W2 / 2;
+      var cy = H2 / 2 - (cellH * t.row + cellH * 0.5);
+      var r  = ORBIT_R * (0.6 + t.z * 0.7);
+
+      t.mesh.position.set(
+        cx + Math.cos(t.phase) * r,
+        cy + Math.sin(t.phase) * r,
+        t.z * 20 - 10
+      );
+      t.mesh.rotation.z = t.phaseRot + Math.sin(t.swayPhase)  * SWAY_AMP;
+      t.mesh.rotation.x = Math.sin(t.tiltXPhase) * TILT_AMP;
+      t.mesh.rotation.y = Math.sin(t.tiltYPhase) * TILT_AMP;
+    });
+
+    renderer.render(scene, cam);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
 })();

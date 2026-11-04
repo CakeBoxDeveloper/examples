@@ -350,6 +350,19 @@ body.theme-light .section-scroll-btn {
   display: none;
 }
 
+/* Matrix code rain canvas */
+.matrix-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Вигнет поверх rain — убран */
+.hero__vignette { display: none; }
+
 /* Wire dots на карточках — невидимые якоря сверху по центру */
 .wire-dot {
   position: absolute;
@@ -560,6 +573,8 @@ body.theme-light .section-scroll-btn {
   width: 100%;
   max-width: 100%;
   padding-inline: 16px;
+  position: relative;
+  z-index: 2;
 }
 
 .hero__col {
@@ -1735,22 +1750,14 @@ body.theme-light .section-scroll-btn {
 .orbit-canvas {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   pointer-events: none;
   z-index: 0;
-}
-
-/* ── DOM-плитки (model-viewer) ── */
-.orbit-tiles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  perspective: 800px;
-  overflow: hidden;
 }
 .contact__inner {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
+
+.contact__fg { display: none; }

@@ -6,7 +6,8 @@
   <title>Portfolio</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="app.js" defer></script>
   <script src="orbit3d.js" defer></script>
 </head>
@@ -34,9 +35,13 @@
   ═══════════════════════════════════════ -->
   <section class="hero" id="hero">
     <canvas id="wireCanvas" class="wire-canvas" aria-hidden="true"></canvas>
+    <canvas id="matrixCanvas" class="matrix-canvas" aria-hidden="true"></canvas>
+    <div class="hero__vignette" aria-hidden="true"></div>
     <div class="hero__inner">
 
       <!-- COL LO -->
+      <!--
+      COL LO + COL LI (закомментировано)
       <div class="hero__col hero__col--lo">
         <article class="card card--beige card--wip-border">
           <div class="card__header card__header--yellow">Panacea</div>
@@ -50,7 +55,7 @@
         </article>
       </div>
 
-      <!-- COL LI: 2 карточки -->
+      COL LI: 2 карточки
       <div class="hero__col hero__col--li">
         <article class="card card--ttm">
           <div class="card__header">Час для себе</div>
@@ -69,6 +74,7 @@
           <span class="wire-dot" data-wire-color="#ff5252" aria-hidden="true"></span>
         </article>
       </div>
+      -->
 
       <!-- CENTER -->
       <div class="hero__center">
@@ -92,7 +98,7 @@
         </button>
       </div>
 
-      <!-- COL RI: 2 карточки -->
+      <!-- COL RI + COL RO (закомментировано)
       <div class="hero__col hero__col--ri">
         <article class="card">
           <div class="card__header">Lacar Drive</div>
@@ -112,7 +118,7 @@
         </article>
       </div>
 
-      <!-- COL RO -->
+      COL RO
       <div class="hero__col hero__col--ro">
         <article class="card card--mse card--wip-border">
           <div class="card__header card__header--yellow">MSE</div>
@@ -125,6 +131,7 @@
           <span class="wire-dot" data-wire-color="#4d8cff" aria-hidden="true"></span>
         </article>
       </div>
+      -->
 
     </div>
 
@@ -269,7 +276,15 @@
   ═══════════════════════════════════════ -->
   <section class="contact" id="contact">
     <canvas id="orbitCanvas" class="orbit-canvas" aria-hidden="true"></canvas>
-    <div id="orbitTiles" class="orbit-tiles" aria-hidden="true"></div>
+
+    <!-- Размытый передний план -->
+    <div class="contact__fg" aria-hidden="true">
+      <div class="contact__fg-tile contact__fg-tile--tl" style="background:#e8ddd0;"></div>
+      <div class="contact__fg-tile contact__fg-tile--tr" style="background:#3d0f1a;"></div>
+      <div class="contact__fg-tile contact__fg-tile--bl" style="background:#0000ff;"></div>
+      <div class="contact__fg-tile contact__fg-tile--br" style="background:#000000;"></div>
+    </div>
+
     <div class="contact__inner">
 
       <div class="cstack">

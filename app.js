@@ -570,3 +570,151 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
+
+/* ═══════════════════════════════════════
+   MATRIX CODE RAIN — hero background
+   Алгоритм по мотивам BambuFarm/rain.py
+═══════════════════════════════════════ */
+(function () {
+  const root = document.querySelector('.hero');
+  const cv   = document.getElementById('matrixCanvas');
+  if (!root || !cv) return;
+  const ctx  = cv.getContext('2d');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Символы как в rain.py
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*+-=/<>|ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ'.split('');
+
+  const CELL    = 26;         // размер ячейки px
+  const COL_GAP = CELL * 2;   // шаг колонок — каждая вторая, не накладываются
+  const FPS     = 20;         // ~как sleep(0.05) в rain.py
+  const STEP    = 1000 / FPS;
+
+  // Цвета зависят от темы
+  function getTheme() {
+    return document.body.classList.contains('theme-light') ? 'light' : 'dark';
+  }
+
+  function palette() {
+    if (getTheme() === 'light') return {
+      bg:     'rgba(240,241,245,0.25)', // светлый fade
+      white:  'rgba(60,60,70,1.0)',     // голова — тёмно-серая
+      bright: 'rgba(90,95,110,0.85)',
+      mid:    'rgba(130,135,150,0.6)',
+      dim:    'rgba(170,175,185,0.35)',
+    };
+    return {
+      bg:     'rgba(8,9,15,0.2)',
+      white:  'rgba(230,255,240,1.0)',
+      bright: 'rgba(0,255,100,0.9)',
+      mid:    'rgba(0,200,70,0.65)',
+      dim:    'rgba(0,120,40,0.35)',
+    };
+  }
+
+  let w = 0, h = 0, dpr = 1, cols = 0, drops = [];
+  let raf = 0, live = false, last = 0;
+
+  const pick = () => CHARS[(Math.random() * CHARS.length) | 0];
+  const rows = () => Math.ceil(h / CELL);
+
+  function makeCol(x) {
+    const r = rows();
+    return {
+      x,
+      head:   -(Math.random() * r | 0),
+      length: 6 + (Math.random() * Math.max(1, r / 2) | 0),
+      speed:  Math.random() < 0.75 ? 1 : 2,  // 75% = speed 1, 25% = speed 2
+      chars:  Array.from({ length: r + 4 }, pick),
+      tick:   0,
+    };
+  }
+
+  function size() {
+    const r = root.getBoundingClientRect();
+    w = r.width; h = r.height;
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    cv.width  = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font         = 'bold ' + CELL + 'px ui-monospace, Menlo, monospace';
+    ctx.textBaseline = 'top';
+    cols  = Math.ceil(w / COL_GAP);
+    drops = Array.from({ length: cols }, (_, i) => makeCol(i * COL_GAP));
+    // Заливаем фон
+    ctx.fillStyle = '#08090f';
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function stepCol(d) {
+    d.tick++;
+    if (d.tick < d.speed) return;
+    d.tick = 0;
+    d.head++;
+    // 12% шанс мутации случайного символа в хвосте (как в rain.py)
+    if (Math.random() < 0.12) {
+      const ri = Math.random() * d.chars.length | 0;
+      d.chars[ri] = pick();
+    }
+    // Сброс колонки
+    const r = rows();
+    if (d.head - d.length > r) {
+      d.head   = -(Math.random() * r / 2 | 0);
+      d.length = 6 + (Math.random() * Math.max(1, r / 2) | 0);
+      d.speed  = Math.random() < 0.75 ? 1 : 2;
+      d.chars  = Array.from({ length: r + 4 }, pick);
+    }
+  }
+
+  function drawCol(d) {
+    const r = rows();
+    const p = palette();
+    for (let row = 0; row < r; row++) {
+      const dist = d.head - row;
+      const y    = row * CELL;
+      const ch   = d.chars[row] || ' ';
+
+      if (dist === 0) {
+        ctx.fillStyle = p.white;
+        ctx.fillText(ch, d.x, y);
+      } else if (dist > 0 && dist <= 2) {
+        ctx.fillStyle = p.bright;
+        ctx.fillText(ch, d.x, y);
+      } else if (dist > 0 && dist <= d.length / 2) {
+        ctx.fillStyle = p.mid;
+        ctx.fillText(ch, d.x, y);
+      } else if (dist > 0 && dist <= d.length) {
+        ctx.fillStyle = p.dim;
+        ctx.fillText(ch, d.x, y);
+      }
+    }
+  }
+
+  function draw() {
+    const p = palette();
+    ctx.fillStyle = p.bg;
+    ctx.fillRect(0, 0, w, h);
+    for (const d of drops) {
+      stepCol(d);
+      drawCol(d);
+    }
+  }
+
+  function frame(now) {
+    if (now - last >= STEP) { last = now; draw(); }
+    if (live) raf = requestAnimationFrame(frame);
+  }
+
+  const start = () => { if (!live && !calm) { live = true; raf = requestAnimationFrame(frame); } };
+  const stop  = () => { live = false; cancelAnimationFrame(raf); };
+
+  size();
+  if (calm) { for (let i = 0; i < 30; i++) draw(); }
+  else new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? start() : stop()), { threshold: 0 }).observe(root);
+
+  let t;
+  addEventListener('resize', () => {
+    clearTimeout(t);
+    t = setTimeout(() => { size(); }, 180);
+  });
+})();
