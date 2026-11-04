@@ -551,23 +551,36 @@ window.addEventListener('DOMContentLoaded', () => {
   function apply(theme) {
     if (theme === 'light') {
       body.classList.add('theme-light');
-      btn.innerHTML = MOON;
-      btn.title = 'Тёмная тема';
+      if (btn) { btn.innerHTML = MOON; btn.title = 'Тёмная тема'; }
     } else {
       body.classList.remove('theme-light');
-      btn.innerHTML = SUN;
-      btn.title = 'Светлая тема';
+      if (btn) { btn.innerHTML = SUN; btn.title = 'Светлая тема'; }
+    }
+    // Синхронно обновляем кнопки День/Ночь в чате
+    var dayBtn   = document.getElementById('chatModeDay');
+    var nightBtn = document.getElementById('chatModeNight');
+    if (dayBtn && nightBtn) {
+      dayBtn.classList.toggle('hero__chat-mode-btn--active',   theme === 'light');
+      nightBtn.classList.toggle('hero__chat-mode-btn--active', theme !== 'light');
     }
   }
 
   const saved = localStorage.getItem(KEY) || 'dark';
   apply(saved);
 
-  btn.addEventListener('click', () => {
-    const next = body.classList.contains('theme-light') ? 'dark' : 'light';
-    localStorage.setItem(KEY, next);
-    apply(next);
-  });
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const next = body.classList.contains('theme-light') ? 'dark' : 'light';
+      localStorage.setItem(KEY, next);
+      apply(next);
+    });
+  }
+
+  // Кнопки День/Ночь в чате — используют ту же apply
+  var dayBtn   = document.getElementById('chatModeDay');
+  var nightBtn = document.getElementById('chatModeNight');
+  if (dayBtn)   dayBtn.addEventListener('click',   function () { localStorage.setItem(KEY, 'light'); apply('light'); });
+  if (nightBtn) nightBtn.addEventListener('click', function () { localStorage.setItem(KEY, 'dark');  apply('dark');  });
 })();
 
 
@@ -763,3 +776,5 @@ window.addEventListener('DOMContentLoaded', () => {
     path: 'https://assets4.lottiefiles.com/packages/lf20_iqon5gsh.json'
   });
 })();
+
+

@@ -16,19 +16,7 @@
   <div class="noise" aria-hidden="true"></div>
 
   <!-- Кнопка темы (временная) -->
-  <button class="theme-toggle" id="themeToggle" title="Переключить тему" aria-label="Переключить тему">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="5"/>
-      <line x1="12" y1="1" x2="12" y2="3"/>
-      <line x1="12" y1="21" x2="12" y2="23"/>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-      <line x1="1" y1="12" x2="3" y2="12"/>
-      <line x1="21" y1="12" x2="23" y2="12"/>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>
-  </button>
+  <!-- кнопка темы убрана — управление через День/Ночь в чате -->
 
   <!-- ══════════════════════════════════════
        HERO
@@ -80,50 +68,63 @@
       <div class="hero__center">
         <div class="hero__chat" id="wireTarget">
 
-          <!-- Тело: пустое состояние -->
+          <!-- Тело: логотип + приветствие -->
           <div class="hero__chat-body">
             <img class="hero__chat-icon" src="https://www.svgrepo.com/download/481626/flower.svg" alt="" aria-hidden="true" />
-            <p class="hero__chat-empty">Начните переписку<br/>с умной мысли<span class="hero__chat-cursor" aria-hidden="true"></span></p>
+            <div class="hero__chat-greeting">
+              <p>Edelweiss — передовой инструмент для разработки, дизайна и решения сложных задач. Всё что вы можете представить — он воплотит.</p>
+            </div>
           </div>
 
-          <!-- Футер: селектор + инпут -->
+          <!-- Футер: инпут + нижняя строка -->
           <div class="hero__chat-footer">
+            <div class="hero__chat-box">
 
-            <!-- Строка: модель + usage -->
-            <div class="hero__chat-model-row">
-              <button class="hero__chat-model" aria-label="Выбрать модель">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-                <span>Edelweiss</span>
-                <svg class="hero__chat-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-              <div class="hero__chat-usage" title="65% использовано">
-                <svg class="hero__chat-ring" viewBox="0 0 28 28" aria-hidden="true">
-                  <circle class="hero__chat-ring-bg" cx="14" cy="14" r="11"/>
-                  <circle class="hero__chat-ring-fill" cx="14" cy="14" r="11"/>
-                </svg>
-                <span class="hero__chat-usage-label">65%</span>
+              <!-- Строка ввода -->
+              <div class="hero__chat-input-row">
+                <input
+                  class="hero__chat-input"
+                  type="text"
+                  readonly
+                  aria-label="Поле ввода чата"
+                />
+                <div class="hero__chat-placeholder" aria-hidden="true">
+                  Что по плану?...<span class="hero__chat-cursor"></span>
+                </div>
+              </div>
+
+              <!-- Тулбар -->
+              <div class="hero__chat-toolbar">
+
+                <!-- Левая часть: + День Ночь -->
+                <div class="hero__chat-toolbar-left">
+                  <button class="hero__chat-plus" aria-label="Добавить">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <div class="hero__chat-mode">
+                    <button class="hero__chat-mode-btn hero__chat-mode-btn--active" id="chatModeDay" aria-label="Светлая тема">День</button>
+                    <button class="hero__chat-mode-btn" id="chatModeNight" aria-label="Тёмная тема">Ночь</button>
+                  </div>
+                </div>
+
+                <!-- Правая часть: Edelweiss · Medium · mic · chevron · waves -->
+                <div class="hero__chat-toolbar-right">
+                  <span class="hero__chat-model-name">Edelweiss</span>
+                  <span class="hero__chat-sep">·</span>
+                  <span class="hero__chat-quality">Medium</span>
+                  <button class="hero__chat-icon-btn" aria-label="Голос">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                  </button>
+                  <button class="hero__chat-icon-btn hero__chat-chevron-btn" aria-label="Настройки">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <button class="hero__chat-icon-btn" aria-label="Уровень">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="12" x2="4" y2="12"/><line x1="6" y1="8" x2="6" y2="16"/><line x1="10" y1="5" x2="10" y2="19"/><line x1="14" y1="8" x2="14" y2="16"/><line x1="18" y1="10" x2="18" y2="14"/><line x1="22" y1="12" x2="22" y2="12"/></svg>
+                  </button>
+                </div>
+
               </div>
             </div>
-
-            <!-- Инпут -->
-            <div class="hero__chat-input-wrap">
-              <input
-                class="hero__chat-input"
-                type="text"
-                placeholder="Что по плану?"
-                readonly
-                aria-label="Поле ввода чата"
-              />
-              <div class="hero__chat-input-actions">
-                <button class="hero__chat-action-btn" aria-label="Прикрепить файл">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                </button>
-                <button class="hero__chat-action-btn hero__chat-action-btn--send" aria-label="Отправить">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                </button>
-              </div>
-            </div>
-
           </div>
 
         </div>
