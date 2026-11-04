@@ -1086,12 +1086,22 @@ body.theme-light .section-scroll-btn {
 .section-scroll-btn:hover { opacity: 0.75; }
 
 .hero .section-scroll-btn {
-  background: linear-gradient(to bottom, transparent 0%, var(--bg) 55%);
+  background: linear-gradient(to bottom, rgba(8,15,9,0) 0%, #080f09 55%);
   transition: opacity var(--ease);
+  transition-property: opacity;
 }
 .cases .section-scroll-btn {
-  background: linear-gradient(to bottom, transparent 0%, var(--bg-alt) 55%);
+  background: linear-gradient(to bottom, rgba(12,26,14,0) 0%, #0c1a0e 55%);
   transition: opacity var(--ease);
+  transition-property: opacity;
+}
+body.theme-light .hero .section-scroll-btn {
+  background: linear-gradient(to bottom, rgba(240,241,245,0) 0%, #f0f1f5 55%) !important;
+  transition-property: opacity;
+}
+body.theme-light .cases .section-scroll-btn {
+  background: linear-gradient(to bottom, rgba(232,233,239,0) 0%, #e8e9ef 55%) !important;
+  transition-property: opacity;
 }
 
 /* убираем старую кнопку cases__cta */
@@ -1213,6 +1223,7 @@ body.theme-light .section-scroll-btn {
   cursor: pointer;
   transition: border-color var(--ease), background var(--ease);
   font-size: 0.82rem;
+  color: var(--text-muted);
   user-select: none;
 }
 .cform__check:hover { border-color: var(--border-accent); }
@@ -1251,7 +1262,7 @@ body.theme-light .section-scroll-btn {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  color: var(--text);
+  color: var(--text-muted);
   font: inherit; font-size: 0.88rem;
   padding: 11px 14px;
   outline: none; resize: vertical;
@@ -1261,7 +1272,7 @@ body.theme-light .section-scroll-btn {
 .cform__input::placeholder,
 .cform__textarea::placeholder { color: var(--text-dim); }
 .cform__input:focus,
-.cform__textarea:focus { border-color: var(--border-accent); }
+.cform__textarea:focus { border-color: var(--border-accent); color: var(--text); }
 
 /* Two-col row */
 .cform__row {
@@ -1284,16 +1295,21 @@ body.theme-light .section-scroll-btn {
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  background: var(--accent);
+  background: var(--chat-footer, #1e261f);
+  border-bottom: 1px solid var(--chat-border, rgba(255,255,255,0.07));
   border-radius: 14px 14px 0 0;
   flex-shrink: 0;
+}
+body.theme-light .cform__header {
+  background: var(--chat-footer, #ebebeb);
+  border-bottom: 1px solid var(--chat-border, rgba(0,0,0,0.09));
 }
 
 .cform__title {
   font-size: clamp(1rem, 2.5vw, 1.2rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: var(--chat-text, #c4ccc5);
   line-height: 1.2;
 }
 
@@ -1525,35 +1541,38 @@ body.theme-light .section-scroll-btn {
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: #f0c000;
-  color: #1a1a1a;
+  background: var(--chat-footer);
+  color: var(--chat-text);
   border-radius: 0 0 14px 14px;
   border: none;
+  border-top: 1px solid var(--chat-border);
   cursor: pointer;
   flex-shrink: 0;
   transition: background var(--ease);
 }
-.cform__submit--yellow:hover { background: #d4a800; }
+.cform__submit--yellow:hover { background: var(--chat-input-bg); }
 
-/* Плашка зелёная (обратная связь) */
-.cform__header--green {
-  background: #1db954;
-}
-
-/* Плашка жёлтая (поддержка) */
+/* Плашка — единый стиль для всех карточек (как чат hero) */
+.cform__header--green,
 .cform__header--yellow {
-  background: #f0c000;
+  background: var(--chat-footer, #1e261f);
+  border-bottom: 1px solid var(--chat-border, rgba(255,255,255,0.07));
+}
+body.theme-light .cform__header--green,
+body.theme-light .cform__header--yellow {
+  background: var(--chat-footer, #ebebeb);
+  border-bottom: 1px solid var(--chat-border, rgba(0,0,0,0.09));
 }
 .cform__title--dark {
-  color: #1a1a1a;
+  color: var(--chat-text, #c4ccc5);
 }
 
-/* Кнопка зелёная */
+/* Кнопки submit — единый цвет */
 .cform__submit--green {
-  background: #1db954;
+  background: var(--accent);
 }
 .cform__submit--green:hover {
-  background: #17a348;
+  background: #3a9458;
 }
 
 /* Донат-блок */
@@ -1600,7 +1619,7 @@ body.theme-light .section-scroll-btn {
   flex: 1;
   font-size: 0.85rem;
   font-weight: 500;
-  color: var(--text);
+  color: var(--text-muted);
 }
 .donate__value--mono {
   font-family: monospace;
@@ -2218,4 +2237,72 @@ body.theme-light .hero__chat-icon {
   margin-left: 1px;
   vertical-align: middle;
   animation: blink 1.1s step-end infinite;
+}
+
+/* SVG иконки в хедерах карточек — белые в тёмной теме */
+.contact__emoji {
+  width: 28px; height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+body.theme-light .contact__emoji {
+  filter: brightness(0);
+  opacity: 0.5;
+}
+
+/* ── Hero chat: теги направлений ── */
+.hero__chat-tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 5px;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hero__chat-tags::-webkit-scrollbar { display: none; }
+
+.hero__chat-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--chat-border);
+  background: var(--chat-input-bg);
+  color: var(--chat-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  cursor: default;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.18s, color 0.18s;
+}
+.hero__chat-tag:hover {
+  border-color: var(--chat-accent);
+  color: var(--chat-text);
+}
+.hero__chat-tag svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* Кнопки submit в карточках contact — единый стиль с хедером */
+.cform__submit.btn--primary {
+  background: var(--chat-footer);
+  color: var(--chat-text);
+  border-top: 1px solid var(--chat-border);
+  border-radius: 0 0 14px 14px;
+}
+.cform__submit.btn--primary:hover {
+  background: var(--chat-input-bg);
+}
+.cform__submit--green.btn--primary {
+  background: var(--chat-footer);
+  color: var(--chat-text);
+}
+.cform__submit--green.btn--primary:hover {
+  background: var(--chat-input-bg);
 }
