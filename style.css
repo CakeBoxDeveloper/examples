@@ -1847,13 +1847,15 @@ body.theme-light {
   gap: 12px;
   padding: 20px;
   min-height: 0;
+  text-align: center;
 }
 
 .hero__chat-icon {
-  width: 96px; height: 96px;
+  width: 125px; height: 125px;
   flex-shrink: 0;
   opacity: 0.25;
   filter: invert(1) sepia(1) saturate(2) hue-rotate(90deg);
+  margin-bottom: 4px;
 }
 body.theme-light .hero__chat-icon {
   filter: none;
@@ -1869,7 +1871,7 @@ body.theme-light .hero__chat-icon {
   font-size: 0.75rem;
   line-height: 1.6;
   color: var(--chat-text);
-  text-align: left;
+  text-align: center;
   position: relative;
 }
 .hero__chat-greeting p { margin: 0; }
@@ -2261,6 +2263,7 @@ body.theme-light .contact__emoji {
   width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
+  justify-content: center;
 }
 .hero__chat-tags::-webkit-scrollbar { display: none; }
 
@@ -2281,12 +2284,16 @@ body.theme-light .contact__emoji {
   transition: border-color 0.18s, color 0.18s;
 }
 .hero__chat-tag:hover {
-  border-color: var(--chat-accent);
-  color: var(--chat-text);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .hero__chat-tag svg {
   flex-shrink: 0;
   opacity: 0.6;
+  transition: opacity 0.18s;
+}
+.hero__chat-tag:hover svg {
+  opacity: 1;
 }
 
 /* Кнопки submit в карточках contact — единый стиль с хедером */

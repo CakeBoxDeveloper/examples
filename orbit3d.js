@@ -53,11 +53,15 @@
 
           if (meshes.length === 0) { resolve(null); return; }
 
-          // Cube = фон, всё остальное = лого
+          // Логируем имена для отладки
+          console.log(plate.file + ':', meshes.map(function(m){ return m.name; }));
+
+          // Cube (по имени, без учёта регистра) = плитка (фон), всё остальное = лого
           var colors = getTileColors();
           meshes.forEach(function(item) {
+            var isCube = /^cube/i.test(item.name);
             item.mat = new THREE.MeshStandardMaterial({
-              color:     item.name === 'Cube' ? colors.bg : colors.logo,
+              color:     isCube ? colors.bg : colors.logo,
               roughness: 0.85,
               metalness: 0.05,
             });
@@ -185,7 +189,8 @@
     tiles.forEach(function(t) {
       t.mesh.traverse(function(child) {
         if (!child.isMesh) return;
-        var color = child.name === 'Cube' ? colors.bg : colors.logo;
+        var isCube = /^cube/i.test(child.name);
+        var color = isCube ? colors.bg : colors.logo;
         var mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach(function(m) { if (m && m.color) m.color.set(color); });
       });
