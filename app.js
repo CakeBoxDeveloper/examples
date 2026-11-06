@@ -223,7 +223,9 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
     if (e.button !== 0) return;
     dragStartX    = e.clientX;
     dragDeltaX    = 0;
-    baseTranslate = -targetX(curIdx);
+    // Читаем текущий translateX из матрицы — защита от rebalance-прыжка
+    const mat = new DOMMatrix(getComputedStyle(track).transform);
+    baseTranslate = mat.m41;
     track.style.transition = 'none';
     track.setPointerCapture(e.pointerId);
   });

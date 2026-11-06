@@ -650,73 +650,95 @@ body.theme-light .section-scroll-btn {
   }
   .hero__col { display: none; }
   .hero__center {
-    width: 90vw;
-    max-width: 90vw;
+    width: 90vw !important;
+    max-width: 90vw !important;
     min-width: 0;
     padding-inline: 0;
+    flex: none;
   }
-  /* Чат занимает почти весь экран по высоте */
   .hero__chat {
     height: calc(100svh - 180px);
     min-height: 360px;
     max-height: none;
   }
 
-  /* ── Cases карусель ── */
+  /* ── Cases карусель — слайды 90vw с margin 5vw ── */
   :root {
-    --ck-gap:     5vw;
-    --ck-slide-w: 90vw;
+    --ck-gap:     0px;
+    --ck-slide-w: 100vw;
   }
   .ck-carousel {
     padding-block: 0;
     margin-block: 0;
-    overflow: hidden; /* clip по обеим осям */
-    width: 100vw;     /* растягиваем на весь экран */
+    overflow: hidden;
+    width: 100vw;
   }
   .ck-track {
     touch-action: pan-y;
-    gap: 5vw;
+    gap: 0;
   }
+  /* слайд занимает 100vw (шаг), но визуально 90vw с отступами */
   .ck-slide {
+    flex: 0 0 100vw;
+    width: 100vw;
     height: calc(100svh - 140px);
     min-height: 300px;
     border-radius: 14px;
     border: 1px solid var(--border);
+    /* внутренний отступ создаёт эффект 90vw блока по центру */
+    box-sizing: border-box;
+    margin: 0;
+    /* визуальное смещение через transform не нужно — используем padding wrapper */
   }
-  .ck-slide.is-active { border-color: var(--border-accent); }
+  /* Оборачиваем содержимое отступом 5vw */
+  .ck-slide { padding-inline: 5vw; border-radius: 0; border-left: none; border-right: none; border-top: none; border-bottom: none; background: transparent; }
+  /* Восстанавливаем стиль внутренних блоков */
+  .ck-preview, .ck-content {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    left: 5vw; right: 5vw; width: auto;
+  }
+  .ck-slide.is-active .ck-preview,
+  .ck-slide.is-active .ck-content { border-color: var(--border-accent); }
   .ck-preview__img    { width: 100px; height: 100px; }
   .ck-preview__label  { font-size: 0.9rem; }
 
-  /* ── Contact стек ── */
+  /* ── Contact: плоская горизонтальная карусель ── */
   .contact { overflow: hidden; padding-block: 60px; }
-  .contact__inner { padding-block: 0; }
+  .contact__inner { padding-block: 0; overflow: visible; }
   .cstack {
+    position: relative;
     width: 90vw;
     max-width: 90vw;
     margin-inline: auto;
-    height: calc(100svh - 200px);
-    min-height: 400px;
+    height: calc(100svh - 220px);
+    min-height: 380px;
     overflow: hidden;
-    touch-action: pan-y;
   }
   .cstack__card {
+    position: absolute;
+    top: 0; left: 0;
     width: 100%;
     height: 100%;
     border-radius: 14px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+    transform-origin: center center;
   }
   .cstack__card[data-pos="center"] {
-    transform: translateX(0) scale(1);
+    transform: translateX(0);
     opacity: 1;
+    z-index: 10;
   }
   .cstack__card[data-pos="left"] {
-    transform: translateX(-110%) scale(1);
+    transform: translateX(-105vw);
     opacity: 0;
+    z-index: 5;
   }
   .cstack__card[data-pos="right"] {
-    transform: translateX(110%) scale(1);
+    transform: translateX(105vw);
     opacity: 0;
+    z-index: 5;
   }
 }
 

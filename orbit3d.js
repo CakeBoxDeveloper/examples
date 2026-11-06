@@ -46,7 +46,10 @@
   ];
 
   const COLS = 4, ROWS = 3;
-  const ORBIT_R    = 40;
+  const IS_MOBILE = window.innerWidth < 860;
+  const ORBIT_R    = IS_MOBILE ? 18 : 40;
+  const ACTUAL_COLS = IS_MOBILE ? 2 : COLS;
+  const ACTUAL_ROWS = IS_MOBILE ? 2 : ROWS;
   const ORBIT_SPD  = 0.00035;
   const SWAY_AMP   = 38 * Math.PI / 180;
   const SWAY_SPD   = 0.0006;
@@ -248,6 +251,9 @@
     var W2 = sec.offsetWidth, H2 = sec.offsetHeight;
     var cellW = W2 / COLS, cellH = H2 / ROWS;
 
+    // На мобиле зажимаем позицию внутри ячейки
+    var isMob = IS_MOBILE;
+
     tiles.forEach(function(t) {
       t.phase      += ORBIT_SPD  * dt * t.orbitDir;
       t.swayPhase  += SWAY_SPD   * dt;
@@ -258,18 +264,25 @@
       var cy = H2 / 2 - (cellH * t.row + cellH * 0.5);
       var r  = ORBIT_R * (0.6 + t.z * 0.7);
 
-      t.mesh.position.set(
-        cx + Math.cos(t.phase) * r,
-        cy + Math.sin(t.phase) * r,
-        t.z * 20 - 10
-      );
+      var px = cx + Math.cos(t.phase) * r;
+      var py = cy + Math.sin(t.phase) * r;
+
+      // Зажимаем в пределах своей ячейки на мобиле
+      if (isMob) {
+        var halfW = cellW * 0.5 - 10;
+        var halfH = cellH * 0.5 - 10;
+        px = Math.max(cx - halfW, Math.min(cx + halfW, px));
+        py = Math.max(cy - halfH, Math.min(cy + halfH, py));
+      }
+
+      t.mesh.position.set(px, py, t.z * 20 - 10);
       t.mesh.rotation.z = t.baseRotZ + t.phaseRot + Math.sin(t.swayPhase) * SWAY_AMP;
       t.mesh.rotation.x = t.baseRotX + Math.sin(t.tiltXPhase) * TILT_AMP;
       t.mesh.rotation.y = Math.sin(t.tiltYPhase) * TILT_AMP;
     });
 
     /* ── Коллижн: попарное отталкивание ── */
-    var MIN_DIST = 52; // минимальное расстояние между центрами (в юнитах сцены)
+    var MIN_DIST = window.innerWidth < 860 ? 38 : 52;
     for (var i = 0; i < tiles.length; i++) {
       for (var j = i + 1; j < tiles.length; j++) {
         var a = tiles[i].mesh.position;
