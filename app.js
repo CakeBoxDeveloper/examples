@@ -562,3 +562,41 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+/* ═══════════════════════════════════════
+   CONTACT FOLDER TABS (mobile)
+═══════════════════════════════════════ */
+(function () {
+  if (window.innerWidth > 860) return;
+
+  var folder = document.getElementById('contactFolder');
+  var tabs   = Array.from(document.querySelectorAll('#contactFolderTabs .contact-folder__tab'));
+  var pages  = Array.from(document.querySelectorAll('#contactFolderPanel .contact-folder__page'));
+  var cards  = Array.from(document.querySelectorAll('.cstack .cstack__card'));
+  if (!folder || !tabs.length || !cards.length) return;
+
+  // Клонируем содержимое каждой карточки в соответствующую страницу
+  cards.forEach(function(card, i) {
+    var page = pages[i];
+    if (!page) return;
+    var wrap = card.querySelector('.cform__wrap');
+    if (wrap) {
+      var clone = wrap.cloneNode(true);
+      // Убираем border-radius у header
+      var header = clone.querySelector('.cform__header');
+      if (header) header.style.borderRadius = '0';
+      page.appendChild(clone);
+    }
+  });
+
+  function switchTo(idx) {
+    tabs.forEach(function(t, i)  { t.classList.toggle('is-active', i === idx); });
+    pages.forEach(function(p, i) { p.classList.toggle('is-active', i === idx); });
+  }
+
+  tabs.forEach(function(tab, i) {
+    tab.addEventListener('click', function() { switchTo(i); });
+  });
+
+  switchTo(0);
+})();
