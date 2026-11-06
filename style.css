@@ -631,7 +631,7 @@ body.theme-light .section-scroll-btn {
   .hero { height: auto; min-height: 100svh; padding: 72px var(--pg) 80px; }
   .hero__inner { flex-direction: column; gap: 28px; }
   .hero__col { display: none; }
-  .hero__center { width: 100%; max-width: 300px; }
+  .hero__center { width: 100%; max-width: 420px; }
 }
 @media (max-width: 400px) { :root { --cw: 147px; } }
 
@@ -1143,12 +1143,32 @@ body.theme-light .cases .section-scroll-btn {
   .ck-preview__img  { width: 110px; height: 110px; }
   .ck-preview__label { font-size: 0.95rem; }
 
-  /* Contact-стек — нормальная ширина на мобиле */
+  /* Contact-стек — полноэкранный свайп на мобиле */
   .cstack {
-    width: min(calc(100vw - 40px), 400px);
+    width: 100%;
+    height: calc(100svh - 120px);
+    overflow: hidden;
+    touch-action: pan-y; /* вертикальный скролл внутри формы разрешён, горизонталь — свайп */
   }
-  .cstack__card[data-pos="left"]  { transform: translateX(-60px) translateY(36px) scale(0.88); }
-  .cstack__card[data-pos="right"] { transform: translateX(60px)  translateY(36px) scale(0.88); }
+  .cstack__card {
+    height: calc(100svh - 120px);
+    border-radius: 0;
+    box-shadow: none;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.4s ease;
+  }
+  /* На мобиле: left — за левым краем, right — за правым */
+  .cstack__card[data-pos="center"] {
+    transform: translateX(0) scale(1);
+  }
+  .cstack__card[data-pos="left"] {
+    transform: translateX(-100%) scale(1);
+    opacity: 0.4;
+  }
+  .cstack__card[data-pos="right"] {
+    transform: translateX(100%) scale(1);
+    opacity: 0.4;
+  }
   .contact { overflow: hidden; }
 }
 

@@ -475,6 +475,39 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Свайп на мобиле (pointer events)
+  (function () {
+    let startX = null, dx = 0;
+    stack.addEventListener('pointerdown', function (e) {
+      // только на мобиле
+      if (window.innerWidth > 860) return;
+      startX = e.clientX;
+      dx = 0;
+      stack.setPointerCapture(e.pointerId);
+    });
+    stack.addEventListener('pointermove', function (e) {
+      if (startX === null) return;
+      dx = e.clientX - startX;
+    });
+    stack.addEventListener('pointerup', function () {
+      if (startX === null) return;
+      startX = null;
+      const threshold = window.innerWidth * 0.25;
+      if (dx < -threshold) {
+        // свайп влево — правая карточка в центр
+        const rightCardIdx = order[2];
+        const rightCard = cards[rightCardIdx];
+        if (rightCard) rightCard.click();
+      } else if (dx > threshold) {
+        // свайп вправо — левая карточка в центр
+        const leftCardIdx = order[0];
+        const leftCard = cards[leftCardIdx];
+        if (leftCard) leftCard.click();
+      }
+    });
+    stack.addEventListener('pointercancel', function () { startX = null; });
+  })();
+
   // Копирование реквизитов
   stack.addEventListener('click', function (e) {
     const btn = e.target.closest('.donate__copy');
