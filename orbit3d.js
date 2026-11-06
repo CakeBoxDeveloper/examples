@@ -4,19 +4,16 @@
 
   const BASE = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/';
 
-  // Цвета: Basic/Plate = фон плитки, Logo = логотип
-  const TILE_COLORS = {
-    dark:  { bg: '#ff0000', logo: '#2d6b3a' },
-    light: { bg: '#b0b8b4', logo: '#787f7c' },  // серые тона для дневной темы
-  };
-
-  function getTileColors() {
-    return document.body.classList.contains('theme-light') ? TILE_COLORS.light : TILE_COLORS.dark;
+  function isLight() {
+    return document.body.classList.contains('theme-light');
   }
 
-  // Basic = плитка (фон), Logo = логотип
-  function isPlate(name) {
-    return /^basic$/i.test(name);
+  function desaturate(color) {
+    var c = color.clone();
+    var hsl = { h: 0, s: 0, l: 0 };
+    c.getHSL(hsl);
+    c.setHSL(hsl.h, 0, Math.min(hsl.l * 0.85 + 0.1, 0.75));
+    return c;
   }
 
   const PLATES = [
@@ -25,7 +22,7 @@
     { file: 'TTM.glb'    },
     { file: 'Panacea.glb'},
     { file: 'Prism.glb'  },
-    { file: 'Glitch.glb' },
+    { file: 'Glitch.glb', rotX: Math.PI / 2 },
     { file: 'Kremua.glb' },
   ];
 
@@ -52,20 +49,19 @@
             if (!child.isMesh) return;
             var geom = child.geometry.clone();
             geom.applyMatrix4(child.matrixWorld);
-            meshes.push({ geom: geom, name: child.name });
+            // Клонируем материал как есть — цвет из GLB сохраняется
+            var mat = Array.isArray(child.material)
+              ? child.material.map(function(m) { return m.clone(); })
+              : child.material.clone();
+            // Сохраняем оригинальный цвет в userData материала
+            var mats = Array.isArray(mat) ? mat : [mat];
+            mats.forEach(function(m) {
+              m.userData.origColor = m.color.clone();
+            });
+            meshes.push({ geom: geom, mat: mat, name: child.name });
           });
 
           if (meshes.length === 0) { resolve(null); return; }
-
-          // Basic = фон (Plate), Logo = логотип
-          var colors = getTileColors();
-          meshes.forEach(function(item) {
-            item.mat = new THREE.MeshStandardMaterial({
-              color:     isPlate(item.name) ? colors.bg : colors.logo,
-              roughness: 0.85,
-              metalness: 0.05,
-            });
-          });
 
           // Общий bbox для нормализации
           var box = new THREE.Box3();
@@ -93,7 +89,7 @@
           });
 
           resolve(group);
-        }, null, function(err) {
+        }, null, function() {
           if (fallbackSrc) tryLoad(fallbackSrc, null);
           else resolve(null);
         });
@@ -146,7 +142,6 @@
       var idx  = (row * COLS + col) % PLATES.length;
       var data = plateData[idx];
 
-      // fallback на первую загрузившуюся
       if (!data) {
         for (var fi = 0; fi < plateData.length; fi++) {
           if (plateData[fi]) { data = plateData[fi]; break; }
@@ -169,7 +164,7 @@
         col:        col,
         row:        row,
         z:          z,
-        baseRotX:   -Math.PI / 2,
+        baseRotX:   PLATES[idx].rotX !== undefined ? PLATES[idx].rotX : Math.PI,
         phase:      Math.random() * Math.PI * 2,
         phaseRot:   (Math.random() - 0.5) * Math.PI / 18,
         swayPhase:  Math.random() * Math.PI * 2,
@@ -180,18 +175,24 @@
     }
   }
 
-  /* ── Перекраска при смене темы ── */
+  /* ── Desaturate при смене темы ── */
   function recolorAll() {
-    var colors = getTileColors();
+    var light = isLight();
     tiles.forEach(function(t) {
       t.mesh.traverse(function(child) {
         if (!child.isMesh) return;
-        var color = isPlate(child.name) ? colors.bg : colors.logo;
         var mats = Array.isArray(child.material) ? child.material : [child.material];
-        mats.forEach(function(m) { if (m && m.color) m.color.set(color); });
+        mats.forEach(function(m) {
+          if (!m || !m.color) return;
+          var orig = m.userData.origColor;
+          if (!orig) return;
+          m.color.copy(light ? desaturate(orig) : orig);
+        });
       });
     });
   }
+
+  recolorAll();
 
   new MutationObserver(function() { recolorAll(); })
     .observe(document.body, { attributes: true, attributeFilter: ['class'] });
