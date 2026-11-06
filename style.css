@@ -628,10 +628,15 @@ body.theme-light .section-scroll-btn {
 }
 
 @media (max-width: 860px) {
-  .hero { height: auto; min-height: 100svh; padding: 72px var(--pg) 80px; }
-  .hero__inner { flex-direction: column; gap: 28px; }
+  /* ── Hero ── */
+  .hero { height: auto; min-height: 100svh; padding: 72px 0 80px; }
+  .hero__inner { flex-direction: column; gap: 28px; padding-inline: 0; }
   .hero__col { display: none; }
-  .hero__center { width: 100%; max-width: 420px; }
+  .hero__center {
+    width: 90%;
+    max-width: 90%;
+    padding-inline: 0;
+  }
 }
 @media (max-width: 400px) { :root { --cw: 147px; } }
 
@@ -1117,47 +1122,49 @@ body.theme-light .cases .section-scroll-btn {
 
 /* case-item__btn видим на всех размерах */
 @media (max-width: 860px) {
-  /* Карусель — один слайд на весь экран */
+  /* ── Cases карусель — 90% ширины, по центру ── */
   :root {
-    --ck-gap:     0px;
-    --ck-slide-w: 100vw;
+    --ck-gap:     5vw;
+    --ck-slide-w: 90vw;
   }
   .ck-carousel {
     padding-block: 0;
     margin-block: 0;
     overflow-x: clip;
     overflow-y: clip;
-  }
-  .ck-slide {
-    height: calc(100svh - 120px);
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-  }
-  .ck-slide.is-active {
-    border-color: var(--border);
+    /* начинаем трек с отступом 5vw чтобы первый слайд был по центру */
+    padding-inline: 0;
   }
   .ck-track {
     touch-action: pan-y;
+    /* компенсируем отступ: первый слайд должен быть по центру */
   }
-  .ck-preview__img  { width: 110px; height: 110px; }
+  .ck-slide {
+    height: calc(100svh - 140px);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+  }
+  .ck-slide.is-active {
+    border-color: var(--border-accent);
+  }
+  .ck-preview__img   { width: 110px; height: 110px; }
   .ck-preview__label { font-size: 0.95rem; }
 
-  /* Contact-стек — полноэкранный свайп на мобиле */
+  /* ── Contact-стек — 90% ширины, свайп ── */
   .cstack {
-    width: 100%;
-    height: calc(100svh - 120px);
+    width: 90%;
+    max-width: 90%;
+    height: calc(100svh - 140px);
     overflow: hidden;
-    touch-action: pan-y; /* вертикальный скролл внутри формы разрешён, горизонталь — свайп */
+    touch-action: pan-y;
   }
   .cstack__card {
-    height: calc(100svh - 120px);
-    border-radius: 0;
-    box-shadow: none;
+    height: calc(100svh - 140px);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
                 opacity 0.4s ease;
   }
-  /* На мобиле: left — за левым краем, right — за правым */
   .cstack__card[data-pos="center"] {
     transform: translateX(0) scale(1);
   }
