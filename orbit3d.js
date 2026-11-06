@@ -268,6 +268,27 @@
       t.mesh.rotation.y = Math.sin(t.tiltYPhase) * TILT_AMP;
     });
 
+    /* ── Коллижн: попарное отталкивание ── */
+    var MIN_DIST = 52; // минимальное расстояние между центрами (в юнитах сцены)
+    for (var i = 0; i < tiles.length; i++) {
+      for (var j = i + 1; j < tiles.length; j++) {
+        var a = tiles[i].mesh.position;
+        var b = tiles[j].mesh.position;
+        var dx = a.x - b.x;
+        var dy = a.y - b.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MIN_DIST && dist > 0.001) {
+          var overlap = (MIN_DIST - dist) * 0.5;
+          var nx = dx / dist;
+          var ny = dy / dist;
+          a.x += nx * overlap;
+          a.y += ny * overlap;
+          b.x -= nx * overlap;
+          b.y -= ny * overlap;
+        }
+      }
+    }
+
     renderer.render(scene, cam);
     requestAnimationFrame(animate);
   }

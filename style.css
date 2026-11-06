@@ -627,17 +627,99 @@ body.theme-light .section-scroll-btn {
   color: var(--text-muted); margin-top: -4px;
 }
 
+/* ══════════════════════════════════════════
+   MOBILE  ≤ 860px
+══════════════════════════════════════════ */
 @media (max-width: 860px) {
+
+  /* ── Глобально: убираем tap-highlight ── */
+  * { -webkit-tap-highlight-color: transparent; }
+
   /* ── Hero ── */
-  .hero { height: auto; min-height: 100svh; padding: 72px 0 80px; }
-  .hero__inner { flex-direction: column; gap: 28px; padding-inline: 0; }
+  .hero {
+    height: auto;
+    min-height: 100svh;
+    padding: 60px 0 80px;
+  }
+  .hero__inner {
+    flex-direction: column;
+    gap: 0;
+    padding-inline: 0;
+    align-items: center;
+    justify-content: center;
+  }
   .hero__col { display: none; }
   .hero__center {
-    width: 90%;
-    max-width: 90%;
+    width: 90vw;
+    max-width: 90vw;
+    min-width: 0;
     padding-inline: 0;
   }
+  /* Чат занимает почти весь экран по высоте */
+  .hero__chat {
+    height: calc(100svh - 180px);
+    min-height: 360px;
+    max-height: none;
+  }
+
+  /* ── Cases карусель ── */
+  :root {
+    --ck-gap:     5vw;
+    --ck-slide-w: 90vw;
+  }
+  .ck-carousel {
+    padding-block: 0;
+    margin-block: 0;
+    overflow: hidden; /* clip по обеим осям */
+    width: 100vw;     /* растягиваем на весь экран */
+  }
+  .ck-track {
+    touch-action: pan-y;
+    gap: 5vw;
+  }
+  .ck-slide {
+    height: calc(100svh - 140px);
+    min-height: 300px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+  }
+  .ck-slide.is-active { border-color: var(--border-accent); }
+  .ck-preview__img    { width: 100px; height: 100px; }
+  .ck-preview__label  { font-size: 0.9rem; }
+
+  /* ── Contact стек ── */
+  .contact { overflow: hidden; padding-block: 60px; }
+  .contact__inner { padding-block: 0; }
+  .cstack {
+    width: 90vw;
+    max-width: 90vw;
+    margin-inline: auto;
+    height: calc(100svh - 200px);
+    min-height: 400px;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .cstack__card {
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  }
+  .cstack__card[data-pos="center"] {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  .cstack__card[data-pos="left"] {
+    transform: translateX(-110%) scale(1);
+    opacity: 0;
+  }
+  .cstack__card[data-pos="right"] {
+    transform: translateX(110%) scale(1);
+    opacity: 0;
+  }
 }
+
 @media (max-width: 400px) { :root { --cw: 147px; } }
 
 /* ═══════════════════════
@@ -1119,65 +1201,6 @@ body.theme-light .cases .section-scroll-btn {
 /* убираем старую кнопку cases__cta */
 .cases__cta { display: none; }
 .btn--gradient { display: none; }
-
-/* case-item__btn видим на всех размерах */
-@media (max-width: 860px) {
-  /* ── Cases карусель — 90% ширины, по центру ── */
-  :root {
-    --ck-gap:     5vw;
-    --ck-slide-w: 90vw;
-  }
-  .ck-carousel {
-    padding-block: 0;
-    margin-block: 0;
-    overflow-x: clip;
-    overflow-y: clip;
-    /* начинаем трек с отступом 5vw чтобы первый слайд был по центру */
-    padding-inline: 0;
-  }
-  .ck-track {
-    touch-action: pan-y;
-    /* компенсируем отступ: первый слайд должен быть по центру */
-  }
-  .ck-slide {
-    height: calc(100svh - 140px);
-    border-radius: 14px;
-    border: 1px solid var(--border);
-  }
-  .ck-slide.is-active {
-    border-color: var(--border-accent);
-  }
-  .ck-preview__img   { width: 110px; height: 110px; }
-  .ck-preview__label { font-size: 0.95rem; }
-
-  /* ── Contact-стек — 90% ширины, свайп ── */
-  .cstack {
-    width: 90%;
-    max-width: 90%;
-    height: calc(100svh - 140px);
-    overflow: hidden;
-    touch-action: pan-y;
-  }
-  .cstack__card {
-    height: calc(100svh - 140px);
-    border-radius: 14px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.4s ease;
-  }
-  .cstack__card[data-pos="center"] {
-    transform: translateX(0) scale(1);
-  }
-  .cstack__card[data-pos="left"] {
-    transform: translateX(-100%) scale(1);
-    opacity: 0.4;
-  }
-  .cstack__card[data-pos="right"] {
-    transform: translateX(100%) scale(1);
-    opacity: 0.4;
-  }
-  .contact { overflow: hidden; }
-}
 
 /* ═══════════════════════
    CONTACT
