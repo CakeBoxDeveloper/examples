@@ -805,3 +805,61 @@ window.addEventListener('DOMContentLoaded', () => {
 */
 
 
+
+
+/* ═══════════════════════════════════════
+   MOB-CASES — folder tabs (mobile only)
+═══════════════════════════════════════ */
+(function () {
+  if (window.innerWidth > 860) return;
+
+  const wrap  = document.getElementById('mobCases');
+  const panel = document.getElementById('mobCasesPanel');
+  const tabs  = Array.from(document.querySelectorAll('#mobCasesTabs .mob-cases__tab'));
+  if (!wrap || !panel || !tabs.length) return;
+
+  // Собираем данные из существующих ck-slide
+  const slides = Array.from(document.querySelectorAll('.ck-slide'));
+
+  function buildPanel(idx) {
+    const slide = slides[idx];
+    if (!slide) return;
+
+    // Инфо-слайд (первый)
+    const infoContent = slide.querySelector('.ck-content--info');
+    if (infoContent) {
+      const img  = slide.querySelector('.ck-info__img');
+      const text = slide.querySelector('.ck-info__text');
+      panel.innerHTML =
+        '<div class="mob-cases__info">' +
+          (img  ? '<img class="mob-cases__info-img" src="' + img.src + '" alt="" />' : '') +
+          (text ? '<p class="mob-cases__info-text">' + text.innerHTML + '</p>' : '') +
+        '</div>';
+      return;
+    }
+
+    // Обычный слайд
+    const titleEl = slide.querySelector('.ck-content__title, [data-flip-target-label]');
+    const iconEl  = slide.querySelector('[data-flip-target-icon]');
+    const listEl  = slide.querySelector('.cases__list');
+
+    panel.innerHTML =
+      '<div class="mob-cases__header">' +
+        '<span class="mob-cases__header-title">' + (titleEl ? titleEl.textContent : '') + '</span>' +
+        (iconEl ? '<img class="mob-cases__header-icon" src="' + iconEl.src + '" alt="" />' : '') +
+      '</div>' +
+      (listEl ? '<ul class="mob-cases__list cases__list">' + listEl.innerHTML + '</ul>' : '');
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('is-active'); });
+      tab.classList.add('is-active');
+      buildPanel(i);
+    });
+  });
+
+  // Показываем блок и инициализируем первую вкладку
+  wrap.removeAttribute('aria-hidden');
+  buildPanel(0);
+})();
