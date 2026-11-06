@@ -16,6 +16,25 @@
     return c;
   }
 
+  function invertForLight(color) {
+    // Для светлой темы: подложка → светло-серая, лого → тёмно-серое
+    // meshIndex передаётся отдельно через colorForLight
+    var c = color.clone();
+    return c;
+  }
+
+  function colorForLight(color, meshIndex) {
+    var c = color.clone();
+    if (meshIndex === 0) {
+      // Подложка — средне-серая
+      c.setHSL(0, 0, 0.68);
+    } else {
+      // Логотип — тёмно-серый
+      c.setHSL(0, 0, 0.32);
+    }
+    return c;
+  }
+
   const PLATES = [
     { file: 'MSE.glb'    },
     { file: 'LC.glb'     },
@@ -29,9 +48,9 @@
   const COLS = 4, ROWS = 3;
   const ORBIT_R    = 40;
   const ORBIT_SPD  = 0.00035;
-  const SWAY_AMP   = 18 * Math.PI / 180;
+  const SWAY_AMP   = 38 * Math.PI / 180;
   const SWAY_SPD   = 0.0006;
-  const TILT_AMP   = 22  * Math.PI / 180;
+  const TILT_AMP   = 48  * Math.PI / 180;
   const TILT_X_SPD = 0.00045;
   const TILT_Y_SPD = 0.00038;
 
@@ -133,6 +152,14 @@
   rim.position.set(-200, -100, 100);
   scene.add(rim);
 
+  // В светлой теме убираем зелёный rim
+  function updateLights() {
+    rim.intensity = isLight() ? 0 : 0.35;
+  }
+  updateLights();
+  new MutationObserver(function() { updateLights(); recolorAll(); })
+    .observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
   /* ── Загружаем GLB ── */
   var plateData = await Promise.all(PLATES.map(loadPlate));
 
@@ -185,6 +212,7 @@
   function recolorAll() {
     var light = isLight();
     tiles.forEach(function(t) {
+      var meshIdx = 0;
       t.mesh.traverse(function(child) {
         if (!child.isMesh) return;
         var mats = Array.isArray(child.material) ? child.material : [child.material];
@@ -192,16 +220,14 @@
           if (!m || !m.color) return;
           var orig = m.userData.origColor;
           if (!orig) return;
-          m.color.copy(light ? desaturate(orig) : orig);
+          m.color.copy(light ? colorForLight(orig, meshIdx) : orig);
         });
+        meshIdx++;
       });
     });
   }
 
   recolorAll();
-
-  new MutationObserver(function() { recolorAll(); })
-    .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
   /* ── Resize ── */
   window.addEventListener('resize', function() {
