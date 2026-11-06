@@ -57,6 +57,13 @@ body.theme-light .ck-slide.is-active { opacity: 1; }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; overflow-x: clip; }
+
+/* Мгновенная смена темы — отключаем все transitions */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
 body {
   font-family: var(--font);
   background: var(--bg);
@@ -1273,6 +1280,10 @@ body.theme-light .cases .section-scroll-btn {
 .cform__textarea::placeholder { color: var(--text-dim); }
 .cform__input:focus,
 .cform__textarea:focus { border-color: var(--border-accent); color: var(--text); }
+body.theme-light .cform__input,
+body.theme-light .cform__textarea { color: #333; }
+body.theme-light .cform__input::placeholder,
+body.theme-light .cform__textarea::placeholder { color: #777; }
 
 /* Two-col row */
 .cform__row {
@@ -1851,15 +1862,15 @@ body.theme-light {
 }
 
 .hero__chat-icon {
-  width: 125px; height: 125px;
+  width: 163px; height: 163px;
   flex-shrink: 0;
-  opacity: 0.25;
-  filter: invert(1) sepia(1) saturate(2) hue-rotate(90deg);
   margin-bottom: 4px;
+  /* Цвета чата — приглушённый зелёный в тёмной теме */
+  filter: invert(45%) sepia(15%) saturate(300%) hue-rotate(90deg) brightness(85%);
 }
 body.theme-light .hero__chat-icon {
-  filter: none;
-  opacity: 0.2;
+  /* Тёмно-серый в светлой теме */
+  filter: brightness(0) opacity(0.65);
 }
 
 /* Приветственная карточка */
@@ -1873,6 +1884,8 @@ body.theme-light .hero__chat-icon {
   color: var(--chat-text);
   text-align: center;
   position: relative;
+  width: fit-content;
+  max-width: 100%;
 }
 .hero__chat-greeting p { margin: 0; }
 
@@ -2179,10 +2192,6 @@ body.theme-light {
 body.theme-light .hero__chat {
   box-shadow: 0 12px 40px rgba(0,0,0,0.1), 0 0 0 1px var(--chat-border);
 }
-body.theme-light .hero__chat-icon {
-  filter: none;
-  opacity: 0.15;
-}
 
 /* Обёртка инпута с курсором */
 .hero__chat-input-row {
@@ -2287,6 +2296,10 @@ body.theme-light .contact__emoji {
   border-color: var(--accent);
   color: var(--accent);
 }
+body.theme-light .hero__chat-tag:hover {
+  border-color: #555;
+  color: #333;
+}
 .hero__chat-tag svg {
   flex-shrink: 0;
   opacity: 0.6;
@@ -2294,6 +2307,15 @@ body.theme-light .contact__emoji {
 }
 .hero__chat-tag:hover svg {
   opacity: 1;
+}
+
+/* Иконка Telegram в кнопке отправки — адаптивная */
+.cform__submit-icon {
+  flex-shrink: 0;
+  filter: brightness(0) invert(1); /* белая в тёмной теме */
+}
+body.theme-light .cform__submit-icon {
+  filter: brightness(0) opacity(0.75); /* тёмно-серая в светлой теме */
 }
 
 /* Кнопки submit в карточках contact — единый стиль с хедером */

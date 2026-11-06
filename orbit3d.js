@@ -4,24 +4,29 @@
 
   const BASE = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/';
 
-  // Два цвета: фон плитки и логотип
-  // mesh index 0 = фон, остальные = лого
+  // Цвета: Basic/Plate = фон плитки, Logo = логотип
   const TILE_COLORS = {
     dark:  { bg: '#0d1f12', logo: '#2d6b3a' },
-    light: { bg: '#c8d4c0', logo: '#5a8a65' },
+    light: { bg: '#b0b8b4', logo: '#787f7c' },  // серые тона для дневной темы
   };
 
   function getTileColors() {
     return document.body.classList.contains('theme-light') ? TILE_COLORS.light : TILE_COLORS.dark;
   }
 
+  // Basic = плитка (фон), Logo = логотип
+  function isPlate(name) {
+    return /^basic$/i.test(name);
+  }
+
   const PLATES = [
-    { file: 'MSE.glb'     },
-    { file: 'LC.glb'      },
-    { file: 'TTM.glb'     },
-    { file: 'Panacea.glb' },
-    { file: 'Prism.glb'   },
-    { file: 'Glitch.glb'  },
+    { file: 'MSE.glb'    },
+    { file: 'LC.glb'     },
+    { file: 'TTM.glb'    },
+    { file: 'Panacea.glb'},
+    { file: 'Prism.glb'  },
+    { file: 'Glitch.glb' },
+    { file: 'Kremua.glb' },
   ];
 
   const COLS = 4, ROWS = 3;
@@ -44,30 +49,25 @@
           var meshes = [];
           gltf.scene.updateMatrixWorld(true);
           gltf.scene.traverse(function(child) {
-            if (child.isMesh) {
-              var geom = child.geometry.clone();
-              geom.applyMatrix4(child.matrixWorld);
-              meshes.push({ geom: geom, name: child.name });
-            }
+            if (!child.isMesh) return;
+            var geom = child.geometry.clone();
+            geom.applyMatrix4(child.matrixWorld);
+            meshes.push({ geom: geom, name: child.name });
           });
 
           if (meshes.length === 0) { resolve(null); return; }
 
-          // Логируем имена для отладки
-          console.log(plate.file + ':', meshes.map(function(m){ return m.name; }));
-
-          // Cube (по имени, без учёта регистра) = плитка (фон), всё остальное = лого
+          // Basic = фон (Plate), Logo = логотип
           var colors = getTileColors();
           meshes.forEach(function(item) {
-            var isCube = /^cube/i.test(item.name);
             item.mat = new THREE.MeshStandardMaterial({
-              color:     isCube ? colors.bg : colors.logo,
+              color:     isPlate(item.name) ? colors.bg : colors.logo,
               roughness: 0.85,
               metalness: 0.05,
             });
           });
 
-          // Считаем общий bbox для центрирования
+          // Общий bbox для нормализации
           var box = new THREE.Box3();
           meshes.forEach(function(item) {
             item.geom.computeBoundingBox();
@@ -81,27 +81,25 @@
 
           var tCenter = new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z);
           var tScale  = new THREE.Matrix4().makeScale(1/maxDim, 1/maxDim, 1/maxDim);
-          var final   = new THREE.Matrix4().multiply(tScale).multiply(tCenter);
+          var final   = new THREE.Matrix4().multiplyMatrices(tScale, tCenter);
 
           var group = new THREE.Group();
           group.userData.maxDim = 1;
           meshes.forEach(function(item) {
             item.geom.applyMatrix4(final);
             var m = new THREE.Mesh(item.geom, item.mat);
-            m.name = item.name; // сохраняем имя для recolorAll
+            m.name = item.name;
             group.add(m);
           });
 
           resolve(group);
-        }, null, function() {
+        }, null, function(err) {
           if (fallbackSrc) tryLoad(fallbackSrc, null);
           else resolve(null);
         });
       }
 
-      var remote = BASE + plate.file;
-      var local  = './' + plate.file;
-      tryLoad(remote, local);
+      tryLoad(BASE + plate.file, './' + plate.file);
     });
   }
 
@@ -148,12 +146,11 @@
       var idx  = (row * COLS + col) % PLATES.length;
       var data = plateData[idx];
 
+      // fallback на первую загрузившуюся
       if (!data) {
-        var fallbackData = null;
         for (var fi = 0; fi < plateData.length; fi++) {
-          if (plateData[fi]) { fallbackData = plateData[fi]; break; }
+          if (plateData[fi]) { data = plateData[fi]; break; }
         }
-        data = fallbackData;
       }
       if (!data) continue;
 
@@ -183,21 +180,19 @@
     }
   }
 
-  /* ── Перекраска всех плиток ── */
+  /* ── Перекраска при смене темы ── */
   function recolorAll() {
     var colors = getTileColors();
     tiles.forEach(function(t) {
       t.mesh.traverse(function(child) {
         if (!child.isMesh) return;
-        var isCube = /^cube/i.test(child.name);
-        var color = isCube ? colors.bg : colors.logo;
+        var color = isPlate(child.name) ? colors.bg : colors.logo;
         var mats = Array.isArray(child.material) ? child.material : [child.material];
         mats.forEach(function(m) { if (m && m.color) m.color.set(color); });
       });
     });
   }
 
-  // Слушаем смену темы
   new MutationObserver(function() { recolorAll(); })
     .observe(document.body, { attributes: true, attributeFilter: ['class'] });
 

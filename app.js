@@ -549,6 +549,12 @@ window.addEventListener('DOMContentLoaded', () => {
   const MOON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`;
 
   function apply(theme) {
+    // Отключаем все transitions на время смены темы
+    document.documentElement.classList.add('theme-switching');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.documentElement.classList.remove('theme-switching');
+    }));
+
     if (theme === 'light') {
       body.classList.add('theme-light');
       if (btn) { btn.innerHTML = MOON; btn.title = 'Тёмная тема'; }
@@ -746,23 +752,6 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ═══════════════════════════════════════
-   HERO CHAT — Lottie анимация
-═══════════════════════════════════════ */
-(function () {
-  var el = document.getElementById('heroLottie');
-  if (!el || typeof lottie === 'undefined') return;
-
-  lottie.loadAnimation({
-    container: el,
-    renderer: 'svg',
-    loop: true,
-    autoplay: true,
-    // Публичная лотти-анимация — печатающий индикатор (typing dots)
-    path: 'https://assets10.lottiefiles.com/packages/lf20_usmfx6bp.json'
-  });
-})();
-
-/* ═══════════════════════════════════════
    HERO CHAT — Lottie typing indicator
 ═══════════════════════════════════════ */
 (function () {
@@ -773,7 +762,7 @@ window.addEventListener('DOMContentLoaded', () => {
     renderer: 'svg',
     loop: true,
     autoplay: true,
-    path: 'https://assets4.lottiefiles.com/packages/lf20_iqon5gsh.json'
+    path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json',
   });
 })();
 
