@@ -22,7 +22,7 @@
     { file: 'TTM.glb'    },
     { file: 'Panacea.glb'},
     { file: 'Prism.glb'  },
-    { file: 'Glitch.glb', rotX: Math.PI / 2 },
+    { file: 'Glitch.glb', rotX: Math.PI, rotZ: Math.PI / 2 },
     { file: 'Kremua.glb' },
   ];
 
@@ -89,7 +89,8 @@
           });
 
           resolve(group);
-        }, null, function() {
+        }, null, function(err) {
+          console.error('Failed to load:', src, err);
           if (fallbackSrc) tryLoad(fallbackSrc, null);
           else resolve(null);
         });
@@ -137,11 +138,15 @@
 
   /* ── Строим плитки ── */
   var tiles = [];
+  var plateIdx = 0;
+
   for (var row = 0; row < ROWS; row++) {
     for (var col = 0; col < COLS; col++) {
-      var idx  = (row * COLS + col) % PLATES.length;
-      var data = plateData[idx];
+      // Пропускаем центральные 2 ячейки средней строки
+      if (row === 1 && (col === 1 || col === 2)) continue;
 
+      var idx  = (plateIdx++) % PLATES.length;
+      var data = plateData[idx];
       if (!data) {
         for (var fi = 0; fi < plateData.length; fi++) {
           if (plateData[fi]) { data = plateData[fi]; break; }
@@ -165,6 +170,7 @@
         row:        row,
         z:          z,
         baseRotX:   PLATES[idx].rotX !== undefined ? PLATES[idx].rotX : Math.PI,
+        baseRotZ:   PLATES[idx].rotZ !== undefined ? PLATES[idx].rotZ : 0,
         phase:      Math.random() * Math.PI * 2,
         phaseRot:   (Math.random() - 0.5) * Math.PI / 18,
         swayPhase:  Math.random() * Math.PI * 2,
@@ -231,7 +237,7 @@
         cy + Math.sin(t.phase) * r,
         t.z * 20 - 10
       );
-      t.mesh.rotation.z = t.phaseRot + Math.sin(t.swayPhase) * SWAY_AMP;
+      t.mesh.rotation.z = t.baseRotZ + t.phaseRot + Math.sin(t.swayPhase) * SWAY_AMP;
       t.mesh.rotation.x = t.baseRotX + Math.sin(t.tiltXPhase) * TILT_AMP;
       t.mesh.rotation.y = Math.sin(t.tiltYPhase) * TILT_AMP;
     });
