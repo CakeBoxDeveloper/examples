@@ -363,41 +363,57 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
   display: flex; flex-direction: column;
   width: var(--block-w); min-width: 240px; max-width: 480px;
   height: var(--folder-h); min-height: 360px; max-height: 640px;
+  position: relative;
 }
 
 .cases-folder__tabs { display: flex; gap: 4px; flex-shrink: 0; }
 
 .cases-folder__tab {
-  flex: 0 0 auto; display: flex; align-items: center; gap: 0;
-  padding: 8px 10px 13px; border: none; border-radius: 10px 10px 0 0;
+  flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 10px 12px; border: none; border-radius: 10px 10px 0 0;
   background: var(--bg-card); color: var(--text-muted); cursor: pointer;
-  position: relative; bottom: -1px;
+  position: relative;
   box-shadow: inset 0 0 0 1px var(--border);
-  overflow: hidden; white-space: nowrap; max-width: 40px;
-  transition: max-width 0.25s ease, gap 0.25s ease, box-shadow 0.18s;
+  overflow: hidden; white-space: nowrap;
+  transition: gap 0.25s ease, box-shadow 0.18s, color 0.18s;
 }
 .cases-folder__tab.is-active {
-  bottom: 0; z-index: 2; max-width: 160px; gap: 6px;
-  color: var(--text); box-shadow: inset 0 0 0 1px var(--border-accent); background: var(--bg-card);
+  z-index: 3; gap: 7px;
+  color: var(--text); background: var(--bg-card);
+  /* три стороны — снизу нет, вкладка сливается с панелью */
+  box-shadow: inset 1px 0 0 var(--border-accent), inset -1px 0 0 var(--border-accent), inset 0 1px 0 var(--border-accent);
+  /* перекрываем верхнюю границу панели */
+  margin-bottom: -1px;
+  padding-bottom: 13px;
 }
-.cases-folder__tab:hover:not(.is-active) { background: rgba(255,255,255,0.04); }
+.cases-folder__tab:hover:not(.is-active) { background: rgba(255,255,255,0.04); color: var(--text); }
 
-.cases-folder__tab-icon { width: 18px; height: 18px; flex-shrink: 0; object-fit: contain; }
+.cases-folder__tab-icon {
+  width: 17px; height: 17px; flex-shrink: 0;
+  /* для inline SVG */
+  display: flex; align-items: center; justify-content: center;
+}
+.cases-folder__tab-icon svg { width: 17px; height: 17px; stroke: currentColor; fill: none; flex-shrink: 0; }
 
 .cases-folder__tab-label {
   font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em;
-  overflow: hidden; max-width: 0; opacity: 0;
-  transition: max-width 0.25s ease, opacity 0.2s ease;
+  overflow: hidden; white-space: nowrap;
 }
-.cases-folder__tab.is-active .cases-folder__tab-label { max-width: 120px; opacity: 1; }
+/* Десктоп — всегда показываем название */
+.cases-folder__tab-label { max-width: 160px; opacity: 1; transition: max-width 0.25s ease, opacity 0.2s ease; }
+/* Мобиле — только у активной */
+@media (max-width: 860px) {
+  .cases-folder__tab-label { max-width: 0; opacity: 0; }
+  .cases-folder__tab.is-active .cases-folder__tab-label { max-width: 140px; opacity: 1; }
+}
 
 /* Panel */
 .cases-folder__panel {
-  flex: 1; background: var(--bg-card); border: 1px solid var(--border-accent);
-  border-radius: 0 10px 10px 10px; overflow: hidden;
+  flex: 1; background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 0 0 10px 10px; overflow: hidden;
   display: flex; flex-direction: column; position: relative; z-index: 1; min-height: 0;
 }
-
 /* Pages */
 .cases-folder__page { display: none; flex-direction: column; flex: 1; min-height: 0; }
 .cases-folder__page.is-active { display: flex; }
@@ -657,6 +673,9 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
     width: var(--block-w); max-width: var(--block-w);
     height: calc(100svh - 160px); max-height: none;
   }
+  /* На мобиле неактивные вкладки схлопываем */
+  .cases-folder__tab { gap: 0; }
+  .cases-folder__tab.is-active { gap: 6px; }
   .contact { overflow: hidden; padding-block: 60px; }
   .contact__inner { padding-block: 0; }
   /* На мобиле заявки — folder-tabs как кейсы */
@@ -702,6 +721,7 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 
   .contact-folder__panel {
     flex: 1; background: var(--bg-card); border: 1px solid var(--border-accent);
+    border-top: none;
     border-radius: 0 10px 10px 10px; overflow: hidden;
     display: flex; flex-direction: column; min-height: 0;
   }
@@ -719,3 +739,61 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 
 /* Сдвигаем fade-top выше без заголовка */
 .cases__fade-top { top: 0; }
+
+/* ═══════════════════════
+   CASES FOLDER — INTRO OVERLAY
+═══════════════════════ */
+.cases-folder__intro {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  /* сплошной фон, без блюра */
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 10px;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+  pointer-events: auto;
+}
+body.theme-light .cases-folder__intro {
+  background: var(--bg-card);
+}
+.cases-folder__intro.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cases-folder__intro-inner {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 20px;
+  padding: 32px 28px; text-align: center;
+  max-width: 360px;
+}
+
+.cases-folder__intro-icon {
+  width: 64px; height: 64px;
+  opacity: 0.25;
+  color: var(--text);
+}
+
+.cases-folder__intro-text {
+  font-size: 0.85rem; color: var(--text-muted);
+  line-height: 1.75; max-width: 300px;
+}
+
+/* Кнопка в стиле badge (как NDA/WIP/VIEW) */
+.cases-folder__intro-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 6px 16px; border-radius: var(--r);
+  background: rgba(77, 175, 106, 0.1);
+  border: 1px solid rgba(77, 175, 106, 0.45);
+  color: var(--accent);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.cases-folder__intro-btn:hover {
+  background: rgba(77, 175, 106, 0.2);
+  border-color: rgba(77, 175, 106, 0.7);
+}

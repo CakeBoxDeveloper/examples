@@ -212,39 +212,36 @@
     <div class="cases-folder" id="casesFolder">
       <div class="cases-folder__tabs" id="casesFolderTabs">
         <button class="cases-folder__tab is-active" data-idx="0">
-          <img class="cases-folder__tab-icon" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/File%20Folder.webp?raw=true" alt="" />
-          <span class="cases-folder__tab-label">О проектах</span>
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+          <span class="cases-folder__tab-label">Веб</span>
         </button>
         <button class="cases-folder__tab" data-idx="1">
-          <img class="cases-folder__tab-icon" src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Laptop.webp" alt="" />
-          <span class="cases-folder__tab-label">Web</span>
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
+          <span class="cases-folder__tab-label">3D / Печать</span>
         </button>
         <button class="cases-folder__tab" data-idx="2">
-          <img class="cases-folder__tab-icon" src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Activity/Crystal%20Ball.webp" alt="" />
-          <span class="cases-folder__tab-label">3D</span>
-        </button>
-        <button class="cases-folder__tab" data-idx="3">
-          <img class="cases-folder__tab-icon" src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Activity/Artist%20Palette.webp" alt="" />
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="12" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="10" cy="18.5" r="2.5"/><path d="M9.5 9.5 8.5 11m4 1-1 2m5.5-5.5-1.5 2M10 15.5l-1-2"/></svg></span>
           <span class="cases-folder__tab-label">Графика</span>
         </button>
-        <button class="cases-folder__tab" data-idx="4">
-          <img class="cases-folder__tab-icon" src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Objects/Newspaper.webp" alt="" />
+        <button class="cases-folder__tab" data-idx="3">
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
           <span class="cases-folder__tab-label">Полиграфия</span>
         </button>
       </div>
 
+      <!-- Оверлей "О проектах" — поверх всего блока, исчезает по клику -->
+      <div class="cases-folder__intro" id="casesFolderIntro" aria-live="polite">
+        <div class="cases-folder__intro-inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="cases-folder__intro-icon"><path d="M3 7a2 2 0 0 1 2-2h3.172a2 2 0 0 1 1.414.586L10.414 6.4A2 2 0 0 0 11.828 7H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+          <p class="cases-folder__intro-text">Здесь собраны все мои проекты. <span class="disclaimer__badge disclaimer__badge--view">Смотреть</span> готовые можно прямо сейчас. Те, которые я <span class="disclaimer__badge disclaimer__badge--wip">ещё делаю</span> — бесплатные сервисы, их можно поддержать чтобы вышли быстрее. <span class="disclaimer__badge disclaimer__badge--nda">NDA</span> не смогу показать по условиям договора.</p>
+          <button class="cases-folder__intro-btn" id="casesFolderIntroDismiss">Смотреть</button>
+        </div>
+      </div>
+
       <div class="cases-folder__panel">
 
-        <!-- 0. О проектах -->
+        <!-- 0. Web-разработка -->
         <div class="cases-folder__page is-active" data-page="0">
-          <div class="cases-folder__info">
-            <img class="cases-folder__info-img" src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/File%20Folder.webp?raw=true" alt="" />
-            <p class="cases-folder__info-text">Здесь собраны все мои проекты. <span class="disclaimer__badge disclaimer__badge--view">Смотреть</span> готовые можно прямо сейчас. Те, которые я <span class="disclaimer__badge disclaimer__badge--wip">ещё делаю</span> — бесплатные сервисы, их можно поддержать чтобы вышли быстрее. <span class="disclaimer__badge disclaimer__badge--nda">NDA</span> не смогу показать по условиям договора.</p>
-          </div>
-        </div>
-
-        <!-- 1. Web-разработка -->
-        <div class="cases-folder__page" data-page="1">
           <div class="cases__fade-top"></div>
           <div class="cases__fade-bot"></div>
           <ul class="cases__list">
@@ -257,11 +254,29 @@
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Мобильное приложение</h3><span class="case-item__cat">PWA</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Платёжная система</h3><span class="case-item__cat">Финтех</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">CRM-система</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Сайт для ресторана</h3><span class="case-item__cat">Лендинг</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Онлайн-запись</h3><span class="case-item__cat">Веб-сервис</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Маркетплейс услуг</h3><span class="case-item__cat">Платформа</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Новостной портал</h3><span class="case-item__cat">Медиа</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Личный кабинет пользователя</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Система уведомлений</h3><span class="case-item__cat">Микросервис</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Сайт для стоматологии</h3><span class="case-item__cat">Медицина</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Виджет чата поддержки</h3><span class="case-item__cat">JS-компонент</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Административная панель</h3><span class="case-item__cat">Back-office</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Игровой движок (браузер)</h3><span class="case-item__cat">Canvas / WebGL</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Карта объектов</h3><span class="case-item__cat">ГИС / API</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Подписочный сервис</h3><span class="case-item__cat">SaaS</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Видео-стриминг страница</h3><span class="case-item__cat">Медиа</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Конфигуратор продукта</h3><span class="case-item__cat">E-commerce</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">API-интеграция с 1С</h3><span class="case-item__cat">Интеграция</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Промо-сайт продукта</h3><span class="case-item__cat">Лендинг</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Форум и сообщество</h3><span class="case-item__cat">Платформа</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Сайт для салона красоты</h3><span class="case-item__cat">Лендинг</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
           </ul>
         </div>
 
-        <!-- 2. 3D модели -->
-        <div class="cases-folder__page" data-page="2">
+        <!-- 1. 3D модели -->
+        <div class="cases-folder__page" data-page="1">
           <div class="cases__fade-top"></div>
           <div class="cases__fade-bot"></div>
           <ul class="cases__list">
@@ -273,11 +288,27 @@
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Промо-модель продукта</h3><span class="case-item__cat">3D / Визуализация</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Архитектурная визуализация</h3><span class="case-item__cat">3D / Рендер</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Персонаж для игры</h3><span class="case-item__cat">Game Asset</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Корпус для электроники</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Подставка для монитора</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Сборная модель робота</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Ювелирный прототип</h3><span class="case-item__cat">SLA печать</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Реквизит для фотосъёмки</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Медицинский учебный макет</h3><span class="case-item__cat">SLA печать</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Геймерский стенд</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Пропеллер для дрона</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Логотип в 3D</h3><span class="case-item__cat">3D / Брендинг</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Сцена для рекламного ролика</h3><span class="case-item__cat">3D / Motion</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Кастомный держатель телефона</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Пиньята-модель</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Витрина для коллекции</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Оружие для косплея</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Интерактивная 3D-сцена</h3><span class="case-item__cat">WebGL</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Корпус для автоматики</h3><span class="case-item__cat">FDM печать</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
           </ul>
         </div>
 
-        <!-- 3. Графика -->
-        <div class="cases-folder__page" data-page="3">
+        <!-- 2. Графика -->
+        <div class="cases-folder__page" data-page="2">
           <div class="cases__fade-top"></div>
           <div class="cases__fade-bot"></div>
           <ul class="cases__list">
@@ -288,11 +319,24 @@
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Интерфейс приложения</h3><span class="case-item__cat">UI / UX</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Логотип и айдентика</h3><span class="case-item__cat">Брендинг</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Социальные медиа</h3><span class="case-item__cat">SMM-графика</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Анимированный логотип</h3><span class="case-item__cat">Motion</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Паттерн для текстиля</h3><span class="case-item__cat">Принт</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Инфографика для отчёта</h3><span class="case-item__cat">Инфографика</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Персонаж-маскот бренда</h3><span class="case-item__cat">Иллюстрация</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Баннеры для рекламы</h3><span class="case-item__cat">Digital / OOH</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Обложка для подкаста</h3><span class="case-item__cat">Медиа-графика</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Иллюстрация для книги</h3><span class="case-item__cat">Иллюстрация</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Дизайн-система компонентов</h3><span class="case-item__cat">Design System</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Концепт игрового интерфейса</h3><span class="case-item__cat">Game UI</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Принт для мерча</h3><span class="case-item__cat">Принт</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Оформление YouTube-канала</h3><span class="case-item__cat">SMM-графика</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Набор стикеров для Telegram</h3><span class="case-item__cat">Иллюстрация</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Редизайн мобильного приложения</h3><span class="case-item__cat">UI / UX</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
           </ul>
         </div>
 
-        <!-- 4. Полиграфия -->
-        <div class="cases-folder__page" data-page="4">
+        <!-- 3. Полиграфия -->
+        <div class="cases-folder__page" data-page="3">
           <div class="cases__fade-top"></div>
           <div class="cases__fade-bot"></div>
           <ul class="cases__list">
@@ -303,6 +347,20 @@
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Каталог продукции</h3><span class="case-item__cat">Каталог</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Упаковка товара</h3><span class="case-item__cat">Packaging</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
             <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Брендбук</h3><span class="case-item__cat">Полиграфия</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Меню для ресторана</h3><span class="case-item__cat">Полиграфия</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Корпоративный ежедневник</h3><span class="case-item__cat">Сувенирка</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Журнал для клиники</h3><span class="case-item__cat">Издание</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Сертификат и грамота</h3><span class="case-item__cat">Полиграфия</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Упаковка подарочного набора</h3><span class="case-item__cat">Packaging</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Настенный плакат</h3><span class="case-item__cat">Постер</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Бейджи для конференции</h3><span class="case-item__cat">Полиграфия</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Этикетка для продукта</h3><span class="case-item__cat">Packaging</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Рекламный стенд Roll-up</h3><span class="case-item__cat">POS-материал</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Папка для документов</h3><span class="case-item__cat">Сувенирка</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Листовка для акции</h3><span class="case-item__cat">Флаер</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Конверт и бланк</h3><span class="case-item__cat">Деловая печать</span></div><button class="btn btn--nda case-item__btn">NDA</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Наклейки и стикерпак</h3><span class="case-item__cat">Принт</span></div><button class="btn btn--view case-item__btn">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Постер для выставки</h3><span class="case-item__cat">Постер</span></div><button class="btn btn--wip case-item__btn">ЕЩЁ ДЕЛАЮ</button></li>
           </ul>
         </div>
 
@@ -477,4 +535,4 @@
   </section>
 
 </body>
-</html>
+</html> 

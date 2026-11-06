@@ -19,14 +19,45 @@ document.getElementById('orderBtn')?.addEventListener('click', () => {
   function switchTo(idx) {
     tabs.forEach((t, i)  => t.classList.toggle('is-active', i === idx));
     pages.forEach((p, i) => p.classList.toggle('is-active', i === idx));
-    // инициализируем fade для новой страницы
     initFade({ querySelector: (s) => pages[idx].querySelector(s) });
   }
 
   tabs.forEach((tab, i) => tab.addEventListener('click', () => switchTo(i)));
-
-  // Инит
   switchTo(0);
+})();
+
+/* ═══════════════════════════════════════
+   CASES FOLDER — INTRO OVERLAY
+═══════════════════════════════════════ */
+(function () {
+  const overlay = document.getElementById('casesFolderIntro');
+  const btn     = document.getElementById('casesFolderIntroDismiss');
+  const folder  = document.getElementById('casesFolder');
+  if (!overlay || !btn || !folder) return;
+
+  function dismiss() {
+    overlay.classList.add('is-hidden');
+    // после окончания transition убираем из потока
+    overlay.addEventListener('transitionend', () => {
+      overlay.style.display = 'none';
+    }, { once: true });
+  }
+
+  btn.addEventListener('click', dismiss);
+
+  // Показываем только при первом скролле до секции cases
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // появился в viewport — показываем оверлей (он уже видимый по умолчанию)
+          observer.disconnect();
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
+  observer.observe(folder);
 })();
 
 /* ═══════════════════════════════════════
