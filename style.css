@@ -631,9 +631,8 @@ body.theme-light .section-scroll-btn {
    MOBILE  ≤ 860px
 ══════════════════════════════════════════ */
   /* ── Cases: folder-tabs адаптив ── */
-  /* (carousel removed, folder-tabs work on all screens) */
   .cases-folder {
-    width: 90vw;
+    width: var(--block-w);
     height: calc(100svh - 160px);
     max-height: none;
   }
@@ -789,8 +788,8 @@ body.theme-light .section-scroll-btn {
   }
   .hero__col { display: none; }
   .hero__center {
-    width: 90vw !important;
-    max-width: 90vw !important;
+    width: var(--block-w);
+    max-width: var(--block-w);
     min-width: 0;
     padding-inline: 0;
     flex: none;
@@ -801,10 +800,10 @@ body.theme-light .section-scroll-btn {
     max-height: none;
   }
 
-  /* ── Cases карусель — слайды 90vw с margin 5vw ── */
+  /* ── Единая ширина всех блоков на мобиле ── */
   :root {
-    --ck-gap:     0px;
-    --ck-slide-w: 100vw;
+    --block-w: 90vw;
+    --ck-gap:  0px;
   }
   .ck-carousel {
     padding-block: 0;
@@ -847,8 +846,8 @@ body.theme-light .section-scroll-btn {
   .contact__inner { padding-block: 0; overflow: visible; }
   .cstack {
     position: relative;
-    width: 90vw;
-    max-width: 90vw;
+    width: var(--block-w);
+    max-width: var(--block-w);
     margin-inline: auto;
     height: calc(100svh - 220px);
     min-height: 380px;
@@ -1145,7 +1144,8 @@ body.theme-light .section-scroll-btn {
 
 /* Размер папки — одинаковый на любом экране */
 :root {
-  --folder-w: min(520px, 90vw);
+  --block-w: calc((100vw - 80px) / 3);
+  --folder-w: var(--block-w);
   --folder-h: calc(100svh - 160px);
 }
 
@@ -1731,7 +1731,9 @@ body.theme-light .cform__header {
 
 .cstack {
   position: relative;
-  width: var(--ck-slide-w);
+  width: var(--block-w);
+  min-width: 240px;
+  max-width: 480px;
   margin-inline: auto;
   height: 510px;
 }
@@ -2060,7 +2062,7 @@ body.theme-light .cform__header--yellow {
    HERO CHAT WINDOW
 ═══════════════════════ */
 .hero__center {
-  width: calc((100vw - 4 * var(--ck-gap, 20px)) / 3);
+  width: var(--block-w);
   min-width: 240px;
   max-width: 480px;
   display: flex;
