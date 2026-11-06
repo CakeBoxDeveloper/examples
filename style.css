@@ -1812,6 +1812,41 @@ body.theme-light .cform__header--yellow {
   justify-content: center;
 }
 
+/* ── Shiny border wrapper ── */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.hero__chat-wrap {
+  --shiny-bg:        #080f09;
+  --shiny-highlight: #4daf6a;
+  --shiny-subtle:    #a8d8b8;
+  --duration: 6s;
+
+  position: relative;
+  width: 100%;
+  border-radius: 15px;
+  padding: 1px;
+  background:
+    conic-gradient(
+      from var(--gradient-angle),
+      transparent,
+      var(--shiny-highlight) 8%,
+      var(--shiny-subtle)    16%,
+      var(--shiny-highlight) 24%,
+      transparent            32%
+    );
+  animation: gradient-angle var(--duration) linear infinite;
+  /* свечение: только глубокая тень */
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+}
+
+@keyframes gradient-angle {
+  to { --gradient-angle: 360deg; }
+}
+
 /* ── CSS-переменные чата ── */
 :root {
   --chat-bg:          #181e1a;
@@ -1840,10 +1875,11 @@ body.theme-light {
   max-height: 640px;
   min-height: 400px;
   background: var(--chat-bg);
-  border: 1px solid var(--chat-border);
+  border: none;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.45), 0 0 0 1px var(--chat-border);
+  /* тонкая пассивная рамка изнутри */
+  box-shadow: inset 0 0 0 1px var(--chat-border);
   display: flex;
   flex-direction: column;
 }
@@ -1856,7 +1892,7 @@ body.theme-light {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 20px;
+  padding: 20px 20px 60px;
   min-height: 0;
   text-align: center;
 }
@@ -2071,7 +2107,7 @@ body.theme-light .hero__chat-theme-btn .icon-sun  { display: block; }
   content: '';
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  height: 35px;
+  height: 50px;
   background: linear-gradient(to bottom, transparent, var(--chat-input-bg));
   pointer-events: none;
   z-index: 1;
@@ -2205,6 +2241,18 @@ body.theme-light {
 }
 body.theme-light .hero__chat {
   box-shadow: 0 12px 40px rgba(0,0,0,0.1), 0 0 0 1px var(--chat-border);
+}
+body.theme-light .hero__chat-wrap {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    transparent,
+    #aaaaaa 8%,
+    #dddddd 16%,
+    #aaaaaa 24%,
+    transparent 32%
+  );
+  animation: gradient-angle 6s linear infinite;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
 }
 
 /* Обёртка инпута с курсором */
