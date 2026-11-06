@@ -6,7 +6,7 @@
 
   // Цвета: Basic/Plate = фон плитки, Logo = логотип
   const TILE_COLORS = {
-    dark:  { bg: '#0d1f12', logo: '#2d6b3a' },
+    dark:  { bg: '#ff0000', logo: '#2d6b3a' },
     light: { bg: '#b0b8b4', logo: '#787f7c' },  // серые тона для дневной темы
   };
 
