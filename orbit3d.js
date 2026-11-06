@@ -41,7 +41,7 @@
     { file: 'TTM.glb'    },
     { file: 'Panacea.glb'},
     { file: 'Prism.glb'  },
-    { file: 'Glitch.glb', rotX: 0 },
+    { file: 'Glitch.glb' },
     { file: 'Kremua.glb' },
   ];
 
