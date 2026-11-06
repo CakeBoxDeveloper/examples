@@ -1824,13 +1824,13 @@ body.theme-light .cform__header--yellow {
   --chat-icon-color:  #3a4a3c;
 }
 body.theme-light {
-  --chat-bg:          #f4f4f4;
-  --chat-footer:      #ebebeb;
+  --chat-bg:          #f0f0f0;
+  --chat-footer:      #e8e8e8;
   --chat-border:      rgba(0,0,0,0.09);
   --chat-text:        #1a1a1a;
-  --chat-muted:       #888888;
+  --chat-muted:       #666666;
   --chat-accent:      #c07a40;
-  --chat-input-bg:    #d4d4d4;
+  --chat-input-bg:    #dcdcdc;
   --chat-icon-color:  #b0b0b0;
 }
 
@@ -2195,12 +2195,12 @@ body.theme-light .hero__chat-theme-btn .icon-sun  { display: block; }
 
 /* Светлая тема — монохром без бежевого */
 body.theme-light {
-  --chat-bg:       #f4f4f4;
-  --chat-footer:   #ebebeb;
+  --chat-bg:       #f0f0f0;
+  --chat-footer:   #e8e8e8;
   --chat-border:   rgba(0,0,0,0.09);
   --chat-text:     #1a1a1a;
-  --chat-muted:    #888888;
-  --chat-input-bg: #e8e8e8;
+  --chat-muted:    #666666;
+  --chat-input-bg: #dcdcdc;
   --chat-icon-color: #b0b0b0;
 }
 body.theme-light .hero__chat {
