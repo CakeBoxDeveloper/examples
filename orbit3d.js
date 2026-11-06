@@ -22,7 +22,7 @@
     { file: 'TTM.glb'    },
     { file: 'Panacea.glb'},
     { file: 'Prism.glb'  },
-    { file: 'Glitch.glb', rotX: Math.PI, rotZ: Math.PI / 2 },
+    { file: 'Glitch.glb', rotX: 0 },
     { file: 'Kremua.glb' },
   ];
 

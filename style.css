@@ -1914,7 +1914,6 @@ body.theme-light .hero__chat-icon {
 /* ── Футер ── */
 .hero__chat-footer {
   flex-shrink: 0;
-  border-top: 1px solid var(--chat-border);
   background: var(--chat-footer);
   padding: 8px 10px;
   display: flex;
@@ -2058,20 +2057,35 @@ body.theme-light .hero__chat-theme-btn .icon-sun  { display: block; }
 
 /* ── Hero chat: новый футер ── */
 .hero__chat-footer {
-  padding: 10px 12px 12px;
-  border-top: 1px solid var(--chat-border);
-  background: var(--chat-footer);
+  padding: 0 12px 12px;
+  background: transparent;
   flex-shrink: 0;
+  position: relative;
+}
+
+/* Градиент поверх низа body */
+.hero__chat-body {
+  position: relative;
+}
+.hero__chat-body::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 35px;
+  background: linear-gradient(to bottom, transparent, var(--chat-input-bg));
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Цельный бокс: инпут + тулбар */
 .hero__chat-box {
   background: var(--chat-input-bg);
-  border: 1px solid var(--chat-border);
-  border-radius: 12px;
+  border: none;
+  border-radius: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  margin: 0 -12px -12px;
 }
 
 .hero__chat-input {
