@@ -490,59 +490,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-/* ── QR-коды в доне ── */
+/* ── QR-коды в доне — заменено новым inline QR IIFE ниже ── */
 (function () {
-  var overlay = document.getElementById('donateQrOverlay');
-  var canvas  = document.getElementById('donateQrCanvas');
-  var closeBtn = document.getElementById('donateQrClose');
-  if (!overlay || !canvas) return;
-
-  function showQr(address) {
-    if (!address || typeof QRCode === 'undefined') return;
-    canvas.width = 0; canvas.height = 0;
-    var isDark = !document.body.classList.contains('theme-light');
-    new QRCode(canvas, {
-      text: address,
-      width: 180, height: 180,
-      colorDark:  isDark ? '#4daf6a' : '#1a1c26',
-      colorLight: isDark ? '#101f12' : '#f2f3f7',
-      correctLevel: QRCode.CorrectLevel.M,
-    });
-    // Показываем адрес под QR
-    var addrEl = document.getElementById('donateQrAddr');
-    if (addrEl) {
-      addrEl.textContent = address.length > 24
-        ? address.slice(0, 12) + '…' + address.slice(-8)
-        : address;
-    }
-    overlay.classList.add('is-visible');
-    overlay.setAttribute('aria-hidden', 'false');
-  }
-
-  // Делегируем клики по QR-кнопкам (у них data-qr, но НЕ только data-copy)
-  document.addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-qr]');
-    if (!btn) return;
-    // Убеждаемся что это именно QR-кнопка (первая кнопка в паре — aria-label="QR-код")
-    if (btn.getAttribute('aria-label') !== 'QR-код') return;
-    var addr = btn.dataset.qr || btn.dataset.copy;
-    if (addr) showQr(addr);
-  });
-
-  if (closeBtn) {
-    closeBtn.addEventListener('click', function () {
-      overlay.classList.remove('is-visible');
-      overlay.setAttribute('aria-hidden', 'true');
-    });
-  }
-
-  // Клик вне QR-box закрывает
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) {
-      overlay.classList.remove('is-visible');
-      overlay.setAttribute('aria-hidden', 'true');
-    }
-  });
+  // Старый overlay удалён — логика перенесена в блок "DONATE — inline QR"
 })();
 (function () {
   const btn  = document.getElementById('themeToggle');
@@ -865,57 +815,156 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ═══════════════════════════════════════
-   DONATE — кнопка "Назад"
+   DL-BUTTON — Lottie + «Отправлено» + сброс через 3с
 ═══════════════════════════════════════ */
 (function () {
-  // Десктоп: возвращаем первую карточку в центр
-  var backBtn = document.getElementById('donateBackBtn');
-  if (!backBtn) return;
+  if (typeof lottie === 'undefined') return;
 
-  backBtn.addEventListener('click', function () {
-    // Находим карточку "order" (заявка) и симулируем клик по ней
-    var orderCard = document.querySelector('.cstack__card[data-card="order"]');
-    if (orderCard && orderCard.dataset.pos !== 'center') {
-      orderCard.click();
+  var SEND_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Send%20animation.json';
+
+  // Инициализируем Lottie для каждой кнопки
+  function makeSendBtn(btnId, lottieContainerId, formId) {
+    var btn       = document.getElementById(btnId);
+    var container = document.getElementById(lottieContainerId);
+    var form      = formId ? document.getElementById(formId) : null;
+    if (!btn || !container) return;
+
+    var anim = lottie.loadAnimation({
+      container: container,
+      renderer:  'svg',
+      loop:      false,
+      autoplay:  false,
+      path:      SEND_URL,
+    });
+
+    // Окрашиваем Lottie в цвет темы через CSS filter на контейнере
+    function applyLottieColor() {
+      var isDark = !document.body.classList.contains('theme-light');
+      container.style.filter = isDark
+        ? 'invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(100%)'  // зелёный
+        : 'invert(45%) sepia(0%) saturate(0%) brightness(60%)';                         // серый
     }
-  });
-})();
+    anim.addEventListener('DOMLoaded', applyLottieColor);
+    // При смене темы
+    var themeObserver = new MutationObserver(applyLottieColor);
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
+    var label   = btn.querySelector('.label');
+    var defaultD = label ? label.querySelector('.default') : null;
+    var stateD   = label ? label.querySelector('.state')   : null;
+    var busy = false;
 
-/* ═══════════════════════════════════════
-   DL-BUTTON — оригинальный jQuery-код 1в1
-═══════════════════════════════════════ */
-(function () {
-  if (typeof $ === 'undefined') return;
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (busy) return;
+      busy = true;
 
-  function setLabel(div, oldD, newD, callback) {
-    oldD.addClass('hide');
-    div.animate({ width: newD.outerWidth() }, 200, function () {
-      oldD.removeClass('show hide');
-      newD.addClass('show');
-      div.removeAttr('style');
-      if (typeof callback === 'function') callback();
+      // Анимируем иконку
+      anim.goToAndPlay(0, true);
+
+      // Переключаем текст на «Отправлено»
+      if (defaultD) defaultD.classList.remove('show');
+      if (stateD)   stateD.classList.add('show');
+
+      // Прогресс-бар
+      btn.classList.add('active');
+
+      // Ждём окончания анимации Lottie (или 2с) → done
+      var onComplete = function () {
+        anim.removeEventListener('complete', onComplete);
+        btn.classList.remove('active');
+        btn.classList.add('done');
+      };
+      anim.addEventListener('complete', onComplete);
+
+      // Через 3с сбрасываем всё
+      setTimeout(function () {
+        busy = false;
+        btn.classList.remove('done');
+        anim.goToAndStop(0, true);
+
+        if (defaultD) defaultD.classList.add('show');
+        if (stateD)   stateD.classList.remove('show');
+
+        // Очищаем форму
+        if (form) {
+          form.reset();
+          form.querySelectorAll('.cform__check input').forEach(function (inp) {
+            inp.checked = false;
+          });
+        }
+      }, 3000);
     });
   }
 
-  $(document).on('click', '.dl-button', function (e) {
-    e.preventDefault();
-    var btn     = $(this),
-        label   = btn.find('.label'),
-        counter = label.find('.counter');
+  makeSendBtn('feedbackSubmitBtn',  'feedbackLottieIcon',  'feedbackForm');
+  makeSendBtn('contactSubmitBtn',   'contactLottieIcon',   'contactForm');
+})();
 
-    if (!btn.hasClass('active') && !btn.hasClass('done')) {
-      btn.addClass('active');
-      setLabel(label, label.find('.default'), label.find('.state'));
-      var duration = parseFloat(getComputedStyle(btn[0]).getPropertyValue('--duration'));
-      setTimeout(function () {
-        counter.addClass('hide');
-        counter.animate({ width: 0 }, 400, function () {
-          label.width(label.find('.state > span').width());
-          counter.removeAttr('style');
-        });
-        btn.removeClass('active').addClass('done');
-      }, duration);
+/* ═══════════════════════════════════════
+   DONATE — inline QR + «СПАСИБО» / «Назад»
+═══════════════════════════════════════ */
+(function () {
+  var grid    = document.querySelector('.cform--donate .donate__grid');
+  var qrInline = document.getElementById('donateQrInline');
+  var qrCanvas = document.getElementById('donateQrCanvas');
+  var addrEl   = document.getElementById('donateQrAddr');
+  var footer   = document.getElementById('donateFooter');
+  var footerTxt = document.getElementById('donateFooterText');
+  if (!grid || !qrInline || !footer) return;
+
+  function openQr(address) {
+    if (!address || typeof QRCode === 'undefined') return;
+
+    // Чистим и генерируем QR
+    qrCanvas.innerHTML = '';
+    var isDark = !document.body.classList.contains('theme-light');
+    new QRCode(qrCanvas, {
+      text:       address,
+      width:      200,
+      height:     200,
+      colorDark:  isDark ? '#4daf6a' : '#1a1c26',
+      colorLight: isDark ? '#101f12' : '#f2f3f7',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+
+    // Сокращённый адрес
+    if (addrEl) {
+      addrEl.textContent = address.length > 20
+        ? address.slice(0, 8) + '…' + address.slice(-6)
+        : address;
     }
+
+    // Прячем сетку, показываем QR
+    grid.style.display     = 'none';
+    qrInline.style.display = 'flex';
+    qrInline.setAttribute('aria-hidden', 'false');
+
+    // Футер → кнопка «Назад»
+    footer.classList.add('is-back');
+    footerTxt.textContent = '← Назад';
+  }
+
+  function closeQr() {
+    grid.style.display     = '';
+    qrInline.style.display = 'none';
+    qrInline.setAttribute('aria-hidden', 'true');
+
+    footer.classList.remove('is-back');
+    footerTxt.textContent = 'СПАСИБО ЗА ПОДДЕРЖКУ';
+  }
+
+  // Клики по QR-кнопкам
+  grid.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-qr]');
+    if (!btn || btn.getAttribute('aria-label') !== 'QR-код') return;
+    e.stopPropagation();
+    openQr(btn.dataset.qr || btn.dataset.copy);
+  });
+
+  // Кнопка «Назад» (только когда is-back)
+  footer.addEventListener('click', function () {
+    if (!footer.classList.contains('is-back')) return;
+    closeQr();
   });
 })();

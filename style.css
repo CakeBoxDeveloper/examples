@@ -765,14 +765,8 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 .donate__copy:hover svg { opacity: 1; }
 .donate__copy.copied { border-color: #1db954; color: #1db954; }
 
-/* QR оверлей */
-.donate__qr-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.55);
-  align-items: center; justify-content: center;
-  z-index: 10000;
-}
-.donate__qr-overlay.is-visible { display: flex; }
+/* QR инлайн */
+.donate__qr-overlay { display: none; }
 .donate__qr-box {
   display: flex; flex-direction: column; align-items: center; gap: 12px;
   position: relative;
@@ -845,60 +839,15 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   transform: translateZ(8px);
 }
 .dl-button > div .icon div {
-  overflow: hidden;
+  overflow: visible;
   position: relative;
-  width: 20px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
 }
 .dl-button > div .icon div:before,
-.dl-button > div .icon div:after {
-  content: "";
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  top: 2px;
-  transition: opacity 0.3s ease;
-}
-.dl-button > div .icon div:before {
-  left: 6px;
-  background-image: radial-gradient(circle at 0 100%, var(--color) 2px, #fff 0px);
-}
-.dl-button > div .icon div:after {
-  right: 6px;
-  background-image: radial-gradient(circle at 100% 100%, var(--color) 2px, #fff 0px);
-}
-.dl-button > div .icon div svg {
-  width: 20px;
-  height: 18px;
-  display: block;
-  margin-top: 2px;
-  position: relative;
-  z-index: 1;
-}
-.dl-button > div .icon div svg.arrow {
-  color: #fff;
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 2;
-  transform: translateY(-1px);
-}
-.dl-button > div .icon div svg.shape {
-  color: var(--color);
-  transition: color 0.4s ease;
-}
-.dl-button > div .icon span {
-  --s: 1;
-  position: absolute;
-  left: 1px;
-  right: 1px;
-  bottom: 2px;
-  background: var(--color);
-  height: 6px;
-  border-radius: 50%;
-  display: block;
-  transform: translateY(0) scale(var(--s));
-}
+.dl-button > div .icon div:after { display: none; }
+.dl-button > div .icon div svg { display: none; }
+.dl-button > div .icon span { display: none; }
 .dl-button > div .label {
   --color: var(--grey-dark);
   line-height: 22px;
@@ -992,31 +941,12 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 }
 .dl-button.active > div { animation: dlbutton-anim calc(var(--duration) * 1ms) linear forwards; }
 .dl-button.active > div .icon div:before,
-.dl-button.active > div .icon div:after { opacity: 0; transition-delay: 0.4s; }
-.dl-button.active > div .icon svg.arrow { animation: dlbutton-arrow calc(var(--duration) * 0.18ms) linear 4 calc(var(--duration) * 0.2ms); }
-.dl-button.active > div .icon span { animation: dlbutton-span calc(var(--duration) * 0.18ms) linear 4 calc(var(--duration) * 0.2ms); }
-.dl-button.active > div .label > div .counter ul:nth-child(1) { --y: -18px; transition-delay: calc(var(--duration) * 0.72ms); }
-.dl-button.active > div .label > div .counter ul:nth-child(2) { --y: -180px; transition-delay: calc(var(--duration) * 0.09ms); animation: dlbutton-motion calc(var(--duration) * 0.5ms) linear forwards calc(var(--duration) * 0.19ms); }
-.dl-button.active > div .label > div .counter ul:nth-child(3) { --y: -540px; transition-delay: calc(var(--duration) * 0.075ms); animation: dlbutton-motion calc(var(--duration) * 0.8ms) linear forwards calc(var(--duration) * 0.075ms); }
-.dl-button.active > div .progress { --s: 1; transition-delay: 0.4s; }
-.dl-button.active > div .progress:after { --s: 1; transition-delay: 0.4s; }
+.dl-button.active > div .icon div:after { opacity: 0; }
+.dl-button.active > div .progress { --s: 1; transition-delay: 0.2s; }
+.dl-button.active > div .progress:after { --s: 1; transition-delay: 0.2s; }
 .dl-button.done > div .icon { --color: var(--success); }
 .dl-button.done .label { --color: var(--success); }
-.dl-button.done .label .counter { width: 0; }
-@keyframes dlbutton-arrow {
-  38% { transform: translateY(100%); opacity: 1; }
-  39% { transform: translateY(100%); opacity: 0; }
-  40% { transform: translateY(-100%); opacity: 0; }
-  41% { transform: translateY(-100%); opacity: 1; }
-  100% { transform: translateY(-1px); opacity: 1; }
-}
-@keyframes dlbutton-span {
-  25%, 55% { transform: translateY(2px) scale(var(--s)); }
-  80%, 100% { transform: translateY(0) scale(var(--s)); }
-}
-@keyframes dlbutton-motion {
-  20%, 70% { filter: blur(0.4px); }
-}
+@keyframes dlbutton-motion { 20%, 70% { filter: blur(0.4px); } }
 @keyframes dlbutton-anim {
   0%   { transform: translateX(0) translateZ(0) scale(1) rotateY(0deg); }
   10%  { transform: translateX(0) translateZ(0) scale(0.96) rotateY(0deg); box-shadow: 0 4px 8px var(--shadow-dark); }
@@ -1026,7 +956,62 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   100% { transform: translateX(0) translateZ(0) scale(1) rotateY(0deg); }
 }
 
-/* Toast-уведомление о копировании */
+/* DL-BUTTON: цвета темы, половина ширины */
+.cform__btn-wrap { display: flex; justify-content: flex-start; }
+.cform__btn-wrap .dl-button { width: 50%; }
+
+/* Lottie-иконка внутри кнопки */
+.dl-lottie-icon { width: 28px; height: 28px; flex-shrink: 0; }
+
+/* Перекрашиваем dl-button в цвета темы */
+.dl-button > div {
+  background: var(--bg-card) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35) !important;
+}
+.dl-button > div .label {
+  --color: var(--text) !important;
+}
+.dl-button > div .icon {
+  --color: var(--text-muted) !important;
+}
+/* В тёмной теме иконка зелёная, в светлой — серая */
+body:not(.theme-light) .dl-button > div .icon { --color: var(--accent) !important; }
+body.theme-light .dl-button > div .icon { --color: var(--text-muted) !important; }
+
+/* done: цвет темы, не белый фон */
+.dl-button.done > div .icon { --color: var(--success) !important; }
+.dl-button.done .label { --color: var(--success) !important; }
+
+/* counter-градиенты под тему */
+.dl-button > div .label > div .counter:before {
+  background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%) !important;
+}
+.dl-button > div .label > div .counter:after {
+  background: linear-gradient(to top, var(--bg-card) 0%, transparent 100%) !important;
+}
+/* icon псевдо-пиксели под фон темы */
+.dl-button > div .icon div:before {
+  background-image: radial-gradient(circle at 0 100%, var(--color) 2px, var(--bg-card) 0px) !important;
+}
+.dl-button > div .icon div:after {
+  background-image: radial-gradient(circle at 100% 100%, var(--color) 2px, var(--bg-card) 0px) !important;
+}
+.dl-button > div .icon div svg.arrow { color: var(--bg-card) !important; }
+
+/* Donate inline QR */
+.donate__qr-inline {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; padding: 12px 0;
+}
+.donate__qr-canvas-inline { border-radius: 8px; overflow: hidden; }
+.donate__qr-canvas-inline canvas { display: block; }
+
+/* Футер доната — кликабельный только когда QR открыт */
+.cform__submit--yellow { cursor: default; }
+.cform__submit--yellow.is-back {
+  cursor: pointer;
+}
+.cform__submit--yellow.is-back:hover { background: var(--chat-input-bg); }
 .copy-toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   background: var(--accent); color: #fff;
