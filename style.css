@@ -179,6 +179,24 @@ body.theme-light .section-scroll-btn { color: var(--text); }
   position: relative;
   padding-top: 48px; padding-bottom: 48px;
 }
+/* Fade-out внизу hero — скрывает нижний край матрицы */
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent 0%, #08090f 50%, #08090f 100%);
+  pointer-events: none; z-index: 1;
+}
+body.theme-light .hero::after {
+  background: linear-gradient(to bottom, transparent 0%, #f2f3f7 50%, #f2f3f7 100%);
+  z-index: 4;
+}
+body.theme-light .hero .section-scroll-btn {
+  z-index: 6;
+}
+body.theme-light .hero::after {
+  background: linear-gradient(to bottom, transparent 0%, transparent 40%, #f2f3f7 100%);
+}
 
 .hero__inner {
   display: flex; flex-direction: row;
@@ -713,9 +731,10 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   border: 1px solid var(--border); color: var(--text-muted); background: none; cursor: pointer;
   transition: border-color var(--ease), color var(--ease), background var(--ease);
 }
-.donate__copy img { opacity: 0.6; transition: opacity 0.18s; display: block; }
+.donate__copy img { opacity: 0.85; transition: opacity 0.18s, filter 0.18s; display: block;
+  filter: invert(65%) sepia(40%) saturate(600%) hue-rotate(95deg) brightness(120%); }
 .donate__copy:hover  { border-color: var(--border-accent); color: var(--accent); background: var(--accent-glow); }
-.donate__copy:hover img { opacity: 1; }
+.donate__copy:hover img { opacity: 1; filter: invert(75%) sepia(50%) saturate(700%) hue-rotate(95deg) brightness(140%); }
 .donate__copy.copied { border-color: #1db954; color: #1db954; }
 
 /* QR оверлей */
