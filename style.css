@@ -822,7 +822,7 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 .theme-toggle:hover { color: var(--text); border-color: var(--border-accent); }
 
 /* ═══════════════════════
-   DL-BUTTON (оригинал 1в1, встроен в форму)
+   DL-BUTTON — оригинал 1в1
 ═══════════════════════ */
 .dl-button {
   --duration: 4000;
@@ -839,29 +839,74 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 }
 .dl-button > div {
   position: relative;
-  background: var(--bg-card);
-  border-radius: 8px;
+  background: #fff;
+  border-radius: 5px;
   overflow: hidden;
   display: flex;
-  padding: 12px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  padding: 16px 24px;
+  box-shadow: 0 4px 12px var(--shadow);
 }
 .dl-button > div .icon {
   --color: var(--grey);
   margin-right: 12px;
   position: relative;
-  /* убрали translateZ — он мешал Lottie SVG */
+  transform: translateZ(8px);
 }
 .dl-button > div .icon div {
-  overflow: visible;
+  overflow: hidden;
   position: relative;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 22px;
 }
 .dl-button > div .icon div:before,
-.dl-button > div .icon div:after { display: none; }
-.dl-button > div .icon div svg { display: none; }
-.dl-button > div .icon span { display: none; }
+.dl-button > div .icon div:after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  top: 2px;
+  transition: opacity 0.3s ease;
+}
+.dl-button > div .icon div:before {
+  left: 6px;
+  background-image: radial-gradient(circle at 0 100%, var(--color) 2px, #fff 0px);
+}
+.dl-button > div .icon div:after {
+  right: 6px;
+  background-image: radial-gradient(circle at 100% 100%, var(--color) 2px, #fff 0px);
+}
+.dl-button > div .icon div svg {
+  width: 20px;
+  height: 18px;
+  display: block;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+.dl-button > div .icon div svg.arrow {
+  color: #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  transform: translateY(-1px);
+}
+.dl-button > div .icon div svg.shape {
+  color: var(--color);
+  transition: color 0.4s ease;
+}
+.dl-button > div .icon span {
+  --s: 1;
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  bottom: 2px;
+  background: var(--color);
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+  transform: translateY(0) scale(var(--s));
+}
 .dl-button > div .label {
   --color: var(--grey-dark);
   line-height: 22px;
@@ -870,7 +915,7 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   color: var(--color);
   position: relative;
   transition: color 0.4s ease;
-  /* убрали translateZ — не нужен */
+  transform: translateZ(8px);
 }
 .dl-button > div .label > div {
   display: flex;
@@ -910,17 +955,11 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   bottom: 0;
   background: linear-gradient(to top, white 0%, rgba(255,255,255,0) 100%);
 }
-.dl-button > div .label > div .counter span {
-  display: inline-block;
-  margin: 0 4px 0 2px;
-}
+.dl-button > div .label > div .counter span { display: inline-block; margin: 0 4px 0 2px; }
 .dl-button > div .label > div .counter ul {
   --y: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  width: 10px;
-  height: 18px;
+  margin: 0; padding: 0; list-style: none;
+  width: 10px; height: 18px;
   backface-visibility: hidden;
   transform: translateY(var(--y)) translateZ(0);
 }
@@ -931,9 +970,7 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 .dl-button > div .label > div .counter.hide { opacity: 0; }
 .dl-button > div .progress {
   --s: 0;
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 3px;
+  position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
   transform-origin: 50% 100%;
   transform: scaleY(var(--s));
   transition: transform 0.4s ease;
@@ -943,8 +980,7 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   --s: 1;
   content: "";
   background: var(--success);
-  position: absolute;
-  left: 0; top: 0; bottom: 0; right: 0;
+  position: absolute; left: 0; top: 0; bottom: 0; right: 0;
   transform-origin: 0 50%;
   transform: scaleX(var(--s));
 }
@@ -953,30 +989,32 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   --s: 0;
   transition: transform calc(var(--duration) * 0.9ms) ease-in-out;
 }
-.dl-button.active > div { animation: none; } /* убрали 3D — ломало Lottie */
+.dl-button.active > div { animation: dlbtn-anim calc(var(--duration) * 1ms) linear forwards; }
 .dl-button.active > div .icon div:before,
-.dl-button.active > div .icon div:after { opacity: 0; }
-.dl-button.active > div .progress { --s: 1; transition-delay: 0.2s; }
-.dl-button.active > div .progress:after { --s: 1; transition-delay: 0.2s; }
-/* Анимация счётчика при active */
-.dl-button.active > div .label > div .counter ul:nth-child(1) {
-  --y: -18px;
-  transition-delay: calc(var(--duration) * 0.72ms);
-}
-.dl-button.active > div .label > div .counter ul:nth-child(2) {
-  --y: -180px;
-  transition-delay: calc(var(--duration) * 0.09ms);
-  animation: dlbutton-motion calc(var(--duration) * 0.5ms) linear forwards calc(var(--duration) * 0.19ms);
-}
-.dl-button.active > div .label > div .counter ul:nth-child(3) {
-  --y: -540px;
-  transition-delay: calc(var(--duration) * 0.075ms);
-  animation: dlbutton-motion calc(var(--duration) * 0.8ms) linear forwards calc(var(--duration) * 0.075ms);
-}
+.dl-button.active > div .icon div:after { opacity: 0; transition-delay: 0.4s; }
+.dl-button.active > div .icon svg.arrow { animation: dlbtn-arrow calc(var(--duration) * 0.18ms) linear 4 calc(var(--duration) * 0.2ms); }
+.dl-button.active > div .icon span     { animation: dlbtn-span  calc(var(--duration) * 0.18ms) linear 4 calc(var(--duration) * 0.2ms); }
+.dl-button.active > div .label > div .counter ul:nth-child(1) { --y: -18px;  transition-delay: calc(var(--duration) * 0.72ms); }
+.dl-button.active > div .label > div .counter ul:nth-child(2) { --y: -180px; transition-delay: calc(var(--duration) * 0.09ms); animation: dlbtn-motion calc(var(--duration) * 0.5ms) linear forwards calc(var(--duration) * 0.19ms); }
+.dl-button.active > div .label > div .counter ul:nth-child(3) { --y: -540px; transition-delay: calc(var(--duration) * 0.075ms); animation: dlbtn-motion calc(var(--duration) * 0.8ms) linear forwards calc(var(--duration) * 0.075ms); }
+.dl-button.active > div .progress { --s: 1; transition-delay: 0.4s; }
+.dl-button.active > div .progress:after { --s: 1; transition-delay: 0.4s; }
 .dl-button.done > div .icon { --color: var(--success); }
 .dl-button.done .label { --color: var(--success); }
-@keyframes dlbutton-motion { 20%, 70% { filter: blur(0.4px); } }
-@keyframes dlbutton-anim {
+.dl-button.done .label .counter { width: 0; }
+@keyframes dlbtn-arrow {
+  38% { transform: translateY(100%); opacity: 1; }
+  39% { transform: translateY(100%); opacity: 0; }
+  40% { transform: translateY(-100%); opacity: 0; }
+  41% { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(-1px); opacity: 1; }
+}
+@keyframes dlbtn-span {
+  25%, 55% { transform: translateY(2px) scale(var(--s)); }
+  80%, 100% { transform: translateY(0) scale(var(--s)); }
+}
+@keyframes dlbtn-motion { 20%, 70% { filter: blur(0.4px); } }
+@keyframes dlbtn-anim {
   0%   { transform: translateX(0) translateZ(0) scale(1) rotateY(0deg); }
   10%  { transform: translateX(0) translateZ(0) scale(0.96) rotateY(0deg); box-shadow: 0 4px 8px var(--shadow-dark); }
   20%  { transform: translateX(-16px) translateZ(32px) scale(1) rotateY(-16deg); box-shadow: 4px 12px 20px var(--shadow-dark); }
@@ -985,91 +1023,45 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
   100% { transform: translateX(0) translateZ(0) scale(1) rotateY(0deg); }
 }
 
-/* DL-BUTTON: по центру, 50% ширины, цвет текста = accent */
-.cform__btn-wrap {
-  display: flex;
-  justify-content: center;
-}
-.cform__btn-wrap .dl-button {
-  width: 50%;
-}
+/* ── Адаптация кнопки под тему проекта ── */
+/* Центрирование, ширина 50% */
+.cform__btn-wrap { display: flex; justify-content: center; }
+.cform__btn-wrap .dl-button { width: 50%; }
+/* Фон под тему (не белый) */
+.dl-button > div { background: var(--bg-card) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
+/* Иконка и текст: в тёмной = accent, в светлой = text-muted */
+body:not(.theme-light) .dl-button > div .icon { --color: var(--accent); }
+body:not(.theme-light) .dl-button > div .label { --color: var(--accent); }
+body.theme-light .dl-button > div .icon { --color: var(--text-muted); }
+body.theme-light .dl-button > div .label { --color: var(--text-muted); }
+/* Пиксели-заглушки иконки под bg-card */
+.dl-button > div .icon div:before { background-image: radial-gradient(circle at 0 100%, var(--color) 2px, var(--bg-card) 0px) !important; }
+.dl-button > div .icon div:after  { background-image: radial-gradient(circle at 100% 100%, var(--color) 2px, var(--bg-card) 0px) !important; }
+.dl-button > div .icon div svg.arrow { color: var(--bg-card) !important; }
+/* Градиенты счётчика под bg-card */
+.dl-button > div .label > div .counter:before { background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%) !important; }
+.dl-button > div .label > div .counter:after  { background: linear-gradient(to top,   var(--bg-card) 0%, transparent 100%) !important; }
+/* Убираем border снизу у формы с кнопкой */
+.cform:has(.cform__btn-wrap) { border-bottom: none; padding-bottom: 16px; }
 
-/* Lottie-иконка: явные размеры, overflow видим */
-.dl-lottie-icon {
-  width: 28px !important;
-  height: 28px !important;
-  flex-shrink: 0;
-  overflow: visible;
-  display: block;
-}
-/* Контейнер иконки — открытый */
-.dl-button > div .icon div {
-  overflow: visible !important;
-  width: 28px !important;
-  height: 28px !important;
-}
-/* Скрываем ненужные SVG-артефакты */
-.dl-button > div .icon div:before,
-.dl-button > div .icon div:after { display: none !important; }
-.dl-button > div .icon div svg { display: none !important; }
-.dl-button > div .icon span { display: none !important; }
+/* Donate inline QR */
+.donate__qr-inline { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 0; }
+.donate__qr-canvas-inline { border-radius: 8px; overflow: hidden; border: 1px solid var(--border-accent); padding: 4px; background: var(--bg-card); }
+.donate__qr-canvas-inline canvas { display: block; border-radius: 5px; }
+.donate__qr-addr { font-size: 1.04rem; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; text-align: center; }
+body.theme-light .donate__qr-addr { color: var(--text-muted); }
 
-/* Убираем дырку (пустой toast до появления) */
+/* Toast над футером доната */
 .donate-toast {
   display: block; text-align: center;
   padding: 0; margin: 0;
-  background: var(--accent); color: #fff;
-  border-radius: 8px;
+  background: var(--accent); color: #fff; border-radius: 8px;
   font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em;
   opacity: 0; height: 0; overflow: hidden; line-height: 0;
   transition: opacity 0.25s ease, height 0.25s ease, line-height 0.25s ease;
   pointer-events: none;
 }
-.donate-toast.show {
-  opacity: 1; height: 28px; line-height: 28px;
-  padding: 0 16px; margin: 0 20px 4px;
-}
-
-/* Перекрашиваем dl-button в цвета темы, текст = accent */
-.dl-button > div .label { --color: var(--accent); }
-/* В тёмной теме иконка зелёная, в светлой — серая */
-body:not(.theme-light) .dl-button > div .icon { --color: var(--accent); }
-body.theme-light .dl-button > div .icon { --color: var(--text-muted); }
-body.theme-light .dl-button > div .label { --color: var(--text-muted); }
-/* done */
-.dl-button.done > div .icon { --color: var(--success) !important; }
-.dl-button.done .label { --color: var(--success) !important; }
-
-/* Градиенты счётчика под bg-card */
-.dl-button > div .label > div .counter:before {
-  background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%) !important;
-}
-.dl-button > div .label > div .counter:after {
-  background: linear-gradient(to top, var(--bg-card) 0%, transparent 100%) !important;
-}
-/* Убираем старые icon-пиксели */
-.dl-button > div .icon div:before { background-image: none !important; }
-.dl-button > div .icon div:after  { background-image: none !important; }
-
-/* Donate inline QR */
-.donate__qr-inline {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 10px; padding: 12px 0;
-}
-/* Тонкая рамка вокруг QR */
-.donate__qr-canvas-inline {
-  border-radius: 8px; overflow: hidden;
-  border: 1px solid var(--border-accent);
-  padding: 4px;
-  background: var(--bg-card);
-}
-.donate__qr-canvas-inline canvas { display: block; border-radius: 5px; }
-/* Название сети — +30% от 0.8rem */
-.donate__qr-addr {
-  font-size: 1.04rem; font-weight: 600;
-  color: var(--accent); letter-spacing: 0.05em; text-align: center;
-}
-body.theme-light .donate__qr-addr { color: var(--text-muted); }
+.donate-toast.show { opacity: 1; height: 28px; line-height: 28px; padding: 0 16px; margin: 0 20px 4px; }
 
 /* Футер доната — кликабельный только когда QR открыт */
 .cform__submit--yellow { cursor: default; }

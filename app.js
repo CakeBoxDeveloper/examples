@@ -815,100 +815,57 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ═══════════════════════════════════════
-   DL-BUTTON — Lottie + счётчик % + сброс через 3с
+   DL-BUTTON — оригинальный jQuery-код + авто-сброс через 3с
 ═══════════════════════════════════════ */
 (function () {
-  var SEND_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Send%20animation.json';
-  var ANIM_DURATION = 1500;
+  if (typeof $ === 'undefined') return;
 
-  function makeSendBtn(btnId, lottieContainerId, formId) {
-    var btn       = document.getElementById(btnId);
-    var container = document.getElementById(lottieContainerId);
-    var form      = formId ? document.getElementById(formId) : null;
-    if (!btn || !container) return;
-
-    /* Инициализация Lottie — стоп на первом кадре */
-    var anim = null;
-    if (typeof lottie !== 'undefined') {
-      anim = lottie.loadAnimation({
-        container: container,
-        renderer:  'svg',
-        loop:      false,
-        autoplay:  false,
-        path:      SEND_URL,
-      });
-
-      /* Цвет иконки через filter */
-      function applyColor() {
-        var isDark = !document.body.classList.contains('theme-light');
-        container.style.filter = isDark
-          ? 'invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(105%)'
-          : 'invert(45%) sepia(0%) saturate(0%) brightness(60%)';
-      }
-      anim.addEventListener('DOMLoaded', applyColor);
-      new MutationObserver(applyColor).observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    var label    = btn.querySelector('.label');
-    var defaultD = label ? label.querySelector('.default') : null;
-    var stateD   = label ? label.querySelector('.state')   : null;
-    var counter  = label ? label.querySelector('.counter') : null;
-    var busy = false;
-
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (busy) return;
-      busy = true;
-
-      /* Запускаем Lottie */
-      if (anim) anim.goToAndPlay(0, true);
-
-      /* Показываем счётчик (state), скрываем дефолт */
-      if (defaultD) defaultD.classList.remove('show');
-      if (stateD)   stateD.classList.add('show');
-      btn.classList.add('active');
-
-      /* Через ANIM_DURATION — показываем "Отправлено", фризим Lottie */
-      setTimeout(function () {
-        /* Фризим Lottie на первом кадре */
-        if (anim) { anim.pause(); }
-
-        /* Прячем счётчик, показываем "Отправлено" */
-        if (counter) {
-          counter.classList.add('hide');
-          counter.style.width = '0';
-        }
-        btn.classList.remove('active');
-        btn.classList.add('done');
-
-        /* Через 3с — полный сброс */
-        setTimeout(function () {
-          busy = false;
-          btn.classList.remove('done');
-
-          if (anim) { anim.goToAndStop(0, true); }
-
-          if (counter) {
-            counter.classList.remove('hide');
-            counter.style.width = '';
-          }
-          if (stateD)   stateD.classList.remove('show');
-          if (defaultD) defaultD.classList.add('show');
-
-          /* Очищаем форму */
-          if (form) {
-            form.reset();
-            form.querySelectorAll('.cform__check input').forEach(function (inp) {
-              inp.checked = false;
-            });
-          }
-        }, 3000);
-      }, ANIM_DURATION);
+  function setLabel(div, oldD, newD, callback) {
+    oldD.addClass('hide');
+    div.animate({ width: newD.outerWidth() }, 200, function () {
+      oldD.removeClass('show hide');
+      newD.addClass('show');
+      div.removeAttr('style');
+      if (typeof callback === 'function') callback();
     });
   }
 
-  makeSendBtn('feedbackSubmitBtn', 'feedbackLottieIcon', 'feedbackForm');
-  makeSendBtn('contactSubmitBtn',  'contactLottieIcon',  'contactForm');
+  $(document).on('click', '.dl-button', function (e) {
+    e.preventDefault();
+    var btn     = $(this),
+        label   = btn.find('.label'),
+        counter = label.find('.counter'),
+        form    = btn.closest('form').length ? btn.closest('form') : btn.closest('.cform');
+
+    if (!btn.hasClass('active') && !btn.hasClass('done')) {
+      btn.addClass('active');
+      setLabel(label, label.find('.default'), label.find('.state'));
+
+      var duration = parseFloat(getComputedStyle(btn[0]).getPropertyValue('--duration'));
+
+      setTimeout(function () {
+        counter.addClass('hide');
+        counter.animate({ width: 0 }, 400, function () {
+          label.width(label.find('.state > span').width());
+          counter.removeAttr('style');
+        });
+        btn.removeClass('active').addClass('done');
+
+        /* Авто-сброс через 3с + очистка формы */
+        setTimeout(function () {
+          setLabel(label, label.find('.state'), label.find('.default'), function () {
+            counter.removeClass('hide');
+            btn.removeClass('done');
+          });
+          /* Очищаем форму */
+          var $form = btn.closest('#contactForm, #feedbackForm');
+          if ($form.length) {
+            $form[0].reset();
+          }
+        }, 3000);
+      }, duration);
+    }
+  });
 })();
 
 /* ═══════════════════════════════════════
