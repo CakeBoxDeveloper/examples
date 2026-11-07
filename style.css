@@ -1119,9 +1119,8 @@ body.theme-light .dl-lottie-wrap {
 .donate__slider {
   position: relative;
   display: flex;
-  align-items: flex-start; /* рамка QR не растягивается по высоте */
+  align-items: stretch;
   width: 100%;
-  flex: 1;
   overflow: hidden;
 }
 /* Список занимает 100%, при QR съезжает влево на 50% (уходит за край) */
@@ -1146,25 +1145,26 @@ body.theme-light .dl-lottie-wrap {
   overflow: hidden;
   display: flex;
   align-items: stretch;
-  justify-content: center;
   flex-direction: column;
   padding: 0;
+  /* тянется по высоте списка */
+  align-self: stretch;
   transition: flex-basis 0.38s cubic-bezier(0.4,0,0.2,1);
 }
-/* Открытое состояние — QR занимает правые 50% без отступов */
+/* Открытое состояние */
 .donate__slider.qr-open .donate__slide--qr {
   flex-basis: 50%;
-  padding: 0 16px 12px 8px;
+  padding: 4px 12px 8px 6px;
 }
 
-/* QR-рамка — высота по содержимому, не растягивается */
+/* QR-рамка — только тикер, без кода */
 .donate__qr-frame {
   border: 1px solid var(--border-accent);
   border-radius: 10px;
   overflow: hidden;
   background: var(--bg-card);
   width: 100%;
-  /* height: auto — рамка по размеру QR + тикер */
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1172,14 +1172,10 @@ body.theme-light .dl-lottie-wrap {
   gap: 0;
 }
 .donate__qr-canvas-inline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 8px 0;
-  width: 100%;
-  box-sizing: border-box;
+  display: none;
 }
-.donate__qr-canvas-inline canvas {
+.donate__qr-canvas-inline canvas,
+.donate__qr-canvas-inline img {
   display: block;
   border-radius: 4px;
   width: 100% !important;
@@ -1196,9 +1192,9 @@ body.theme-light .dl-lottie-wrap {
 }
 .donate__qr-addr {
   font-size: 0.75rem; font-weight: 700;
-  color: var(--accent); letter-spacing: 0.05em;
+  color: var(--accent); letter-spacing: 0.06em;
   text-align: center;
-  width: 100%; padding: 4px 6px 8px; margin: 0;
+  width: 100%; padding: 0; margin: 0;
   box-sizing: border-box;
   white-space: nowrap;
   overflow: hidden;

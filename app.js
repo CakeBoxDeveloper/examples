@@ -939,8 +939,8 @@ window.addEventListener('DOMContentLoaded', () => {
     var isDark = !document.body.classList.contains('theme-light');
     new QRCode(qrCanvas, {
       text:         address,
-      width:        180,
-      height:       180,
+      width:        160,
+      height:       160,
       colorDark:    isDark ? '#4daf6a' : '#1a1c26',
       colorLight:   isDark ? '#101f12' : '#f2f3f7',
       correctLevel: QRCode.CorrectLevel.M,
