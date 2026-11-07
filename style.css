@@ -1119,7 +1119,7 @@ body.theme-light .dl-lottie-wrap {
 .donate__slider {
   position: relative;
   display: flex;
-  align-items: stretch;
+  align-items: flex-start; /* рамка QR не растягивается по высоте */
   width: 100%;
   flex: 1;
   overflow: hidden;
@@ -1157,14 +1157,14 @@ body.theme-light .dl-lottie-wrap {
   padding: 0 16px 12px 8px;
 }
 
-/* QR-рамка — занимает всю высоту и ширину правой половины */
+/* QR-рамка — высота по содержимому, не растягивается */
 .donate__qr-frame {
   border: 1px solid var(--border-accent);
   border-radius: 10px;
   overflow: hidden;
   background: var(--bg-card);
   width: 100%;
-  height: 100%;
+  /* height: auto — рамка по размеру QR + тикер */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1172,7 +1172,6 @@ body.theme-light .dl-lottie-wrap {
   gap: 0;
 }
 .donate__qr-canvas-inline {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;

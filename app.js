@@ -954,9 +954,10 @@ window.addEventListener('DOMContentLoaded', () => {
     slider.classList.remove('qr-open');
   }
 
-  /* Клики по QR-кнопкам */
+  /* Клики по QR-кнопкам — только когда список НЕ задвинут */
   if (grid) {
     grid.addEventListener('click', function (e) {
+      if (slider.classList.contains('qr-open')) return; /* задвинут — игнорируем */
       var btn = e.target.closest('[data-qr]');
       if (!btn || btn.getAttribute('aria-label') !== 'QR-код') return;
       e.stopPropagation();
@@ -964,17 +965,20 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* Клик по заблюренному списку — закрываем QR */
+  /* Клик по заблюренному списку — только закрываем QR, всё остальное блокируем */
   if (listSlide) {
     listSlide.addEventListener('click', function (e) {
       if (!slider.classList.contains('qr-open')) return;
+      e.stopPropagation();
+      e.preventDefault();
       closeQr();
-    });
+    }, true); /* capture — перехватываем до дочерних элементов */
   }
 
-  /* Toast при копировании */
+  /* Toast при копировании — только когда список НЕ задвинут */
   if (grid) {
     grid.addEventListener('click', function (e) {
+      if (slider.classList.contains('qr-open')) return; /* задвинут — игнорируем */
       var btn = e.target.closest('.donate__copy[aria-label="Скопировать"]');
       if (!btn) return;
       var text = btn.dataset.copy;
