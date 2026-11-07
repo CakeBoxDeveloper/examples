@@ -663,13 +663,12 @@ body.theme-light .contact__emoji {
 
 .cform {
   display: flex; flex-direction: column; gap: 16px;
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-top: none; border-radius: 0; border-bottom: 1px solid var(--border); padding: 20px; position: relative;
+  background: var(--bg-card); border: none;
+  border-top: none; border-radius: 0; padding: 20px; position: relative;
 }
-/* Убираем нижний padding и границу когда в форме есть кнопка-wrap */
+/* Если есть кнопка — убираем нижний padding (кнопка сама несёт отступ) */
 .cform:has(.cform__btn-wrap) {
-  padding-bottom: 16px;
-  border-bottom: none;
+  padding-bottom: 0;
 }
 .cform__group { display: flex; flex-direction: column; gap: 8px; border: none; padding: 0; margin: 0; }
 .cform__legend,
@@ -1024,13 +1023,11 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 }
 
 /* ── Адаптация кнопки под тему проекта ── */
-/* Кнопка auto-width, центрируется margin:auto */
-.cform__btn-wrap { display: block; }
-.cform__btn-wrap .dl-button { display: block; width: auto; margin: 0 auto; }
-/* Контент внутри по центру */
-.dl-button > div { justify-content: center; }
+/* Кнопка auto-width, центрируется margin:auto, равные отступы */
+.cform__btn-wrap { display: block; padding: 16px 0; }
+.cform__btn-wrap .dl-button { display: table; margin: 0 auto; }
 /* Фон под тему (не белый) */
-.dl-button > div { background: var(--bg-card) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
+.dl-button > div { background: var(--bg-card) !important; box-shadow: none !important; outline: 1.5px solid var(--accent); outline-offset: -1.5px; }
 /* Иконка и текст: в тёмной = accent, в светлой = text-muted */
 body:not(.theme-light) .dl-button > div .icon { --color: var(--accent); }
 body:not(.theme-light) .dl-button > div .label { --color: var(--accent); }
@@ -1043,14 +1040,70 @@ body.theme-light .dl-button > div .label { --color: var(--text-muted); }
 /* Градиенты счётчика под bg-card */
 .dl-button > div .label > div .counter:before { background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%) !important; }
 .dl-button > div .label > div .counter:after  { background: linear-gradient(to top,   var(--bg-card) 0%, transparent 100%) !important; }
-/* Убираем border снизу у формы с кнопкой */
-.cform:has(.cform__btn-wrap) { border-bottom: none; padding-bottom: 16px; }
+/* Фаза active — скрываем span «Отправлено», показываем только счётчик */
+.dl-button.active .state > span { display: none; }
+/* Фаза done — скрываем счётчик, показываем только «Отправлено» */
+.dl-button.done .label .counter { display: none; }
 
-/* Donate inline QR */
-.donate__qr-inline { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 0; }
-.donate__qr-canvas-inline { border-radius: 8px; overflow: hidden; border: 1px solid var(--border-accent); padding: 4px; background: var(--bg-card); }
-.donate__qr-canvas-inline canvas { display: block; border-radius: 5px; }
-.donate__qr-addr { font-size: 1.04rem; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; text-align: center; }
+/* feedbackForm textarea растягивается на всё свободное место */
+#feedbackForm { flex: 1; display: flex; flex-direction: column; }
+#feedbackForm .cform__group:last-child { flex: 1; display: flex; flex-direction: column; }
+#feedbackForm .cform__group:last-child .cform__textarea { flex: 1; resize: none; }
+
+/* Donate inline QR — слайдер */
+.donate__slider {
+  position: relative;
+  display: flex;
+  width: 100%;
+  overflow: hidden;          /* обрезает выехавший список */
+}
+/* Слайд со списком — занимает 100%, при открытом QR съезжает влево на 50% */
+.donate__slide--list {
+  flex: 0 0 100%;
+  transition: flex-basis 0.35s cubic-bezier(0.4,0,0.2,1),
+              filter 0.35s ease,
+              transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+/* Слайд с QR — изначально скрыт за правым краем, появляется как 50% */
+.donate__slide--qr {
+  flex: 0 0 0%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  transition: flex-basis 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+/* Открытое состояние: список — 50% с блюром и сдвигом, QR — 50% */
+.donate__slider.qr-open .donate__slide--list {
+  flex-basis: 50%;
+  filter: blur(3px);
+  opacity: 0.6;
+  cursor: pointer;
+}
+.donate__slider.qr-open .donate__slide--qr {
+  flex-basis: 50%;
+  padding: 8px 0 8px 8px;
+}
+
+/* QR-рамка */
+.donate__qr-frame {
+  border: 1px solid var(--border-accent);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+  width: 100%;
+}
+.donate__qr-canvas-inline { display: block; padding: 8px 8px 0; }
+.donate__qr-canvas-inline canvas { display: block; border-radius: 5px; width: 100% !important; height: auto !important; }
+/* Название сети под QR */
+.donate__qr-addr {
+  font-size: 0.9rem; font-weight: 700;
+  color: var(--accent); letter-spacing: 0.06em;
+  text-align: center; padding: 8px 12px; margin: 0;
+}
 body.theme-light .donate__qr-addr { color: var(--text-muted); }
 
 /* Toast над футером доната */

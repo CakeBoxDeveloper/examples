@@ -465,7 +465,7 @@
               </div>
 
               <div class="cform__group cform__btn-wrap">
-                <a class="dl-button" id="feedbackSubmitBtn" href="#" style="--duration:1500">
+                <a class="dl-button" id="feedbackSubmitBtn" href="#" style="--duration:3000">
                   <div>
                     <div class="icon">
                       <div>
@@ -506,7 +506,9 @@
             </div>
             <div class="cform cform--donate">
               <p class="donate__desc">Все мои open-source проекты бесплатны. Если хочешь ускорить выход — можно поддержать криптой.</p>
-              <div class="donate__grid">
+              <div class="donate__slider">
+                <div class="donate__slide donate__slide--list">
+                <div class="donate__grid">
 
                 <div class="donate__cell">
                   <span class="donate__coin">USDT <span class="donate__net">TRC-20</span></span>
@@ -592,17 +594,21 @@
                   </div>
                 </div>
 
-              </div>
+              </div><!-- /donate__grid -->
+              </div><!-- /donate__slide--list -->
 
-              <!-- QR-оверлей — заменяет сетку инлайн -->
-              <div class="donate__qr-inline" id="donateQrInline" aria-hidden="true" style="display:none">
-                <div id="donateQrCanvas" class="donate__qr-canvas-inline"></div>
-                <p class="donate__qr-addr" id="donateQrAddr"></p>
-              </div>
+                <div class="donate__slide donate__slide--qr" id="donateQrInline" aria-hidden="true">
+                  <div class="donate__qr-frame">
+                    <div id="donateQrCanvas" class="donate__qr-canvas-inline"></div>
+                    <p class="donate__qr-addr" id="donateQrAddr"></p>
+                  </div>
+                </div>
+
+              </div><!-- /donate__slider -->
 
             </div>
             <div class="cform__submit cform__submit--yellow" id="donateFooter">
-              <span id="donateFooterText">СПАСИБО ЗА ПОДДЕРЖКУ</span>
+              <span>СПАСИБО ЗА ПОДДЕРЖКУ</span>
             </div>
           </div>
         </div>
@@ -647,7 +653,7 @@
               </div>
 
               <div class="cform__group cform__btn-wrap">
-                <a class="dl-button" id="contactSubmitBtn" href="#" style="--duration:1500">
+                <a class="dl-button" id="contactSubmitBtn" href="#" style="--duration:3000">
                   <div>
                     <div class="icon">
                       <div>
@@ -686,4 +692,4 @@
   <div class="copy-toast" id="copyToast" aria-live="polite">Скопировано!</div>
 
 </body>
-</html> 
+</html>

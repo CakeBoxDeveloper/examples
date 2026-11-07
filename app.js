@@ -866,16 +866,16 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ═══════════════════════════════════════
-   DONATE — inline QR + «СПАСИБО» / «Назад» + toast над футером
+   DONATE — слайд-QR + «СПАСИБО»
 ═══════════════════════════════════════ */
 (function () {
-  var grid      = document.querySelector('.cform--donate .donate__grid');
-  var qrInline  = document.getElementById('donateQrInline');
+  var slider    = document.querySelector('.donate__slider');
+  var listSlide = document.querySelector('.donate__slide--list');
   var qrCanvas  = document.getElementById('donateQrCanvas');
   var addrEl    = document.getElementById('donateQrAddr');
   var footer    = document.getElementById('donateFooter');
-  var footerTxt = document.getElementById('donateFooterText');
-  if (!grid || !qrInline || !footer) return;
+  var grid      = document.querySelector('.cform--donate .donate__grid');
+  if (!slider || !qrCanvas || !footer) return;
 
   /* Toast над футером */
   var donateToast = document.createElement('div');
@@ -899,48 +899,40 @@ window.addEventListener('DOMContentLoaded', () => {
     var isDark = !document.body.classList.contains('theme-light');
     new QRCode(qrCanvas, {
       text:         address,
-      width:        200,
-      height:       200,
+      width:        180,
+      height:       180,
       colorDark:    isDark ? '#4daf6a' : '#1a1c26',
       colorLight:   isDark ? '#101f12' : '#f2f3f7',
       correctLevel: QRCode.CorrectLevel.M,
     });
 
-    /* Под кодом — сеть, не адрес */
     if (addrEl) addrEl.textContent = net || '';
-
-    grid.style.display     = 'none';
-    qrInline.style.display = 'flex';
-    qrInline.setAttribute('aria-hidden', 'false');
-
-    footer.classList.add('is-back');
-    footerTxt.textContent = '← Назад';
+    slider.classList.add('qr-open');
   }
 
   function closeQr() {
-    grid.style.display     = '';
-    qrInline.style.display = 'none';
-    qrInline.setAttribute('aria-hidden', 'true');
-
-    footer.classList.remove('is-back');
-    footerTxt.textContent = 'СПАСИБО ЗА ПОДДЕРЖКУ';
+    slider.classList.remove('qr-open');
   }
 
   /* Клики по QR-кнопкам */
-  grid.addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-qr]');
-    if (!btn || btn.getAttribute('aria-label') !== 'QR-код') return;
-    e.stopPropagation();
-    openQr(btn.dataset.qr || btn.dataset.copy, btn.dataset.net || '');
-  });
+  if (grid) {
+    grid.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-qr]');
+      if (!btn || btn.getAttribute('aria-label') !== 'QR-код') return;
+      e.stopPropagation();
+      openQr(btn.dataset.qr || btn.dataset.copy, btn.dataset.net || '');
+    });
+  }
 
-  /* Кнопка «Назад» */
-  footer.addEventListener('click', function () {
-    if (!footer.classList.contains('is-back')) return;
-    closeQr();
-  });
+  /* Клик по заблюренному списку — закрываем QR */
+  if (listSlide) {
+    listSlide.addEventListener('click', function (e) {
+      if (!slider.classList.contains('qr-open')) return;
+      closeQr();
+    });
+  }
 
-  /* Toast при копировании (делегирование от stack уже есть, дублируем для donate) */
+  /* Toast при копировании */
   if (grid) {
     grid.addEventListener('click', function (e) {
       var btn = e.target.closest('.donate__copy[aria-label="Скопировать"]');
