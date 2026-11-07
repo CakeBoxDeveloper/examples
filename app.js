@@ -1,5 +1,99 @@
 /* Portfolio — app.js */
 
+/* ═══════════════════════════════════════
+   LOADER
+═══════════════════════════════════════ */
+(function () {
+  var loaderEl     = document.getElementById('loader');
+  var loaderLottie = document.getElementById('loaderLottie');
+  var heroLottie   = document.getElementById('heroLottie');
+  if (!loaderEl || !loaderLottie || typeof lottie === 'undefined') return;
+
+  // Тема лоадера по локальному времени: 8:00–20:00 = день
+  var hour = new Date().getHours();
+  var isDaytime = hour >= 8 && hour < 20;
+  if (isDaytime) {
+    loaderEl.classList.add('loader--day');
+    document.body.classList.add('theme-light');
+  }
+
+  var SMALL = 110; // начальный размер
+  var LARGE = 220; // финальный размер (совпадает с hero)
+
+  // Позиционируем лоадер-лотти точно по центру hero-лотти
+  function positionLoader() {
+    if (!heroLottie) return;
+    var r = heroLottie.getBoundingClientRect();
+    var cx = r.left + r.width  / 2;
+    var cy = r.top  + r.height / 2;
+    loaderLottie.style.left = (cx - SMALL / 2) + 'px';
+    loaderLottie.style.top  = (cy - SMALL / 2) + 'px';
+  }
+
+  // Ждём DOMContentLoaded чтобы getBoundingClientRect был точным
+  document.addEventListener('DOMContentLoaded', positionLoader);
+  window.addEventListener('resize', positionLoader);
+  // На случай если скрипт запускается после DOMContentLoaded
+  if (document.readyState !== 'loading') positionLoader();
+
+  var loaderAnim = lottie.loadAnimation({
+    container: loaderLottie,
+    renderer:  'svg',
+    loop:      true,
+    autoplay:  true,
+    path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json',
+  });
+
+  loaderAnim.setSpeed(3); // втрое быстрее
+
+  var pageReady    = false;
+  var cycleCount   = 0;
+  var dismissed    = false;
+
+  loaderAnim.addEventListener('loopComplete', function () {
+    cycleCount++;
+    if (pageReady && cycleCount >= 3 && !dismissed) dismiss();
+  });
+
+  window.addEventListener('load', function () {
+    pageReady = true;
+    if (cycleCount >= 3 && !dismissed) dismiss();
+  });
+
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+
+    // Шаг 1: лотти вырастает до финального размера на месте hero
+    var r = heroLottie ? heroLottie.getBoundingClientRect() : null;
+    if (r) {
+      var cx = r.left + r.width  / 2;
+      var cy = r.top  + r.height / 2;
+      loaderLottie.style.transition =
+        'width 0.18s cubic-bezier(0.4,0,0.2,1),' +
+        'height 0.18s cubic-bezier(0.4,0,0.2,1),' +
+        'left 0.18s cubic-bezier(0.4,0,0.2,1),' +
+        'top 0.18s cubic-bezier(0.4,0,0.2,1)';
+      loaderLottie.style.width  = LARGE + 'px';
+      loaderLottie.style.height = LARGE + 'px';
+      loaderLottie.style.left   = (cx - LARGE / 2) + 'px';
+      loaderLottie.style.top    = (cy - LARGE / 2) + 'px';
+    }
+
+    // Шаг 2: после роста — лоадер уходит fade
+    setTimeout(function () {
+      loaderEl.classList.add('is-hiding');
+
+      // Шаг 3: полное скрытие
+      setTimeout(function () {
+        loaderEl.classList.add('is-hidden');
+        loaderAnim.destroy();
+        document.dispatchEvent(new CustomEvent('loaderDone'));
+      }, 280);
+    }, 200);
+  }
+})();
+
 /* ── Scroll buttons ── */
 document.getElementById('scrollBtn')?.addEventListener('click', () => {
   document.getElementById('cases')?.scrollIntoView({ behavior: 'smooth' });
@@ -92,6 +186,29 @@ document.querySelectorAll('.cform__check input').forEach((input) => {
     }
   });
 });
+
+/* ── Shimmer на кнопке заявки когда форма готова ── */
+(function () {
+  var form    = document.getElementById('contactForm');
+  var submitBtn = document.getElementById('contactSubmitBtn');
+  if (!form || !submitBtn) return;
+  var shimmer = submitBtn.querySelector('.btn__shimmer');
+  if (!shimmer) return;
+
+  function checkReady() {
+    var task    = form.querySelector('input[name="task"]');
+    var contact = form.querySelector('input[name="contact"]');
+    var typeChecked = form.querySelector('input[name="type"]:checked');
+    var taskVal = task ? task.value.trim() : form.querySelector('input[id="name"]')?.value.trim();
+    var contactVal = contact ? contact.value.trim() : '';
+    var ready = !!(typeChecked && taskVal && contactVal);
+    shimmer.classList.toggle('btn__shimmer--hidden', !ready);
+  }
+
+  form.addEventListener('input', checkReady);
+  form.addEventListener('change', checkReady);
+  checkReady();
+})();
 
 /* ── Hero fade-in ── */
 window.addEventListener('DOMContentLoaded', () => {
@@ -359,23 +476,64 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-/* ── Theme toggle ── */
+/* ── QR-коды в доне ── */
+(function () {
+  var overlay = document.getElementById('donateQrOverlay');
+  var canvas  = document.getElementById('donateQrCanvas');
+  var closeBtn = document.getElementById('donateQrClose');
+  if (!overlay || !canvas) return;
+
+  function showQr(address) {
+    if (!address || typeof QRCode === 'undefined') return;
+    canvas.width = 0; canvas.height = 0;
+    var isDark = !document.body.classList.contains('theme-light');
+    new QRCode(canvas, {
+      text: address,
+      width: 180, height: 180,
+      colorDark:  isDark ? '#4daf6a' : '#1a1c26',
+      colorLight: isDark ? '#101f12' : '#f2f3f7',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+    overlay.classList.add('is-visible');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+
+  // Делегируем клики по QR-кнопкам (у них data-qr)
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-qr]');
+    if (!btn) return;
+    e.stopPropagation();
+    var addr = btn.dataset.qr || btn.dataset.copy;
+    if (addr) showQr(addr);
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function () {
+      overlay.classList.remove('is-visible');
+      overlay.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  // Клик вне QR-box закрывает
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) {
+      overlay.classList.remove('is-visible');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+  });
+})();
 (function () {
   const btn  = document.getElementById('themeToggle');
   const body = document.body;
-  const KEY  = 'portfolio-theme';
 
-  // Иконки: солнце (светлая) и луна (тёмная)
   const SUN  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
   const MOON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`;
 
   function apply(theme) {
-    // Отключаем все transitions на время смены темы
     document.documentElement.classList.add('theme-switching');
     requestAnimationFrame(() => requestAnimationFrame(() => {
       document.documentElement.classList.remove('theme-switching');
     }));
-
     if (theme === 'light') {
       body.classList.add('theme-light');
       if (btn) { btn.innerHTML = MOON; btn.title = 'Тёмная тема'; }
@@ -383,7 +541,6 @@ window.addEventListener('DOMContentLoaded', () => {
       body.classList.remove('theme-light');
       if (btn) { btn.innerHTML = SUN; btn.title = 'Светлая тема'; }
     }
-    // Синхронно обновляем кнопки День/Ночь в чате
     var dayBtn   = document.getElementById('chatModeDay');
     var nightBtn = document.getElementById('chatModeNight');
     if (dayBtn && nightBtn) {
@@ -392,22 +549,23 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const saved = localStorage.getItem(KEY) || 'dark';
-  apply(saved);
+  // Тема по времени — без localStorage, только сессия
+  // Лоадер уже мог поставить theme-light, синхронизируем иконку
+  var currentTheme = body.classList.contains('theme-light') ? 'light' : 'dark';
+  apply(currentTheme);
 
   if (btn) {
     btn.addEventListener('click', () => {
       const next = body.classList.contains('theme-light') ? 'dark' : 'light';
-      localStorage.setItem(KEY, next);
       apply(next);
     });
   }
 
-  // Кнопки День/Ночь в чате — используют ту же apply
+  // Кнопки День/Ночь в чате
   var dayBtn   = document.getElementById('chatModeDay');
   var nightBtn = document.getElementById('chatModeNight');
-  if (dayBtn)   dayBtn.addEventListener('click',   function () { localStorage.setItem(KEY, 'light'); apply('light'); });
-  if (nightBtn) nightBtn.addEventListener('click', function () { localStorage.setItem(KEY, 'dark');  apply('dark');  });
+  if (dayBtn)   dayBtn.addEventListener('click',   function () { apply('light'); });
+  if (nightBtn) nightBtn.addEventListener('click', function () { apply('dark');  });
 })();
 
 
@@ -587,12 +745,20 @@ window.addEventListener('DOMContentLoaded', () => {
     path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json',
   });
 
+  anim.setSpeed(0.5); // пассивная — вдвое медленнее лоадера
+
   var isHovering = false;
   var totalFrames = 0;
   var resumeTimer = null;
+  var mouseEnabled = false; // включается после лоадера
 
   anim.addEventListener('DOMLoaded', function () {
     totalFrames = anim.totalFrames;
+  });
+
+  // Разрешаем mouse-driven после скрытия лоадера
+  document.addEventListener('loaderDone', function () {
+    mouseEnabled = true;
   });
 
   // Радиус зоны реакции вокруг центра лотти (px)
@@ -604,7 +770,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   document.addEventListener('mousemove', function (e) {
-    if (!totalFrames) return;
+    if (!totalFrames || !mouseEnabled) return;
     var c = getCenterOf(el);
     var dx = e.clientX - c.x;
     var dy = e.clientY - c.y;

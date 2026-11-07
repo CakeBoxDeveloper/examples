@@ -8,6 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="app.js" defer></script>
   <script src="orbit3d.js" defer></script>
 </head>
@@ -33,8 +34,12 @@
     </defs>
   </svg>
 
-  <!-- Кнопка темы (временная) -->
-  <!-- кнопка темы убрана — управление через День/Ночь в чате -->
+  <!-- ══════════════════════════════════════
+       LOADER
+  ═══════════════════════════════════════ -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__lottie" id="loaderLottie"></div>
+  </div>
 
   <!-- ══════════════════════════════════════
        HERO
@@ -450,7 +455,7 @@
             </div>
             <form class="cform" id="feedbackForm" novalidate>
               <div class="cform__group">
-                <input class="cform__input" type="text" name="fb_contact" placeholder="@username или почта" autocomplete="off" />
+                <input class="cform__input" type="text" name="fb_contact" placeholder="@username" autocomplete="off" />
               </div>
               <div class="cform__group">
                 <textarea class="cform__textarea" name="fb_message" rows="5" placeholder="Ваше сообщение…"></textarea>
@@ -458,6 +463,7 @@
             </form>
             <button type="submit" form="feedbackForm" class="btn btn--primary cform__submit cform__submit--green">
               Отправить
+              <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" class="cform__submit-icon" />
               <span class="btn__shimmer"></span>
             </button>
           </div>
@@ -473,25 +479,105 @@
                 alt="" aria-hidden="true" />
             </div>
             <div class="cform cform--donate">
-              <p class="donate__desc">Все мои open-source проекты бесплатны. Если хочешь ускорить выход — можно поддержать донатом.</p>
-              <div class="donate__list">
-                <div class="donate__item">
-                  <span class="donate__label">Tinkoff</span>
-                  <span class="donate__value">2200 7007 XXXX XXXX</span>
-                  <button class="donate__copy" data-copy="2200700700000000" aria-label="Скопировать">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  </button>
+              <p class="donate__desc">Все мои open-source проекты бесплатны. Если хочешь ускорить выход — можно поддержать криптой.</p>
+              <div class="donate__grid">
+
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">TRC-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="" data-qr="" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
                 </div>
-                <div class="donate__item">
-                  <span class="donate__label">USDT TRC-20</span>
-                  <span class="donate__value donate__value--mono">TXxx…xxxx</span>
-                  <button class="donate__copy" data-copy="TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" aria-label="Скопировать">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  </button>
+
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">ERC-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="" data-qr="" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">BEP-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="" data-qr="" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">SOL</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="" data-qr="" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="donate__cell">
+                  <span class="donate__coin">USDC <span class="donate__net">ERC-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="" data-qr="" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="donate__cell">
+                  <span class="donate__coin">ETH</span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="" data-qr="" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="donate__cell donate__cell--wide">
+                  <span class="donate__coin">BTC</span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="" data-qr="" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- QR-оверлей -->
+              <div class="donate__qr-overlay" id="donateQrOverlay" aria-hidden="true">
+                <div class="donate__qr-box">
+                  <canvas class="donate__qr-canvas" id="donateQrCanvas"></canvas>
+                  <button class="donate__qr-close" id="donateQrClose" aria-label="Закрыть">✕</button>
                 </div>
               </div>
+
             </div>
-            <div class="cform__submit cform__submit--yellow">Поддержать</div>
+            <div class="cform__submit cform__submit--yellow">Спасибо 🤍</div>
           </div>
         </div>
 
@@ -518,11 +604,11 @@
               </fieldset>
 
               <div class="cform__group">
-                <input class="cform__input" type="text" id="name" name="name" placeholder="Что разрабатываем / что нужно сделать" autocomplete="name" />
+                <input class="cform__input" type="text" id="name" name="name" placeholder="Суть задачи, кратко..." autocomplete="off" />
               </div>
 
               <div class="cform__group cform__group--row">
-                <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
+                <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username" autocomplete="off" />
                 <div class="cform__messenger-btns">
                   <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
                   <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
@@ -535,10 +621,10 @@
               </div>
 
             </form>
-            <button type="submit" form="contactForm" class="btn btn--primary cform__submit">
-              <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/bdbe9e1d0d06182689bebe0c47a75113961299f2/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" class="cform__submit-icon" />
+            <button type="submit" form="contactForm" class="btn btn--primary cform__submit" id="contactSubmitBtn">
               Отправить заявку
-              <span class="btn__shimmer"></span>
+              <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" class="cform__submit-icon" />
+              <span class="btn__shimmer btn__shimmer--hidden"></span>
             </button>
           </div>
         </div>

@@ -69,8 +69,36 @@ body.theme-light {
 }
 
 /* ═══════════════════════
-   RESET & BASE
+   LOADER
 ═══════════════════════ */
+.loader {
+  position: fixed; inset: 0; z-index: 9000;
+  background: #060c07;
+  display: flex; align-items: flex-start; justify-content: center;
+  pointer-events: all;
+  transition: opacity 0.25s ease;
+}
+.loader.loader--day {
+  background: #f2f3f7;
+}
+.loader.loader--day .loader__lottie {
+  filter: brightness(0) opacity(0.55);
+}
+.loader__lottie {
+  position: absolute; /* позиционируем через JS */
+  width: 110px; height: 110px;
+  flex-shrink: 0;
+  filter: invert(45%) sepia(15%) saturate(300%) hue-rotate(90deg) brightness(85%);
+  /* transform-origin по центру — рост из центра */
+  transform-origin: center center;
+  transition: width 0.18s cubic-bezier(0.4,0,0.2,1),
+              height 0.18s cubic-bezier(0.4,0,0.2,1),
+              top 0.18s cubic-bezier(0.4,0,0.2,1),
+              left 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.loader.is-hiding { opacity: 0; pointer-events: none; }
+.loader.is-hidden { display: none; }
+
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; overflow-x: clip; }
 
@@ -122,6 +150,7 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
   animation: shimmer 2.4s ease-in-out infinite;
   pointer-events: none;
 }
+.btn__shimmer--hidden { display: none; }
 @keyframes shimmer { 0% { left: -60%; } 100% { left: 160%; } }
 
 /* ── Lottie arrow ── */
@@ -658,22 +687,60 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 /* Donate */
 .cform--donate { border-radius: 0; border-top: none; border-bottom: none; }
 .donate__desc  { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
-.donate__list  { display: flex; flex-direction: column; gap: 10px; }
-.donate__item  {
-  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+
+/* Сетка 2 колонки */
+.donate__grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  position: relative;
+}
+.donate__cell {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 9px 12px;
   background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--r);
 }
-.donate__label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); flex-shrink: 0; width: 90px; }
-.donate__value { flex: 1; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
-.donate__value--mono { font-family: monospace; font-size: 0.78rem; }
+.donate__cell--wide { grid-column: 1 / -1; }
+.donate__coin {
+  font-size: 0.78rem; font-weight: 700; color: var(--text); white-space: nowrap;
+}
+.donate__net {
+  font-size: 0.65rem; font-weight: 500; color: var(--text-muted);
+  margin-left: 3px;
+}
+.donate__actions { display: flex; gap: 5px; flex-shrink: 0; }
 .donate__copy {
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 6px;
+  width: 26px; height: 26px; border-radius: 5px;
   border: 1px solid var(--border); color: var(--text-muted); background: none; cursor: pointer;
   transition: border-color var(--ease), color var(--ease), background var(--ease);
 }
+.donate__copy img { opacity: 0.6; transition: opacity 0.18s; display: block; }
 .donate__copy:hover  { border-color: var(--border-accent); color: var(--accent); background: var(--accent-glow); }
+.donate__copy:hover img { opacity: 1; }
 .donate__copy.copied { border-color: #1db954; color: #1db954; }
+
+/* QR оверлей */
+.donate__qr-overlay {
+  display: none; position: absolute; inset: 0;
+  background: var(--bg-card);
+  border-radius: var(--r);
+  align-items: center; justify-content: center;
+  z-index: 10;
+}
+.donate__qr-overlay.is-visible { display: flex; }
+.donate__qr-box {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  position: relative;
+}
+.donate__qr-canvas { border-radius: 8px; }
+.donate__qr-close {
+  position: absolute; top: -12px; right: -12px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--bg-alt); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.7rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background var(--ease);
+}
+.donate__qr-close:hover { background: var(--border); }
 
 /* ═══════════════════════
    THEME TOGGLE
