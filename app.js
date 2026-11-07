@@ -834,8 +834,7 @@ window.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     var btn     = $(this),
         label   = btn.find('.label'),
-        counter = label.find('.counter'),
-        form    = btn.closest('form').length ? btn.closest('form') : btn.closest('.cform');
+        counter = label.find('.counter');
 
     if (!btn.hasClass('active') && !btn.hasClass('done')) {
       btn.addClass('active');
@@ -844,6 +843,7 @@ window.addEventListener('DOMContentLoaded', () => {
       var duration = parseFloat(getComputedStyle(btn[0]).getPropertyValue('--duration'));
 
       setTimeout(function () {
+        /* Стягиваем label до размера span «Отправлено», убираем счётчик */
         counter.addClass('hide');
         counter.animate({ width: 0 }, 400, function () {
           label.width(label.find('.state > span').width());
@@ -851,17 +851,14 @@ window.addEventListener('DOMContentLoaded', () => {
         });
         btn.removeClass('active').addClass('done');
 
-        /* Авто-сброс через 3с + очистка формы */
+        /* Авто-сброс через 3с */
         setTimeout(function () {
           setLabel(label, label.find('.state'), label.find('.default'), function () {
-            counter.removeClass('hide');
+            counter.stop(true).removeClass('hide').removeAttr('style');
             btn.removeClass('done');
           });
-          /* Очищаем форму */
           var $form = btn.closest('#contactForm, #feedbackForm');
-          if ($form.length) {
-            $form[0].reset();
-          }
+          if ($form.length) $form[0].reset();
         }, 3000);
       }, duration);
     }

@@ -1024,9 +1024,11 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 }
 
 /* ── Адаптация кнопки под тему проекта ── */
-/* Центрирование, ширина 50% */
-.cform__btn-wrap { display: flex; justify-content: center; }
-.cform__btn-wrap .dl-button { width: 50%; }
+/* Кнопка auto-width, центрируется margin:auto */
+.cform__btn-wrap { display: block; }
+.cform__btn-wrap .dl-button { display: block; width: auto; margin: 0 auto; }
+/* Контент внутри по центру */
+.dl-button > div { justify-content: center; }
 /* Фон под тему (не белый) */
 .dl-button > div { background: var(--bg-card) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
 /* Иконка и текст: в тёмной = accent, в светлой = text-muted */
