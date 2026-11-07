@@ -815,43 +815,44 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ═══════════════════════════════════════
-   DL-BUTTON — Lottie + «Отправлено» + сброс через 3с
+   DL-BUTTON — Lottie + счётчик % + сброс через 3с
 ═══════════════════════════════════════ */
 (function () {
-  if (typeof lottie === 'undefined') return;
-
   var SEND_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Send%20animation.json';
+  var ANIM_DURATION = 1500;
 
-  // Инициализируем Lottie для каждой кнопки
   function makeSendBtn(btnId, lottieContainerId, formId) {
     var btn       = document.getElementById(btnId);
     var container = document.getElementById(lottieContainerId);
     var form      = formId ? document.getElementById(formId) : null;
     if (!btn || !container) return;
 
-    var anim = lottie.loadAnimation({
-      container: container,
-      renderer:  'svg',
-      loop:      false,
-      autoplay:  false,
-      path:      SEND_URL,
-    });
+    /* Инициализация Lottie — стоп на первом кадре */
+    var anim = null;
+    if (typeof lottie !== 'undefined') {
+      anim = lottie.loadAnimation({
+        container: container,
+        renderer:  'svg',
+        loop:      false,
+        autoplay:  false,
+        path:      SEND_URL,
+      });
 
-    // Окрашиваем Lottie в цвет темы через CSS filter на контейнере
-    function applyLottieColor() {
-      var isDark = !document.body.classList.contains('theme-light');
-      container.style.filter = isDark
-        ? 'invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(100%)'  // зелёный
-        : 'invert(45%) sepia(0%) saturate(0%) brightness(60%)';                         // серый
+      /* Цвет иконки через filter */
+      function applyColor() {
+        var isDark = !document.body.classList.contains('theme-light');
+        container.style.filter = isDark
+          ? 'invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(105%)'
+          : 'invert(45%) sepia(0%) saturate(0%) brightness(60%)';
+      }
+      anim.addEventListener('DOMLoaded', applyColor);
+      new MutationObserver(applyColor).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
-    anim.addEventListener('DOMLoaded', applyLottieColor);
-    // При смене темы
-    var themeObserver = new MutationObserver(applyLottieColor);
-    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-    var label   = btn.querySelector('.label');
+    var label    = btn.querySelector('.label');
     var defaultD = label ? label.querySelector('.default') : null;
     var stateD   = label ? label.querySelector('.state')   : null;
+    var counter  = label ? label.querySelector('.counter') : null;
     var busy = false;
 
     btn.addEventListener('click', function (e) {
@@ -859,88 +860,105 @@ window.addEventListener('DOMContentLoaded', () => {
       if (busy) return;
       busy = true;
 
-      // Анимируем иконку
-      anim.goToAndPlay(0, true);
+      /* Запускаем Lottie */
+      if (anim) anim.goToAndPlay(0, true);
 
-      // Переключаем текст на «Отправлено»
+      /* Показываем счётчик (state), скрываем дефолт */
       if (defaultD) defaultD.classList.remove('show');
       if (stateD)   stateD.classList.add('show');
-
-      // Прогресс-бар
       btn.classList.add('active');
 
-      // Ждём окончания анимации Lottie (или 2с) → done
-      var onComplete = function () {
-        anim.removeEventListener('complete', onComplete);
+      /* Через ANIM_DURATION — показываем "Отправлено", фризим Lottie */
+      setTimeout(function () {
+        /* Фризим Lottie на первом кадре */
+        if (anim) { anim.pause(); }
+
+        /* Прячем счётчик, показываем "Отправлено" */
+        if (counter) {
+          counter.classList.add('hide');
+          counter.style.width = '0';
+        }
         btn.classList.remove('active');
         btn.classList.add('done');
-      };
-      anim.addEventListener('complete', onComplete);
 
-      // Через 3с сбрасываем всё
-      setTimeout(function () {
-        busy = false;
-        btn.classList.remove('done');
-        anim.goToAndStop(0, true);
+        /* Через 3с — полный сброс */
+        setTimeout(function () {
+          busy = false;
+          btn.classList.remove('done');
 
-        if (defaultD) defaultD.classList.add('show');
-        if (stateD)   stateD.classList.remove('show');
+          if (anim) { anim.goToAndStop(0, true); }
 
-        // Очищаем форму
-        if (form) {
-          form.reset();
-          form.querySelectorAll('.cform__check input').forEach(function (inp) {
-            inp.checked = false;
-          });
-        }
-      }, 3000);
+          if (counter) {
+            counter.classList.remove('hide');
+            counter.style.width = '';
+          }
+          if (stateD)   stateD.classList.remove('show');
+          if (defaultD) defaultD.classList.add('show');
+
+          /* Очищаем форму */
+          if (form) {
+            form.reset();
+            form.querySelectorAll('.cform__check input').forEach(function (inp) {
+              inp.checked = false;
+            });
+          }
+        }, 3000);
+      }, ANIM_DURATION);
     });
   }
 
-  makeSendBtn('feedbackSubmitBtn',  'feedbackLottieIcon',  'feedbackForm');
-  makeSendBtn('contactSubmitBtn',   'contactLottieIcon',   'contactForm');
+  makeSendBtn('feedbackSubmitBtn', 'feedbackLottieIcon', 'feedbackForm');
+  makeSendBtn('contactSubmitBtn',  'contactLottieIcon',  'contactForm');
 })();
 
 /* ═══════════════════════════════════════
-   DONATE — inline QR + «СПАСИБО» / «Назад»
+   DONATE — inline QR + «СПАСИБО» / «Назад» + toast над футером
 ═══════════════════════════════════════ */
 (function () {
-  var grid    = document.querySelector('.cform--donate .donate__grid');
-  var qrInline = document.getElementById('donateQrInline');
-  var qrCanvas = document.getElementById('donateQrCanvas');
-  var addrEl   = document.getElementById('donateQrAddr');
-  var footer   = document.getElementById('donateFooter');
+  var grid      = document.querySelector('.cform--donate .donate__grid');
+  var qrInline  = document.getElementById('donateQrInline');
+  var qrCanvas  = document.getElementById('donateQrCanvas');
+  var addrEl    = document.getElementById('donateQrAddr');
+  var footer    = document.getElementById('donateFooter');
   var footerTxt = document.getElementById('donateFooterText');
   if (!grid || !qrInline || !footer) return;
 
-  function openQr(address) {
+  /* Toast над футером */
+  var donateToast = document.createElement('div');
+  donateToast.className = 'donate-toast';
+  donateToast.textContent = 'Скопировано!';
+  footer.parentNode.insertBefore(donateToast, footer);
+  var toastTimer = null;
+
+  function showDonateToast() {
+    donateToast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      donateToast.classList.remove('show');
+    }, 1800);
+  }
+
+  function openQr(address, net) {
     if (!address || typeof QRCode === 'undefined') return;
 
-    // Чистим и генерируем QR
     qrCanvas.innerHTML = '';
     var isDark = !document.body.classList.contains('theme-light');
     new QRCode(qrCanvas, {
-      text:       address,
-      width:      200,
-      height:     200,
-      colorDark:  isDark ? '#4daf6a' : '#1a1c26',
-      colorLight: isDark ? '#101f12' : '#f2f3f7',
+      text:         address,
+      width:        200,
+      height:       200,
+      colorDark:    isDark ? '#4daf6a' : '#1a1c26',
+      colorLight:   isDark ? '#101f12' : '#f2f3f7',
       correctLevel: QRCode.CorrectLevel.M,
     });
 
-    // Сокращённый адрес
-    if (addrEl) {
-      addrEl.textContent = address.length > 20
-        ? address.slice(0, 8) + '…' + address.slice(-6)
-        : address;
-    }
+    /* Под кодом — сеть, не адрес */
+    if (addrEl) addrEl.textContent = net || '';
 
-    // Прячем сетку, показываем QR
     grid.style.display     = 'none';
     qrInline.style.display = 'flex';
     qrInline.setAttribute('aria-hidden', 'false');
 
-    // Футер → кнопка «Назад»
     footer.classList.add('is-back');
     footerTxt.textContent = '← Назад';
   }
@@ -954,17 +972,32 @@ window.addEventListener('DOMContentLoaded', () => {
     footerTxt.textContent = 'СПАСИБО ЗА ПОДДЕРЖКУ';
   }
 
-  // Клики по QR-кнопкам
+  /* Клики по QR-кнопкам */
   grid.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-qr]');
     if (!btn || btn.getAttribute('aria-label') !== 'QR-код') return;
     e.stopPropagation();
-    openQr(btn.dataset.qr || btn.dataset.copy);
+    openQr(btn.dataset.qr || btn.dataset.copy, btn.dataset.net || '');
   });
 
-  // Кнопка «Назад» (только когда is-back)
+  /* Кнопка «Назад» */
   footer.addEventListener('click', function () {
     if (!footer.classList.contains('is-back')) return;
     closeQr();
   });
+
+  /* Toast при копировании (делегирование от stack уже есть, дублируем для donate) */
+  if (grid) {
+    grid.addEventListener('click', function (e) {
+      var btn = e.target.closest('.donate__copy[aria-label="Скопировать"]');
+      if (!btn) return;
+      var text = btn.dataset.copy;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(function () {
+        btn.classList.add('copied');
+        showDonateToast();
+        setTimeout(function () { btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  }
 })();
