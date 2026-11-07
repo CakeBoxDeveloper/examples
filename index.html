@@ -15,6 +15,24 @@
 
   <div class="noise" aria-hidden="true"></div>
 
+  <!-- SVG-фильтр для liquid glass эффекта на десктопе -->
+  <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+    <defs>
+      <filter id="frosted" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feColorMatrix type="saturate" values="1.4" in="blur" result="sat"/>
+        <feComponentTransfer in="sat" result="bright">
+          <feFuncR type="linear" slope="1.05"/>
+          <feFuncG type="linear" slope="1.05"/>
+          <feFuncB type="linear" slope="1.05"/>
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode in="bright"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
   <!-- Кнопка темы (временная) -->
   <!-- кнопка темы убрана — управление через День/Ночь в чате -->
 
@@ -103,6 +121,7 @@
 
           <!-- Футер: инпут + нижняя строка -->
           <div class="hero__chat-footer">
+
             <div class="hero__chat-box">
 
               <!-- Строка ввода -->

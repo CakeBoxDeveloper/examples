@@ -59,12 +59,12 @@ body.theme-light {
   --border:        rgba(0, 0, 0, 0.09);
   --border-accent: rgba(77, 175, 106, 0.4);
 
-  --chat-bg:         #f0f0f0;
-  --chat-footer:     #e8e8e8;
+  --chat-bg:         #f2f2f2;
+  --chat-footer:     #e9e9e9;
   --chat-border:     rgba(0,0,0,0.09);
   --chat-text:       #1a1a1a;
   --chat-muted:      #666666;
-  --chat-input-bg:   #dcdcdc;
+  --chat-input-bg:   #dedede;
   --chat-icon-color: #b0b0b0;
 }
 
@@ -200,6 +200,16 @@ body.theme-light .cases .section-scroll-btn { background: linear-gradient(to bot
 body.theme-light .hero__chat-wrap {
   box-shadow: 0 12px 40px rgba(0,0,0,0.1);
 }
+/* Пассивная рамка в светлой теме — всегда видна под шиммером */
+body.theme-light .hero__chat-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  pointer-events: none;
+  z-index: 2;
+}
 /* Анимированная рамка — только 1px контур, без засветки внутри */
 .hero__chat-wrap::after {
   content: '';
@@ -234,8 +244,16 @@ body.theme-light .hero__chat-wrap::after {
   background: rgba(17, 23, 20, 0.72); border: none; border-radius: 14px;
   overflow: hidden; box-shadow: inset 0 0 0 1px var(--chat-border);
   display: flex; flex-direction: column;
+  /* мобиле — обычный blur */
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+}
+/* десктоп — SVG liquid glass */
+@media (min-width: 861px) {
+  .hero__chat {
+    backdrop-filter: url(#frosted);
+    -webkit-backdrop-filter: url(#frosted);
+  }
 }
 body.theme-light .hero__chat {
   background: rgba(220, 225, 232, 0.82);
@@ -253,6 +271,15 @@ body.theme-light .hero__chat {
   height: 70px;
   background: linear-gradient(to bottom, transparent, var(--chat-input-bg));
   pointer-events: none; z-index: 1;
+}
+
+/* Волнистая граница футера */
+.hero__chat-wave {
+  display: block;
+  width: 100%; height: 56px;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  overflow: visible;
 }
 
 .hero__chat-icon {

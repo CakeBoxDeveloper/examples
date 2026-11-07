@@ -574,9 +574,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 /* ═══════════════════════════════════════
    HERO CHAT — Lottie typing indicator
-   ВРЕМЕННО ЗАКОММЕНТИРОВАНО — идёт работа над анимацией
 ═══════════════════════════════════════ */
-/*
 (function () {
   var el = document.getElementById('heroLottie');
   if (!el || typeof lottie === 'undefined') return;
@@ -588,7 +586,6 @@ window.addEventListener('DOMContentLoaded', () => {
     path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json',
   });
 })();
-*/
 
 
 
