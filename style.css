@@ -286,7 +286,7 @@ body.theme-light .hero__chat-tag {
 }
 
 .hero__chat-icon {
-  width: 163px; height: 163px; flex-shrink: 0; margin-bottom: 4px;
+  width: 220px; height: 220px; flex-shrink: 0; margin-bottom: 4px;
   filter: invert(45%) sepia(15%) saturate(300%) hue-rotate(90deg) brightness(85%);
 }
 body.theme-light .hero__chat-icon { filter: brightness(0) opacity(0.65); }

@@ -578,12 +578,59 @@ window.addEventListener('DOMContentLoaded', () => {
 (function () {
   var el = document.getElementById('heroLottie');
   if (!el || typeof lottie === 'undefined') return;
-  lottie.loadAnimation({
+
+  var anim = lottie.loadAnimation({
     container: el,
     renderer: 'svg',
     loop: true,
     autoplay: true,
     path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json',
+  });
+
+  var isHovering = false;
+  var totalFrames = 0;
+  var resumeTimer = null;
+
+  anim.addEventListener('DOMLoaded', function () {
+    totalFrames = anim.totalFrames;
+  });
+
+  // Радиус зоны реакции вокруг центра лотти (px)
+  var RADIUS = 160;
+
+  function getCenterOf(el) {
+    var r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    if (!totalFrames) return;
+    var c = getCenterOf(el);
+    var dx = e.clientX - c.x;
+    var dy = e.clientY - c.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < RADIUS) {
+      if (!isHovering) {
+        isHovering = true;
+        anim.pause();
+        clearTimeout(resumeTimer);
+      }
+      // Угол от -PI до PI, сдвигаем чтобы 0 был сверху (-PI/2)
+      var angle = Math.atan2(dy, dx) + Math.PI / 2;
+      if (angle < 0) angle += Math.PI * 2;
+      // Нормализуем в 0..1
+      var progress = angle / (Math.PI * 2);
+      anim.goToAndStop(progress * totalFrames, true);
+    } else {
+      if (isHovering) {
+        isHovering = false;
+        // Плавный возврат к автоплею через 300ms
+        resumeTimer = setTimeout(function () {
+          anim.play();
+        }, 300);
+      }
+    }
   });
 })();
 
