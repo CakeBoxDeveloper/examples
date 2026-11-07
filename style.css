@@ -127,10 +127,11 @@ button { font: inherit; color: inherit; cursor: pointer; border: none; backgroun
 /* ── Lottie arrow ── */
 .lottie-arrow {
   width: 32px; height: 32px; flex-shrink: 0;
-  filter: invert(50%) sepia(80%) saturate(500%) hue-rotate(195deg) brightness(110%);
+  filter: invert(65%) sepia(40%) saturate(600%) hue-rotate(95deg) brightness(120%);
 }
-.hero .lottie-arrow { filter: invert(78%) sepia(60%) saturate(600%) hue-rotate(95deg) brightness(130%); }
+.hero .lottie-arrow { filter: invert(65%) sepia(40%) saturate(600%) hue-rotate(95deg) brightness(120%); }
 body.theme-light .lottie-arrow { filter: invert(50%) sepia(0%) saturate(0%) brightness(60%); }
+.section-scroll-btn { color: var(--accent); }
 body.theme-light .section-scroll-btn { color: var(--text); }
 
 /* ── Canvases ── */
@@ -171,21 +172,14 @@ body.theme-light .section-scroll-btn { color: var(--text); }
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 5;
   display: flex; align-items: center; justify-content: center;
   gap: 12px; padding: 20px var(--pg);
-  border: none; font: inherit; color: var(--text);
+  border: none; font: inherit; color: var(--accent);
   font-size: 0.88rem; font-weight: 900; letter-spacing: 0.09em; text-transform: uppercase;
   cursor: pointer; transition: opacity var(--ease);
   -webkit-tap-highlight-color: transparent;
   background: transparent; width: 100%;
 }
+body.theme-light .section-scroll-btn { color: var(--text); }
 .section-scroll-btn:hover { opacity: 0.75; }
-.hero .section-scroll-btn  { background: linear-gradient(to bottom, rgba(8,9,15,0) 0%, #08090f 55%); }
-.cases .section-scroll-btn { background: linear-gradient(to bottom, rgba(12,26,14,0) 0%, #0c1a0e 55%); }
-body.theme-light .hero .section-scroll-btn  { background: linear-gradient(to bottom, rgba(240,241,245,0) 0%, #f0f1f5 55%) !important; }
-body.theme-light .cases .section-scroll-btn { background: linear-gradient(to bottom, rgba(232,233,239,0) 0%, #e8e9ef 55%) !important; }
-
-/* ═══════════════════════
-   HERO CHAT
-═══════════════════════ */
 @property --gradient-angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -505,7 +499,7 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
 
 .case-item__meta { display: flex; flex-direction: row; align-items: center; gap: 12px; flex: 1; }
 .case-item__title { font-size: 0.9rem; font-weight: 700; transition: color var(--ease); flex: 0 0 auto; white-space: nowrap; }
-.case-item__cat   { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); flex: 1 1 auto; text-align: right; margin-right: 8px; }
+.case-item__cat   { display: none; }
 .case-item__btn   { flex-shrink: 0; font-size: 0.65rem; padding: 5px 12px; margin-left: auto; }
 
 /* Fade overlays */
