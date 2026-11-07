@@ -413,15 +413,29 @@ window.addEventListener('DOMContentLoaded', () => {
     stack.addEventListener('pointercancel', function () { startX = null; });
   })();
 
-  // Копирование реквизитов
+  // Копирование реквизитов + toast
+  var copyToast = document.getElementById('copyToast');
+  var toastTimer = null;
+
+  function showCopyToast() {
+    if (!copyToast) return;
+    clearTimeout(toastTimer);
+    copyToast.classList.add('show');
+    toastTimer = setTimeout(function () {
+      copyToast.classList.remove('show');
+    }, 1800);
+  }
+
   stack.addEventListener('click', function (e) {
-    const btn = e.target.closest('.donate__copy');
+    // Только кнопки "Скопировать" (aria-label="Скопировать"), не QR
+    const btn = e.target.closest('.donate__copy[aria-label="Скопировать"]');
     if (!btn) return;
     e.stopPropagation();
     const text = btn.dataset.copy;
     if (!text) return;
     navigator.clipboard.writeText(text).then(() => {
       btn.classList.add('copied');
+      showCopyToast();
       setTimeout(() => btn.classList.remove('copied'), 1500);
     });
   });
@@ -494,15 +508,23 @@ window.addEventListener('DOMContentLoaded', () => {
       colorLight: isDark ? '#101f12' : '#f2f3f7',
       correctLevel: QRCode.CorrectLevel.M,
     });
+    // Показываем адрес под QR
+    var addrEl = document.getElementById('donateQrAddr');
+    if (addrEl) {
+      addrEl.textContent = address.length > 24
+        ? address.slice(0, 12) + '…' + address.slice(-8)
+        : address;
+    }
     overlay.classList.add('is-visible');
     overlay.setAttribute('aria-hidden', 'false');
   }
 
-  // Делегируем клики по QR-кнопкам (у них data-qr)
+  // Делегируем клики по QR-кнопкам (у них data-qr, но НЕ только data-copy)
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-qr]');
     if (!btn) return;
-    e.stopPropagation();
+    // Убеждаемся что это именно QR-кнопка (первая кнопка в паре — aria-label="QR-код")
+    if (btn.getAttribute('aria-label') !== 'QR-код') return;
     var addr = btn.dataset.qr || btn.dataset.copy;
     if (addr) showQr(addr);
   });
@@ -840,4 +862,60 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   switchTo(0);
+})();
+
+/* ═══════════════════════════════════════
+   DONATE — кнопка "Назад"
+═══════════════════════════════════════ */
+(function () {
+  // Десктоп: возвращаем первую карточку в центр
+  var backBtn = document.getElementById('donateBackBtn');
+  if (!backBtn) return;
+
+  backBtn.addEventListener('click', function () {
+    // Находим карточку "order" (заявка) и симулируем клик по ней
+    var orderCard = document.querySelector('.cstack__card[data-card="order"]');
+    if (orderCard && orderCard.dataset.pos !== 'center') {
+      orderCard.click();
+    }
+  });
+})();
+
+
+/* ═══════════════════════════════════════
+   DL-BUTTON — оригинальный jQuery-код 1в1
+═══════════════════════════════════════ */
+(function () {
+  if (typeof $ === 'undefined') return;
+
+  function setLabel(div, oldD, newD, callback) {
+    oldD.addClass('hide');
+    div.animate({ width: newD.outerWidth() }, 200, function () {
+      oldD.removeClass('show hide');
+      newD.addClass('show');
+      div.removeAttr('style');
+      if (typeof callback === 'function') callback();
+    });
+  }
+
+  $(document).on('click', '.dl-button', function (e) {
+    e.preventDefault();
+    var btn     = $(this),
+        label   = btn.find('.label'),
+        counter = label.find('.counter');
+
+    if (!btn.hasClass('active') && !btn.hasClass('done')) {
+      btn.addClass('active');
+      setLabel(label, label.find('.default'), label.find('.state'));
+      var duration = parseFloat(getComputedStyle(btn[0]).getPropertyValue('--duration'));
+      setTimeout(function () {
+        counter.addClass('hide');
+        counter.animate({ width: 0 }, 400, function () {
+          label.width(label.find('.state > span').width());
+          counter.removeAttr('style');
+        });
+        btn.removeClass('active').addClass('done');
+      }, duration);
+    }
+  });
 })();
