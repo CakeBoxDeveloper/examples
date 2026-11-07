@@ -815,6 +815,40 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ═══════════════════════════════════════
+   DL-BUTTON Lottie — инициализация иконок
+═══════════════════════════════════════ */
+(function () {
+  if (typeof lottie === 'undefined') return;
+  var SEND_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Send%20animation.json';
+
+  ['feedbackLottie', 'contactLottie'].forEach(function (id) {
+    var container = document.getElementById(id);
+    if (!container) return;
+
+    var anim = lottie.loadAnimation({
+      container: container,
+      renderer:  'svg',
+      loop:      false,
+      autoplay:  false,
+      path:      SEND_URL,
+    });
+
+    /* Стоп на последнем кадре после загрузки */
+    anim.addEventListener('DOMLoaded', function () {
+      anim.goToAndStop(anim.totalFrames - 1, true);
+    });
+
+    /* Стоп на последнем кадре после воспроизведения */
+    anim.addEventListener('complete', function () {
+      anim.goToAndStop(anim.totalFrames - 1, true);
+    });
+
+    /* Сохраняем anim на контейнере для доступа из кнопки-обработчика */
+    container._lottieAnim = anim;
+  });
+})();
+
+/* ═══════════════════════════════════════
    DL-BUTTON — оригинальный jQuery-код + авто-сброс через 3с
 ═══════════════════════════════════════ */
 (function () {
@@ -839,6 +873,12 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!btn.hasClass('active') && !btn.hasClass('done')) {
       btn.addClass('active');
       setLabel(label, label.find('.default'), label.find('.state'));
+
+      /* Запускаем Lottie */
+      var lottieContainer = btn.find('.dl-lottie-wrap')[0];
+      if (lottieContainer && lottieContainer._lottieAnim) {
+        lottieContainer._lottieAnim.goToAndPlay(0, true);
+      }
 
       var duration = parseFloat(getComputedStyle(btn[0]).getPropertyValue('--duration'));
 

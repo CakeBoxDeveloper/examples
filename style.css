@@ -593,6 +593,8 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
 .cstack__card .cform--donate { flex: 1; overflow-y: auto; scrollbar-width: none; }
 .cstack__card .cform::-webkit-scrollbar,
 .cstack__card .cform--donate::-webkit-scrollbar { display: none; }
+/* donate внутри cstack — не скроллим, слайдер сам управляет */
+.cstack__card .cform--donate { overflow-y: visible; }
 
 .cstack__card[data-pos="center"] { z-index: 10; transform: translateX(0) scale(1); opacity: 1; cursor: default; box-shadow: 0 16px 48px rgba(0,0,0,0.6); }
 .cstack__card[data-pos="left"]   { z-index: 5;  transform: translateX(-120px) translateY(44px) scale(0.827); transform-origin: top center; opacity: 1; cursor: pointer; }
@@ -738,13 +740,15 @@ body.theme-light .cform__textarea::placeholder { color: #777; }
 body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 
 /* Donate */
-.cform--donate { border-radius: 0; border-top: none; border-bottom: none; }
-.donate__desc  { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+.cform--donate { border-radius: 0; border-top: none; border-bottom: none; display: flex; flex-direction: column; padding: 0 !important; gap: 0; }
+.donate__desc  { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0; padding: 16px 16px 10px; }
 
 /* Сетка 2 колонки */
 .donate__grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
   position: relative;
+  padding: 0;
+  margin: 0;
 }
 .donate__cell {
   display: flex; align-items: center; justify-content: space-between;
@@ -1026,8 +1030,7 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 /* Кнопка auto-width, центрируется margin:auto, равные отступы */
 .cform__btn-wrap { display: block; padding: 16px 0; }
 .cform__btn-wrap .dl-button { display: table; margin: 0 auto; }
-/* Фон под тему (не белый) */
-.dl-button > div { background: var(--bg-card) !important; box-shadow: none !important; outline: 1.5px solid var(--accent); outline-offset: -1.5px; }
+/* Фон под тему (не белый) — см. ниже для outline/shadow */
 /* Иконка и текст: в тёмной = accent, в светлой = text-muted */
 body:not(.theme-light) .dl-button > div .icon { --color: var(--accent); }
 body:not(.theme-light) .dl-button > div .label { --color: var(--accent); }
@@ -1040,69 +1043,168 @@ body.theme-light .dl-button > div .label { --color: var(--text-muted); }
 /* Градиенты счётчика под bg-card */
 .dl-button > div .label > div .counter:before { background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%) !important; }
 .dl-button > div .label > div .counter:after  { background: linear-gradient(to top,   var(--bg-card) 0%, transparent 100%) !important; }
-/* Фаза active — скрываем span «Отправлено», показываем только счётчик */
-.dl-button.active .state > span { display: none; }
-/* Фаза done — скрываем счётчик, показываем только «Отправлено» */
-.dl-button.done .label .counter { display: none; }
+/* Фаза active — только счётчик, span «Отправлено» скрыт */
+.dl-button .state > span {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  vertical-align: middle;
+  white-space: nowrap;
+  /* плавно появляется после счётчика */
+  transition: max-width 0.5s cubic-bezier(0.4,0,0.2,1) 0.15s,
+              opacity 0.4s ease 0.15s;
+}
+.dl-button.done .state > span {
+  max-width: 150px;
+  opacity: 1;
+}
+.dl-button.active .state > span {
+  max-width: 0 !important;
+  opacity: 0 !important;
+  transition: none;
+}
+/* Фаза done — counter плавно схлопывается */
+.dl-button.done .label .counter {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.4s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.3s ease;
+}
 
-/* feedbackForm textarea растягивается на всё свободное место */
-#feedbackForm { flex: 1; display: flex; flex-direction: column; }
-#feedbackForm .cform__group:last-child { flex: 1; display: flex; flex-direction: column; }
-#feedbackForm .cform__group:last-child .cform__textarea { flex: 1; resize: none; }
+/* Lottie внутри dl-button иконки */
+.dl-lottie-wrap {
+  width: 22px; height: 22px;
+  overflow: visible;
+}
+/* Цвет Lottie = цвет label (accent или text-muted) — через filter */
+body:not(.theme-light) .dl-lottie-wrap {
+  filter: invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(105%);
+}
+body.theme-light .dl-lottie-wrap {
+  filter: brightness(0) opacity(0.5);
+}
+
+/* Пассив — обводка, без тени; плавный переход */
+.dl-button > div {
+  background: var(--bg-card) !important;
+  outline: 1.5px solid var(--accent);
+  outline-offset: -1.5px;
+  box-shadow: none !important;
+  transition: outline-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+/* Актив/done — убираем обводку, добавляем shadow */
+.dl-button.active > div,
+.dl-button.done > div {
+  outline-color: transparent !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.55) !important;
+}
+
+/* feedbackForm — форма растягивается, textarea заполняет всё */
+#feedbackForm { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.cform__group--grow { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.cform__textarea--grow { flex: 1; resize: none; min-height: 60px; }
+
+/* Фикс: cform__wrap у feedback — сплошной фон без дыр */
+[data-card="feedback"] .cform__wrap {
+  background: var(--bg-card);
+}
+[data-card="feedback"] .cform__btn-wrap {
+  background: var(--bg-card);
+  padding: 0 20px 20px;
+}
 
 /* Donate inline QR — слайдер */
 .donate__slider {
   position: relative;
   display: flex;
+  align-items: stretch;
   width: 100%;
-  overflow: hidden;          /* обрезает выехавший список */
+  flex: 1;
+  overflow: hidden;
 }
-/* Слайд со списком — занимает 100%, при открытом QR съезжает влево на 50% */
+/* Список занимает 100%, при QR съезжает влево на 50% (уходит за край) */
 .donate__slide--list {
   flex: 0 0 100%;
-  transition: flex-basis 0.35s cubic-bezier(0.4,0,0.2,1),
-              filter 0.35s ease,
-              transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  min-width: 100%;
+  overflow: visible;
+  padding: 0 0 12px;
+  box-sizing: border-box;
+  transition: margin-left 0.38s cubic-bezier(0.4,0,0.2,1),
+              filter 0.38s ease,
+              opacity 0.38s ease,
+              padding 0s;
 }
-/* Слайд с QR — изначально скрыт за правым краем, появляется как 50% */
+/* В нормальном состоянии добавляем горизонтальные отступы */
+.donate__slider:not(.qr-open) .donate__slide--list {
+  padding: 0 16px 12px;
+}
+/* QR-слайд */
 .donate__slide--qr {
   flex: 0 0 0%;
   overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   flex-direction: column;
-  gap: 8px;
   padding: 0;
-  transition: flex-basis 0.35s cubic-bezier(0.4,0,0.2,1);
+  transition: flex-basis 0.38s cubic-bezier(0.4,0,0.2,1);
 }
-/* Открытое состояние: список — 50% с блюром и сдвигом, QR — 50% */
-.donate__slider.qr-open .donate__slide--list {
-  flex-basis: 50%;
-  filter: blur(3px);
-  opacity: 0.6;
-  cursor: pointer;
-}
+/* Открытое состояние — QR занимает правые 50% без отступов */
 .donate__slider.qr-open .donate__slide--qr {
   flex-basis: 50%;
-  padding: 8px 0 8px 8px;
+  padding: 0 16px 12px 8px;
 }
 
-/* QR-рамка */
+/* QR-рамка — занимает всю высоту и ширину правой половины */
 .donate__qr-frame {
   border: 1px solid var(--border-accent);
   border-radius: 10px;
   overflow: hidden;
   background: var(--bg-card);
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
 }
-.donate__qr-canvas-inline { display: block; padding: 8px 8px 0; }
-.donate__qr-canvas-inline canvas { display: block; border-radius: 5px; width: 100% !important; height: auto !important; }
-/* Название сети под QR */
+.donate__qr-canvas-inline {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 8px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.donate__qr-canvas-inline canvas {
+  display: block;
+  border-radius: 4px;
+  width: 100% !important;
+  height: auto !important;
+}
+/* Список при открытом QR — сдвиг впритык, клики остаются активными для закрытия */
+.donate__slide--list { position: relative; }
+.donate__slider.qr-open .donate__slide--list {
+  margin-left: -50%;
+  opacity: 0.6;
+  cursor: pointer;
+  pointer-events: auto;
+  filter: blur(2px) brightness(0.75);
+}
 .donate__qr-addr {
-  font-size: 0.9rem; font-weight: 700;
-  color: var(--accent); letter-spacing: 0.06em;
-  text-align: center; padding: 8px 12px; margin: 0;
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--accent); letter-spacing: 0.05em;
+  text-align: center;
+  width: 100%; padding: 4px 6px 8px; margin: 0;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 body.theme-light .donate__qr-addr { color: var(--text-muted); }
 
