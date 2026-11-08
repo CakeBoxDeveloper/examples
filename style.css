@@ -648,10 +648,18 @@ body.theme-light .donate__copy:hover img {
 body.theme-light .donate__copy:hover svg {
   opacity: 0.75 !important;
 }
+/* Светлая тема: copied — инверсия: фон = цвет рамки (#888), кнопка = цвет фона карточки */
 body.theme-light .donate__copy.copied {
-  border-color: #999 !important;
-  color: #555 !important;
-  background: #d0d0d0 !important;
+  background: #888 !important;
+  border-color: var(--chat-footer) !important;
+  color: var(--chat-footer) !important;
+}
+body.theme-light .donate__copy.copied img {
+  filter: brightness(0) invert(1) opacity(0.9) !important;
+}
+body.theme-light .donate__copy.copied svg {
+  opacity: 1 !important;
+  color: var(--chat-footer) !important;
 }
 /* QR-box в светлой теме */
 body.theme-light .donate__qr-box {
@@ -791,20 +799,31 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 .donate__copy {
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; border-radius: 5px;
-  border: 1px solid var(--border); color: var(--accent); background: none; cursor: pointer;
-  transition: border-color var(--ease), color var(--ease), background var(--ease);
+  border: 1px solid var(--border-accent); color: var(--accent); background: transparent; cursor: pointer;
+  transition: border-color 0.28s ease, color 0.28s ease, background 0.28s ease;
 }
 /* SVG-иконка копирования — зелёная через currentColor */
 .donate__copy svg { opacity: 0.75; transition: opacity 0.18s; }
 /* IMG-иконка QR — зелёная через filter */
 .donate__copy img {
-  display: block; opacity: 0.75; transition: opacity 0.18s;
+  display: block; opacity: 0.75; transition: opacity 0.18s, filter 0.28s ease;
   filter: invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(100%);
 }
-.donate__copy:hover { border-color: var(--border-accent); background: var(--accent-glow); }
+.donate__copy:hover { border-color: var(--border-accent); background: var(--accent-dim); }
 .donate__copy:hover img,
 .donate__copy:hover svg { opacity: 1; }
-.donate__copy.copied { border-color: #1db954; color: #1db954; }
+
+/* Тёмная тема: copied — инверсия: фон = цвет акцента, рамка = фон карточки */
+.donate__copy.copied {
+  background: rgba(77,175,106,0.25) !important;
+  border-color: var(--chat-input-bg) !important;
+  color: var(--accent) !important;
+}
+.donate__copy.copied svg { opacity: 1; }
+.donate__copy.copied img {
+  filter: invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(100%);
+  opacity: 1;
+}
 
 /* QR инлайн */
 .donate__qr-overlay { display: none; }
