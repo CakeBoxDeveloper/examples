@@ -966,3 +966,27 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   window.addEventListener('resize', initMarquee);
 })();
+
+/* ═══════════════════════════════════════
+   MOBILE DONATE — копирование по клику на плашку валюты
+═══════════════════════════════════════ */
+(function () {
+  if (window.innerWidth > 860) return;
+
+  document.querySelectorAll('.donate__cell').forEach(function (cell) {
+    cell.addEventListener('click', function (e) {
+      /* если кликнули на кнопку копировать — не дублируем */
+      if (e.target.closest('.donate__copy')) return;
+
+      var copyBtn = cell.querySelector('.donate__copy[aria-label="Скопировать"]');
+      if (!copyBtn) return;
+      var text = copyBtn.dataset.copy;
+      if (!text) return;
+
+      navigator.clipboard.writeText(text).then(function () {
+        copyBtn.classList.add('copied');
+        setTimeout(function () { copyBtn.classList.remove('copied'); }, 1500);
+      }).catch(function () {});
+    });
+  });
+})();

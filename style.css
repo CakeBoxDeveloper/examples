@@ -1398,14 +1398,43 @@ body.theme-light .donate__qr-addr { color: var(--text-muted); }
     white-space: nowrap;
   }
   .contact { overflow: hidden; padding-block: 60px; }
-  .contact__inner { padding-block: 0; }
+  .contact__inner {
+    padding-block: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
   /* На мобиле заявки — folder-tabs как кейсы */
   .cstack { display: none; }
   .cform__row { grid-template-columns: 1fr; }
   .cform__group--row { grid-template-columns: 1fr; }
   .cform__input--half  { grid-column: 1; }
   .cform__messenger-btns { grid-column: 1; }
-}
+
+  /* Убираем заголовки карточек — они дублируют табы */
+  .contact-folder__page .cform__header { display: none; }
+
+  /* Активная вкладка — нет нижней границы (эффект одного слоя) */
+  .contact-folder__tab.is-active {
+    box-shadow: inset 1px 0 0 var(--border-accent), inset -1px 0 0 var(--border-accent), inset 0 1px 0 var(--border-accent);
+    margin-bottom: -1px;
+    padding-bottom: 14px;
+  }
+
+  /* Кнопки отправки — скругление совпадает с карточкой (10px) */
+  .contact-folder__page .cform__submit,
+  .contact-folder__page .cform__submit--green.btn--primary,
+  .contact-folder__page .cform__submit--yellow {
+    border-radius: 0 0 10px 10px;
+  }
+
+  /* Донат на мобиле — скрываем QR-кнопку, только копировать */
+  .donate__copy[aria-label="QR-код"] { display: none; }
+  /* Плашка валюты — кликабельная (визуальный сигнал) */
+  .donate__cell { cursor: pointer; }
+  /* Донат — скролл внутри карточки */
+  .contact-folder__page .cform--donate {
+    overflow-y: auto;
+    flex: 1;
+  }
 
 /* ═══════════════════════
    MOBILE CONTACT FOLDER
