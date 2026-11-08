@@ -627,13 +627,32 @@ body.theme-light .donate__cell {
   background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1);
 }
 body.theme-light .donate__copy {
-  border-color: rgba(0,0,0,0.15); color: var(--text-muted);
-  background: #e4e4e4 !important;
+  border-color: rgba(0,0,0,0.18);
+  color: #888 !important;
+  background: #e8e8e8 !important;
+}
+body.theme-light .donate__copy img {
+  filter: brightness(0) opacity(0.45) !important;
+}
+body.theme-light .donate__copy svg {
+  opacity: 0.5 !important;
 }
 body.theme-light .donate__copy:hover {
-  border-color: var(--accent); background: rgba(77,175,106,0.1);
+  background: #d8d8d8 !important;
+  border-color: rgba(0,0,0,0.3) !important;
+  color: #555 !important;
 }
-body.theme-light .donate__copy.copied { border-color: #1db954; color: #1db954; }
+body.theme-light .donate__copy:hover img {
+  filter: brightness(0) opacity(0.6) !important;
+}
+body.theme-light .donate__copy:hover svg {
+  opacity: 0.75 !important;
+}
+body.theme-light .donate__copy.copied {
+  border-color: #999 !important;
+  color: #555 !important;
+  background: #d0d0d0 !important;
+}
 /* QR-box в светлой теме */
 body.theme-light .donate__qr-box {
   background: #fff; border-color: rgba(0,0,0,0.15);
