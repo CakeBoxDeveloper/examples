@@ -413,19 +413,6 @@ window.addEventListener('DOMContentLoaded', () => {
     stack.addEventListener('pointercancel', function () { startX = null; });
   })();
 
-  // Копирование реквизитов + toast
-  var copyToast = document.getElementById('copyToast');
-  var toastTimer = null;
-
-  function showCopyToast() {
-    if (!copyToast) return;
-    clearTimeout(toastTimer);
-    copyToast.classList.add('show');
-    toastTimer = setTimeout(function () {
-      copyToast.classList.remove('show');
-    }, 1800);
-  }
-
   stack.addEventListener('click', function (e) {
     // Только кнопки "Скопировать" (aria-label="Скопировать"), не QR
     const btn = e.target.closest('.donate__copy[aria-label="Скопировать"]');
@@ -435,7 +422,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!text) return;
     navigator.clipboard.writeText(text).then(() => {
       btn.classList.add('copied');
-      showCopyToast();
       setTimeout(() => btn.classList.remove('copied'), 1500);
     });
   });
@@ -868,20 +854,7 @@ window.addEventListener('DOMContentLoaded', () => {
   var grid      = document.querySelector('.cform--donate .donate__grid');
   if (!slider || !qrCanvas || !footer) return;
 
-  /* Toast над футером */
-  var donateToast = document.createElement('div');
-  donateToast.className = 'donate-toast';
-  donateToast.textContent = 'Скопировано!';
-  footer.parentNode.insertBefore(donateToast, footer);
   var toastTimer = null;
-
-  function showDonateToast() {
-    donateToast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () {
-      donateToast.classList.remove('show');
-    }, 1800);
-  }
 
   function openQr(address, net) {
     if (!address || typeof QRCode === 'undefined') return;
@@ -954,7 +927,6 @@ window.addEventListener('DOMContentLoaded', () => {
       if (!text) return;
       navigator.clipboard.writeText(text).then(function () {
         btn.classList.add('copied');
-        showDonateToast();
         setTimeout(function () { btn.classList.remove('copied'); }, 1500);
       });
     });
