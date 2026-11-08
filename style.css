@@ -1172,14 +1172,17 @@ body.theme-light .dl-lottie-wrap {
   gap: 0;
 }
 .donate__qr-canvas-inline {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
-.donate__qr-canvas-inline canvas,
+/* qrcodejs генерирует и canvas и img — скрываем canvas, оставляем только img */
+.donate__qr-canvas-inline canvas { display: none !important; }
 .donate__qr-canvas-inline img {
-  display: block;
   border-radius: 4px;
-  width: 100% !important;
-  height: auto !important;
 }
 /* Список при открытом QR — сдвиг впритык, клики остаются активными для закрытия */
 .donate__slide--list { position: relative; }

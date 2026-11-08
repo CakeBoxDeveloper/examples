@@ -937,14 +937,31 @@ window.addEventListener('DOMContentLoaded', () => {
 
     qrCanvas.innerHTML = '';
     var isDark = !document.body.classList.contains('theme-light');
+
+    /* Фиксируем высоту слайдера ДО добавления QR — чтобы рамка не росла */
+    var listH = listSlide.getBoundingClientRect().height;
+    slider.style.height = listH + 'px';
+
     new QRCode(qrCanvas, {
       text:         address,
-      width:        160,
-      height:       160,
+      width:        256,
+      height:       256,
       colorDark:    isDark ? '#4daf6a' : '#1a1c26',
       colorLight:   isDark ? '#101f12' : '#f2f3f7',
       correctLevel: QRCode.CorrectLevel.M,
     });
+
+    /* убираем инлайн размеры которые ставит qrcodejs */
+    setTimeout(function () {
+      var img = qrCanvas.querySelector('img');
+      if (img) {
+        img.removeAttribute('style');
+        img.style.width = '75%';
+        img.style.height = 'auto';
+        img.style.display = 'block';
+        img.style.borderRadius = '4px';
+      }
+    }, 50);
 
     if (addrEl) addrEl.textContent = net || '';
     slider.classList.add('qr-open');
@@ -952,6 +969,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function closeQr() {
     slider.classList.remove('qr-open');
+    slider.style.height = '';
   }
 
   /* Клики по QR-кнопкам — только когда список НЕ задвинут */
