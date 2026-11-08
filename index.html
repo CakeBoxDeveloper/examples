@@ -458,34 +458,16 @@
             </div>
             <form class="cform" id="feedbackForm" novalidate>
               <div class="cform__group">
-                <input class="cform__input" type="text" name="fb_contact" placeholder="@username" autocomplete="off" />
+                <input class="cform__input" type="text" name="fb_contact" placeholder="@username или почта" autocomplete="off" />
               </div>
-              <div class="cform__group cform__group--grow">
-                <textarea class="cform__textarea cform__textarea--grow" name="fb_message" placeholder="Ваше сообщение…"></textarea>
+              <div class="cform__group">
+                <textarea class="cform__textarea" name="fb_message" rows="5" placeholder="Ваше сообщение…"></textarea>
               </div>
             </form>
-            <div class="cform__btn-wrap">
-                <a class="dl-button" id="feedbackSubmitBtn" href="#" style="--duration:3000">
-                  <div>
-                    <div class="icon">
-                      <div class="dl-lottie-wrap" id="feedbackLottie"></div>
-                    </div>
-                    <div class="label">
-                      <div class="show default">Отправить</div>
-                      <div class="state">
-                        <div class="counter">
-                          <ul><li></li><li>1</li></ul>
-                          <ul><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li></ul>
-                          <ul><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li></ul>
-                          <span>%</span>
-                        </div>
-                        <span>Отправлено</span>
-                      </div>
-                    </div>
-                    <div class="progress"></div>
-                  </div>
-                </a>
-            </div>
+            <button type="submit" form="feedbackForm" class="btn btn--primary cform__submit cform__submit--green">
+              Отправить
+              <span class="btn__shimmer"></span>
+            </button>
           </div>
         </div>
 
@@ -608,6 +590,7 @@
         </div>
 
         <!-- КАРТОЧКА 1: Заявка на разработку (передний план) -->
+        <!-- КАРТОЧКА 1: Заявка на разработку (передний план) -->
         <div class="cstack__card cstack__card--active" data-card="order">
           <div class="cform__wrap">
             <div class="cform__header">
@@ -630,11 +613,11 @@
               </fieldset>
 
               <div class="cform__group">
-                <input class="cform__input" type="text" id="name" name="name" placeholder="Суть задачи, кратко..." autocomplete="off" />
+                <input class="cform__input" type="text" id="name" name="name" placeholder="Что разрабатываем / что нужно сделать" autocomplete="name" />
               </div>
 
               <div class="cform__group cform__group--row">
-                <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username" autocomplete="off" />
+                <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username или почта" autocomplete="off" />
                 <div class="cform__messenger-btns">
                   <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
                   <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
@@ -646,30 +629,12 @@
                 <textarea class="cform__textarea" id="comment" name="comment" rows="3" placeholder="Пожелания, референсы, сроки…"></textarea>
               </div>
 
-              <div class="cform__group cform__btn-wrap">
-                <a class="dl-button" id="contactSubmitBtn" href="#" style="--duration:3000">
-                  <div>
-                    <div class="icon">
-                      <div class="dl-lottie-wrap" id="contactLottie"></div>
-                    </div>
-                    <div class="label">
-                      <div class="show default">Отправить</div>
-                      <div class="state">
-                        <div class="counter">
-                          <ul><li></li><li>1</li></ul>
-                          <ul><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li></ul>
-                          <ul><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li><li>0</li></ul>
-                          <span>%</span>
-                        </div>
-                        <span>Отправлено</span>
-                      </div>
-                    </div>
-                    <div class="progress"></div>
-                  </div>
-                </a>
-              </div>
-
             </form>
+            <button type="submit" form="contactForm" class="btn btn--primary cform__submit">
+              <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/bdbe9e1d0d06182689bebe0c47a75113961299f2/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" class="cform__submit-icon" />
+              Отправить заявку
+              <span class="btn__shimmer"></span>
+            </button>
           </div>
         </div>
 

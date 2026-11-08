@@ -817,91 +817,42 @@ window.addEventListener('DOMContentLoaded', () => {
 /* ═══════════════════════════════════════
    DL-BUTTON Lottie — инициализация иконок
 ═══════════════════════════════════════ */
-(function () {
-  if (typeof lottie === 'undefined') return;
-  var SEND_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Send%20animation.json';
-
-  ['feedbackLottie', 'contactLottie'].forEach(function (id) {
-    var container = document.getElementById(id);
-    if (!container) return;
-
-    var anim = lottie.loadAnimation({
-      container: container,
-      renderer:  'svg',
-      loop:      false,
-      autoplay:  false,
-      path:      SEND_URL,
-    });
-
-    /* Стоп на последнем кадре после загрузки */
-    anim.addEventListener('DOMLoaded', function () {
-      anim.goToAndStop(anim.totalFrames - 1, true);
-    });
-
-    /* Стоп на последнем кадре после воспроизведения */
-    anim.addEventListener('complete', function () {
-      anim.goToAndStop(anim.totalFrames - 1, true);
-    });
-
-    /* Сохраняем anim на контейнере для доступа из кнопки-обработчика */
-    container._lottieAnim = anim;
-  });
-})();
+/* Lottie для кнопок отправки — не используется (кнопки заменены на простые) */
 
 /* ═══════════════════════════════════════
    DL-BUTTON — оригинальный jQuery-код + авто-сброс через 3с
 ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   SUBMIT BUTTONS — простые кнопки отправки
+═══════════════════════════════════════ */
 (function () {
-  if (typeof $ === 'undefined') return;
+  [
+    { btnId: 'feedbackSubmitBtn', formId: 'feedbackForm' },
+    { btnId: 'contactSubmitBtn',  formId: 'contactForm'  },
+  ].forEach(function (cfg) {
+    var btn  = document.getElementById(cfg.btnId);
+    var form = document.getElementById(cfg.formId);
+    if (!btn) return;
 
-  function setLabel(div, oldD, newD, callback) {
-    oldD.addClass('hide');
-    div.animate({ width: newD.outerWidth() }, 200, function () {
-      oldD.removeClass('show hide');
-      newD.addClass('show');
-      div.removeAttr('style');
-      if (typeof callback === 'function') callback();
-    });
-  }
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (btn.disabled) return;
 
-  $(document).on('click', '.dl-button', function (e) {
-    e.preventDefault();
-    var btn     = $(this),
-        label   = btn.find('.label'),
-        counter = label.find('.counter');
+      var origText = btn.textContent.trim().replace(/\s+/g,' ');
 
-    if (!btn.hasClass('active') && !btn.hasClass('done')) {
-      btn.addClass('active');
-      setLabel(label, label.find('.default'), label.find('.state'));
-
-      /* Запускаем Lottie */
-      var lottieContainer = btn.find('.dl-lottie-wrap')[0];
-      if (lottieContainer && lottieContainer._lottieAnim) {
-        lottieContainer._lottieAnim.goToAndPlay(0, true);
-      }
-
-      var duration = parseFloat(getComputedStyle(btn[0]).getPropertyValue('--duration'));
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
 
       setTimeout(function () {
-        /* Стягиваем label до размера span «Отправлено», убираем счётчик */
-        counter.addClass('hide');
-        counter.animate({ width: 0 }, 400, function () {
-          label.width(label.find('.state > span').width());
-          counter.removeAttr('style');
-        });
-        btn.removeClass('active').addClass('done');
+        btn.style.opacity = '1';
 
-        /* Авто-сброс через 3с */
+        /* сброс через 3с */
         setTimeout(function () {
-          setLabel(label, label.find('.state'), label.find('.default'), function () {
-            counter.stop(true).removeClass('hide').removeAttr('style');
-            btn.removeClass('done');
-          });
-          var $form = btn.closest('#contactForm, #feedbackForm');
-          if ($form.length) $form[0].reset();
+          btn.disabled = false;
+          if (form) form.reset();
         }, 3000);
-      }, duration);
-    }
+      }, 1200);
+    });
   });
 })();
 
