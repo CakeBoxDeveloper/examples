@@ -1352,9 +1352,51 @@ body.theme-light .donate__qr-addr { color: var(--text-muted); }
     width: var(--block-w); max-width: var(--block-w);
     height: calc(100svh - 160px); max-height: none;
   }
-  /* На мобиле неактивные вкладки схлопываем */
-  .cases-folder__tab { gap: 0; }
-  .cases-folder__tab.is-active { gap: 6px; }
+  /* Неактивные вкладки — сжимаются до иконки, активная — занимает всё место */
+  .cases-folder__tab { gap: 0; flex: 0 0 36px; }
+  .cases-folder__tab.is-active { gap: 6px; flex: 1 1 0; }
+
+  /* Строки кейсов — название 80%, плашка 20% */
+  .case-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 14px;
+  }
+  .case-item__meta {
+    min-width: 0;
+    overflow: hidden;
+  }
+  /* Бегущая строка для длинного названия */
+  .case-item__title {
+    font-size: 0.85rem;
+    flex: none;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    /* маска — фейдаут на краях */
+    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
+    mask-image: linear-gradient(to right, black 70%, transparent 100%);
+  }
+  /* Если текст не помещается — запускаем marquee */
+  .case-item__title.is-marquee {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    animation: marquee-scroll 8s linear infinite;
+  }
+  @keyframes marquee-scroll {
+    0%   { transform: translateX(0); }
+    40%  { transform: translateX(var(--marquee-offset, -30%)); }
+    60%  { transform: translateX(var(--marquee-offset, -30%)); }
+    100% { transform: translateX(0); }
+  }
+  .case-item__btn {
+    font-size: 0.6rem;
+    padding: 4px 7px;
+    margin-left: 0;
+    white-space: nowrap;
+  }
   .contact { overflow: hidden; padding-block: 60px; }
   .contact__inner { padding-block: 0; }
   /* На мобиле заявки — folder-tabs как кейсы */

@@ -932,3 +932,37 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 })();
+
+/* ═══════════════════════════════════════
+   MARQUEE — бегущая строка для длинных названий кейсов (мобиле)
+═══════════════════════════════════════ */
+(function () {
+  if (window.innerWidth > 860) return;
+
+  function initMarquee() {
+    document.querySelectorAll('.case-item__title').forEach(function (el) {
+      var parent = el.parentElement; /* .case-item__meta */
+      if (!parent) return;
+      var parentW = parent.offsetWidth;
+      var textW   = el.scrollWidth;
+      if (textW > parentW) {
+        var offset = -(textW - parentW);
+        el.style.setProperty('--marquee-offset', offset + 'px');
+        el.classList.add('is-marquee');
+        /* случайный старт чтобы не все анимировались одновременно */
+        el.style.animationDelay = (Math.random() * -4) + 's';
+      } else {
+        el.classList.remove('is-marquee');
+        el.style.removeProperty('--marquee-offset');
+      }
+    });
+  }
+
+  /* запускаем после рендера */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMarquee);
+  } else {
+    setTimeout(initMarquee, 200);
+  }
+  window.addEventListener('resize', initMarquee);
+})();
