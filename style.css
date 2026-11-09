@@ -503,10 +503,16 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
 .cases-folder__panel {
   flex: 1; background: var(--bg-card);
   border: 1px solid var(--border-accent);
+  border-top: none;
   border-radius: 0 0 10px 10px; overflow: hidden;
   display: flex; flex-direction: column; position: relative; z-index: 1; min-height: 0;
 }
-/* Pages */
+
+/* Активная вкладка кейсов — без нижней границы, сливается с панелью */
+.cases-folder__tab.is-active {
+  margin-bottom: -1px;
+  box-shadow: inset 1px 0 0 var(--border-accent), inset -1px 0 0 var(--border-accent), inset 0 1px 0 var(--border-accent);
+}/* Pages */
 .cases-folder__page { display: none; flex-direction: column; flex: 1; min-height: 0; }
 .cases-folder__page.is-active { display: flex; }
 
@@ -1442,11 +1448,11 @@ body.theme-light .cases-folder__tab.is-active {
     padding-bottom: 14px;
   }
 
-  /* Кнопки отправки — скругление совпадает с карточкой (10px) */
+  /* Кнопки отправки — скругление совпадает с карточкой (14px) */
   .contact-folder__page .cform__submit,
   .contact-folder__page .cform__submit--green.btn--primary,
   .contact-folder__page .cform__submit--yellow {
-    border-radius: 0 0 10px 10px;
+    border-radius: 0 0 14px 14px;
   }
 
   /* Донат на мобиле — скрываем QR-кнопку, только копировать */
@@ -1470,14 +1476,79 @@ body.theme-light .cases-folder__tab.is-active {
     display: flex; flex-direction: column;
     width: var(--block-w); max-width: var(--block-w);
     height: calc(100svh - 160px); max-height: none; min-height: 400px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  /* Все фоны внутри contact-folder — прозрачные */
+  .contact-folder__tab,
+  .contact-folder__panel,
+  .contact-folder__page .cform__wrap,
+  .contact-folder__page .cform,
+  .contact-folder__page .cform--donate,
+  .contact-folder__page .cform__header,
+  .contact-folder__page .cform__btn-wrap,
+  .contact-folder__page .cform__submit,
+  .contact-folder__page .cform__submit--yellow,
+  .contact-folder__page .cform__submit--green.btn--primary,
+  .contact-folder__page .donate__cell,
+  .contact-folder__page .donate__grid,
+  .contact-folder__page .donate__slide--list,
+  .contact-folder__page .donate__desc {
+    background: transparent !important;
+  }
+  /* Убираем рамки у кошельков */
+  .contact-folder__page .donate__cell {
+    border-color: rgba(255,255,255,0.1) !important;
+  }
+  /* Инпуты и textarea — прозрачные, без рамки */
+  .contact-folder__page .cform__input,
+  .contact-folder__page .cform__textarea {
+    background: transparent !important;
+    border-color: rgba(255,255,255,0.12) !important;
+  }
+  body.theme-light .contact-folder__page .cform__input,
+  body.theme-light .contact-folder__page .cform__textarea {
+    border-color: rgba(0,0,0,0.15) !important;
+  }
+  /* Убираем все внутренние горизонтальные границы */
+  .contact-folder__page .cform__group,
+  .contact-folder__page .cform__header {
+    border-bottom: none !important;
+    border-top: none !important;
+  }
+  .contact-folder__page .cform__submit,
+  .contact-folder__page .cform__submit--yellow,
+  .contact-folder__page .cform__submit--green.btn--primary {
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 0 14px 14px;
+  }
+  /* Граница между табами и панелью — убрать */
+  .contact-folder__panel {
+    border-top: none !important;
+  }
+  /* Рамка только снаружи */
+  .contact-folder__tab {
+    box-shadow: inset 0 0 0 1px var(--border-accent);
+  }
+  .contact-folder__panel {
+    border-color: var(--border-accent);
+  }
+  body.theme-light .contact-folder__tab {
+    box-shadow: inset 0 0 0 1px #d0d0d0;
+  }
+  body.theme-light .contact-folder__panel {
+    border-color: #d0d0d0;
   }
   .contact-folder__tabs { display: flex; gap: 4px; flex-shrink: 0; align-items: flex-end; }
   .contact-folder__tab {
     flex: 0 0 36px; display: flex; align-items: center; justify-content: center; gap: 0;
     padding: 8px 10px 11px; border: none; border-radius: 10px 10px 0 0;
-    background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+    color: var(--text-muted); cursor: pointer;
     position: relative;
-    box-shadow: inset 0 0 0 1px var(--border);
+    box-shadow: inset 0 0 0 1px var(--border-accent);
     overflow: hidden; white-space: nowrap;
     transition: flex 0.25s ease, gap 0.25s ease, box-shadow 0.18s;
   }
@@ -1488,15 +1559,9 @@ body.theme-light .cases-folder__tab.is-active {
     /* три стороны без нижней */
     box-shadow: inset 1px 0 0 var(--border-accent), inset -1px 0 0 var(--border-accent), inset 0 1px 0 var(--border-accent);
     overflow: visible;
-    /* псевдоэлемент перекрывает границу панели снизу */
   }
   .contact-folder__tab.is-active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px; left: 0; right: 0;
-    height: 3px;
-    background: var(--bg-card);
-    z-index: 5;
+    display: none;
   }
   .contact-folder__tab-icon {
     width: 18px; height: 18px; flex-shrink: 0; object-fit: contain;
@@ -1526,11 +1591,17 @@ body.theme-light .cases-folder__tab.is-active {
   .contact-folder__tab.is-active .contact-folder__tab-label { max-width: 160px; opacity: 1; }
 
   .contact-folder__panel {
-    flex: 1; background: var(--bg-card); border: 1px solid var(--border-accent);
+    flex: 1; border: 1px solid var(--border-accent);
     border-top: none;
-    border-radius: 0 0 10px 10px; overflow: hidden;
+    border-radius: 0 0 14px 14px; overflow: hidden;
     display: flex; flex-direction: column; min-height: 0;
     position: relative; z-index: 1;
+  }
+  body.theme-light .contact-folder__tab {
+    box-shadow: inset 0 0 0 1px #d0d0d0;
+  }
+  body.theme-light .contact-folder__panel {
+    border-color: #d0d0d0;
   }
   .contact-folder__page { display: none; flex-direction: column; flex: 1; min-height: 0; }
   .contact-folder__page.is-active { display: flex; }
@@ -1545,6 +1616,7 @@ body.theme-light .cases-folder__tab.is-active {
   .contact-folder__page .cform__btn-wrap,
   .contact-folder__page .cform__submit {
     flex-shrink: 0;
+    border-radius: 0 0 14px 14px;
   }
 
   /* Убираем border-radius у cform__header внутри folder */
