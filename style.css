@@ -1277,6 +1277,25 @@ body.theme-light .dl-lottie-wrap {
 }
 body.theme-light .donate__qr-addr { color: var(--text-muted); }
 
+/* Светлая тема: рамка QR-кода — серая */
+body.theme-light .donate__qr-frame {
+  border-color: #d0d0d0;
+}
+
+/* Светлая тема: разделители строк кейсов — серые */
+body.theme-light .case-item {
+  border-bottom-color: #d8d8d8;
+}
+body.theme-light .cases-folder__panel {
+  border-color: #d0d0d0;
+}
+body.theme-light .cases-folder__tab {
+  box-shadow: inset 0 0 0 1px #d0d0d0;
+}
+body.theme-light .cases-folder__tab.is-active {
+  box-shadow: inset 1px 0 0 #c0c0c0, inset -1px 0 0 #c0c0c0, inset 0 1px 0 #c0c0c0;
+}
+
 /* Toast над футером доната */
 .donate-toast {
   display: block; text-align: center;
