@@ -92,9 +92,17 @@
       position: relative;
       background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(77,175,106,0.06) 0%, transparent 70%);
     }
+    /* Плитки-фон — canvas на весь hero */
+    .hero__tiles-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+    .hero { overflow: hidden; }
     .hero__inner {
       display: flex; flex-direction: column; align-items: center;
       gap: 28px; width: 100%;
+      position: relative; z-index: 1;
     }
     .holocard-wrap {
       width: var(--block-w);
@@ -373,6 +381,7 @@
   </a>
 
   <section class="hero">
+    <canvas class="hero__tiles-canvas" id="tilesCanvas"></canvas>
     <div class="hero__inner">
       <div class="holocard-wrap" id="holowrap"></div>
       <div class="hero__meta">
@@ -533,8 +542,7 @@ ws.onclose = () => {
   }
 
   // Реакции — клик переключает активность и инкрементит счётчик
-  function handleReaction(btn) {
-    const isActive = btn.classList.contains('is-active');
+  function handleReaction(btn) {    const isActive = btn.classList.contains('is-active');
     const countEl = btn.querySelector('.reaction-btn__count');
     let count = parseInt(countEl.textContent) || 0;
     if (isActive) {
@@ -814,6 +822,205 @@ ws.onclose = () => {
       animate();
     }
     requestAnimationFrame(init);
+  })();
+  </script>
+
+  <script>
+  // ── Плитки по бокам от голограммы ──
+  (function() {
+    if (typeof THREE === 'undefined') return;
+
+    const canvas = document.getElementById('tilesCanvas');
+    const hero   = canvas.parentElement;
+
+    function resize() {
+      canvas.width  = hero.offsetWidth;
+      canvas.height = hero.offsetHeight;
+      camera.left   = -canvas.width  / 2;
+      camera.right  =  canvas.width  / 2;
+      camera.top    =  canvas.height / 2;
+      camera.bottom = -canvas.height / 2;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.width, canvas.height);
+    }
+
+    const scene    = new THREE.Scene();
+    const camera   = new THREE.OrthographicCamera(-1,1,1,-1,1,1000);
+    camera.position.z = 500;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dir = new THREE.DirectionalLight(0xffffff, 1.6);
+    dir.position.set(200, 300, 400); scene.add(dir);
+    const rim = new THREE.DirectionalLight(0x88ff99, 0.3);
+    rim.position.set(-200, -100, 100); scene.add(rim);
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    const HUE    = 155;
+    const TILE_S = 70;   // размер плитки в пикселях сцены
+    const DEPTH  = 8;    // толщина экструзии
+    const COUNT  = 8;    // плиток с каждой стороны
+
+    function harmColor(h, s, l) {
+      const c = new THREE.Color();
+      c.setHSL(((h % 360) + 360) / 360, s, l);
+      return c;
+    }
+
+    // Геометрия плитки — квадрат со скруглёнными углами
+    function makeTileGeo(size, r, d) {
+      const hw = size / 2, hr = r;
+      const shape = new THREE.Shape();
+      shape.moveTo(-hw + hr, -hw);
+      shape.lineTo( hw - hr, -hw);  shape.quadraticCurveTo( hw, -hw,  hw, -hw + hr);
+      shape.lineTo( hw,  hw - hr);  shape.quadraticCurveTo( hw,  hw,  hw - hr,  hw);
+      shape.lineTo(-hw + hr,  hw);  shape.quadraticCurveTo(-hw,  hw, -hw,  hw - hr);
+      shape.lineTo(-hw, -hw + hr);  shape.quadraticCurveTo(-hw, -hw, -hw + hr, -hw);
+      return new THREE.ExtrudeGeometry(shape, {
+        depth: d, bevelEnabled: true,
+        bevelSegments: 3, steps: 1, bevelSize: 1.5, bevelThickness: 1.5
+      });
+    }
+
+    const tileGeo  = makeTileGeo(TILE_S, 10, DEPTH);
+    const tileMat  = new THREE.MeshStandardMaterial({
+      color: harmColor(HUE, 0.35, 0.14), roughness: 0.5, metalness: 0.15
+    });
+
+    // Логотип на плитке — светлее корпуса чтобы был виден
+    const logoMat = new THREE.MeshStandardMaterial({
+      color: harmColor(HUE, 0.5, 0.72), metalness: 0.6, roughness: 0.2,
+      side: THREE.DoubleSide
+    });
+
+    const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/KremuaSVG.svg';
+    let logoTemplate = null;
+
+    const loader = new THREE.SVGLoader();
+    loader.load(svgUrl, (data) => {
+      const grp = new THREE.Group();
+      data.paths.forEach(path => {
+        THREE.SVGLoader.createShapes(path).forEach(shape => {
+          const g = new THREE.ExtrudeGeometry(shape, {
+            depth: 12, bevelEnabled: true,
+            bevelSegments: 2, steps: 1, bevelSize: 2, bevelThickness: 2
+          });
+          g.computeVertexNormals();
+          grp.add(new THREE.Mesh(g, logoMat));
+        });
+      });
+      // нормализуем логотип
+      const box = new THREE.Box3().setFromObject(grp);
+      const ctr = box.getCenter(new THREE.Vector3());
+      const sz  = new THREE.Vector3(); box.getSize(sz);
+      grp.children.forEach(c => c.geometry.translate(-ctr.x, -ctr.y, -ctr.z));
+      const maxD = Math.max(sz.x, sz.y) || 1;
+      const s = (TILE_S * 0.6) / maxD;
+      grp.scale.set(s, -s, s);
+      grp.position.z = DEPTH + 2;  // выступает над лицевой стороной плитки
+      logoTemplate = grp;
+
+      // Создаём плитки
+      buildTiles();
+    });
+
+    const tiles = [];
+
+    function buildTiles() {
+      for (let i = 0; i < COUNT * 2; i++) {
+        const tile = new THREE.Group();
+
+        // Корпус — сдвинут назад, лицевая сторона в z=0
+        const body = new THREE.Mesh(tileGeo.clone(), tileMat.clone());
+        body.position.z = -DEPTH;
+        tile.add(body);
+
+        // Лого
+        if (logoTemplate) {
+          tile.add(logoTemplate.clone());
+        }
+
+        // Начальная позиция — по бокам (левая или правая половина)
+        const side = i < COUNT ? -1 : 1;  // -1 = левая, 1 = правая
+        tile.userData = {
+          side,
+          phase:      Math.random() * Math.PI * 2,
+          swayPhase:  Math.random() * Math.PI * 2,
+          tiltX:      Math.random() * Math.PI * 2,
+          tiltY:      Math.random() * Math.PI * 2,
+          orbitDir:   Math.random() < 0.5 ? 1 : -1,
+          z:          0.3 + Math.random() * 0.7,
+          baseX:      0,  // вычисляется в animate
+          baseY:      0,
+        };
+        scene.add(tile);
+        tiles.push(tile);
+      }
+    }
+
+    const ORBIT_R   = 28;
+    const ORBIT_SPD = 0.00035;
+    const SWAY_AMP  = 38 * Math.PI / 180;
+    const SWAY_SPD  = 0.0006;
+    const TILT_AMP  = 48 * Math.PI / 180;
+    const TILT_SPD  = 0.00042;
+
+    let last = null;
+    function animate(ts) {
+      requestAnimationFrame(animate);
+      if (!last) last = ts;
+      const dt = Math.min(ts - last, 50); last = ts;
+
+      const W = canvas.width, H = canvas.height;
+
+      // Зона центра (занята голограммой) — примерно 1/3 ширины
+      const centerW = W / 3;
+      const sideW   = (W - centerW) / 2;  // ширина каждой боковой зоны
+
+      // Делим плитки COUNT штук на каждую сторону, раскладываем по сетке 2×4
+      const cols = 2, rows = Math.ceil(COUNT / cols);
+      const cellW = sideW / cols;
+      const cellH = H / rows;
+
+      tiles.forEach((tile, idx) => {
+        const d = tile.userData;
+        d.phase     += ORBIT_SPD  * dt * d.orbitDir;
+        d.swayPhase += SWAY_SPD   * dt;
+        d.tiltX     += TILT_SPD   * dt;
+        d.tiltY     += TILT_SPD * 0.9 * dt;
+
+        const localIdx = idx % COUNT;
+        const col = localIdx % cols;
+        const row = Math.floor(localIdx / cols);
+
+        // Центр ячейки
+        let cx, cy;
+        if (d.side === -1) {
+          // левая сторона
+          cx = -(centerW / 2) - sideW + col * cellW + cellW / 2;
+        } else {
+          // правая сторона
+          cx = (centerW / 2) + col * cellW + cellW / 2;
+        }
+        cy = H / 2 - (row * cellH + cellH / 2);
+
+        const r = ORBIT_R * (0.6 + d.z * 0.7);
+        tile.position.x = cx + Math.cos(d.phase) * r;
+        tile.position.y = cy + Math.sin(d.phase) * r;
+        tile.position.z = d.z * 20 - 10;
+
+        tile.rotation.z = Math.sin(d.swayPhase) * SWAY_AMP;
+        tile.rotation.x = Math.PI + Math.sin(d.tiltX) * TILT_AMP;
+        tile.rotation.y = Math.sin(d.tiltY) * TILT_AMP;
+      });
+
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
   })();
   </script>
 </body>
