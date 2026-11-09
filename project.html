@@ -1170,7 +1170,7 @@ ws.onclose = () => {
         const ey = cy + Math.sin(angle) * len;
         const nx =  Math.sin(angle);
         const ny = -Math.cos(angle);
-        const alpha = (0.22 + 0.15 * pulse) * 0.49;
+        const alpha = (0.22 + 0.15 * pulse) * 0.14;
         const grad = ctx.createLinearGradient(cx, cy, ex, ey);
         grad.addColorStop(0,    `rgba(${R},${G},${B},0)`);
         grad.addColorStop(0.2,  `rgba(${R},${G},${B},${(alpha*0.5).toFixed(3)})`);
