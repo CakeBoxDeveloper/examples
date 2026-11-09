@@ -543,11 +543,14 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
 .case-item:last-child  { border-bottom: none; }
 .case-item:hover { background: rgba(77,140,255,0.04); }
 .case-item:hover .case-item__title { color: var(--accent); }
+body.theme-light .case-item:hover { background: #ebebeb; }
+body.theme-light .case-item:hover .case-item__title { color: #444; }
 
 .case-item__meta { display: flex; flex-direction: row; align-items: center; gap: 12px; flex: 1; }
-.case-item__title { font-size: 0.9rem; font-weight: 700; transition: color var(--ease); flex: 0 0 auto; white-space: nowrap; }
+.case-item__title { font-size: 0.9rem; font-weight: 700; transition: color var(--ease); flex: 0 0 auto; white-space: nowrap; color: #a8c4a8; }
 .case-item__cat   { display: none; }
 .case-item__btn   { flex-shrink: 0; font-size: 0.65rem; padding: 5px 12px; margin-left: auto; }
+body.theme-light .case-item__title { color: var(--text); }
 
 /* Fade overlays */
 .cases__fade-top,
@@ -816,8 +819,9 @@ body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 }
 .donate__cell--wide { grid-column: 1 / -1; }
 .donate__coin {
-  font-size: 0.78rem; font-weight: 700; color: var(--text); white-space: nowrap;
+  font-size: 0.78rem; font-weight: 700; color: #a8c4a8; white-space: nowrap;
 }
+body.theme-light .donate__coin { color: var(--text); }
 .donate__net {
   font-size: 0.65rem; font-weight: 500; color: var(--text-muted);
   margin-left: 3px;
