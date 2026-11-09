@@ -458,11 +458,11 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
   position: relative;
 }
 
-.cases-folder__tabs { display: flex; gap: 4px; flex-shrink: 0; }
+.cases-folder__tabs { display: flex; gap: 6px; flex-shrink: 0; margin-bottom: 8px; }
 
 .cases-folder__tab {
   flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px 12px; border: none; border-radius: 10px 10px 0 0;
+  padding: 8px 10px; border: none; border-radius: 8px;
   background: var(--bg-card); color: var(--text-muted); cursor: pointer;
   position: relative;
   box-shadow: inset 0 0 0 1px var(--border);
@@ -472,11 +472,7 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
 .cases-folder__tab.is-active {
   z-index: 3; gap: 7px;
   color: var(--text); background: var(--bg-card);
-  /* три стороны — снизу нет, вкладка сливается с панелью */
-  box-shadow: inset 1px 0 0 var(--border-accent), inset -1px 0 0 var(--border-accent), inset 0 1px 0 var(--border-accent);
-  /* перекрываем верхнюю границу панели */
-  margin-bottom: -1px;
-  padding-bottom: 13px;
+  box-shadow: inset 0 0 0 1px var(--border-accent);
 }
 .cases-folder__tab:hover:not(.is-active) { background: rgba(255,255,255,0.04); color: var(--text); }
 
@@ -503,15 +499,13 @@ body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
 .cases-folder__panel {
   flex: 1; background: var(--bg-card);
   border: 1px solid var(--border-accent);
-  border-top: none;
-  border-radius: 0 0 10px 10px; overflow: hidden;
+  border-radius: 4px; overflow: hidden;
   display: flex; flex-direction: column; position: relative; z-index: 1; min-height: 0;
 }
 
-/* Активная вкладка кейсов — без нижней границы, сливается с панелью */
+/* Активная вкладка кейсов */
 .cases-folder__tab.is-active {
-  margin-bottom: -1px;
-  box-shadow: inset 1px 0 0 var(--border-accent), inset -1px 0 0 var(--border-accent), inset 0 1px 0 var(--border-accent);
+  box-shadow: inset 0 0 0 1px var(--border-accent);
 }/* Pages */
 .cases-folder__page { display: none; flex-direction: column; flex: 1; min-height: 0; }
 .cases-folder__page.is-active { display: flex; }
@@ -1476,8 +1470,8 @@ body.theme-light .cases-folder__tab.is-active {
     display: flex; flex-direction: column;
     width: var(--block-w); max-width: var(--block-w);
     height: calc(100svh - 160px); max-height: none; min-height: 400px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(2.5px);
+    -webkit-backdrop-filter: blur(2.5px);
   }
   /* Все фоны внутри contact-folder — прозрачные */
   .contact-folder__tab,
@@ -1509,6 +1503,17 @@ body.theme-light .cases-folder__tab.is-active {
   body.theme-light .contact-folder__page .cform__input,
   body.theme-light .contact-folder__page .cform__textarea {
     border-color: rgba(0,0,0,0.15) !important;
+  }
+  /* Светлая тема: кнопки валют и кнопки отправки — непрозрачный серый фон */
+  body.theme-light .contact-folder__page .donate__cell {
+    background: #ededf1 !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+  body.theme-light .contact-folder__page .cform__submit,
+  body.theme-light .contact-folder__page .cform__submit--yellow,
+  body.theme-light .contact-folder__page .cform__submit--green.btn--primary {
+    background: #ededf1 !important;
+    border-radius: 4px !important;
   }
   /* Убираем все внутренние горизонтальные границы */
   .contact-folder__page .cform__group,
