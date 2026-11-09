@@ -337,8 +337,16 @@
     .reaction-btn:active { transform: scale(0.92); }
     .reaction-btn.is-active { border-color: var(--accent); background: rgba(77,175,106,0.12); }
     .reaction-btn__icon {
-      font-size: 1.4rem; line-height: 1;
-      /* нейтральный фильтр — убирает цветность эмодзи в поддерживающих браузерах */
+      width: 28px; height: 28px; display: block;
+      filter: invert(62%) sepia(20%) saturate(400%) hue-rotate(90deg) brightness(90%);
+      transition: filter 0.18s, transform 0.12s;
+    }
+    .reaction-btn:hover .reaction-btn__icon {
+      filter: invert(72%) sepia(35%) saturate(500%) hue-rotate(90deg) brightness(110%);
+      transform: scale(1.15);
+    }
+    .reaction-btn.is-active .reaction-btn__icon {
+      filter: invert(72%) sepia(35%) saturate(500%) hue-rotate(90deg) brightness(120%);
     }
     .reaction-btn__count {
       font-size: 0.68rem; font-weight: 700; color: var(--text-dim);
@@ -491,20 +499,20 @@ ws.onclose = () => {
       </div>
 
       <div class="article__reactions">
-        <button class="reaction-btn" data-reaction="like" onclick="handleReaction(this)">
-          <span class="reaction-btn__icon">👍</span>
+        <button class="reaction-btn" data-reaction="fire" onclick="handleReaction(this)">
+          <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/fire-svgrepo-com.svg" alt="огонь">
           <span class="reaction-btn__count">0</span>
         </button>
-        <button class="reaction-btn" data-reaction="dislike" onclick="handleReaction(this)">
-          <span class="reaction-btn__icon">👎</span>
+        <button class="reaction-btn" data-reaction="heart" onclick="handleReaction(this)">
+          <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/heart-svgrepo-com%20(3).svg" alt="сердце">
           <span class="reaction-btn__count">0</span>
         </button>
         <button class="reaction-btn" data-reaction="clap" onclick="handleReaction(this)">
-          <span class="reaction-btn__icon">👏</span>
+          <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/clap-svgrepo-com%20(1).svg" alt="аплодисменты">
           <span class="reaction-btn__count">0</span>
         </button>
-        <button class="reaction-btn" data-reaction="question" onclick="handleReaction(this)">
-          <span class="reaction-btn__icon">🤔</span>
+        <button class="reaction-btn" data-reaction="spark" onclick="handleReaction(this)">
+          <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/celebration-spark-svgrepo-com.svg" alt="праздник">
           <span class="reaction-btn__count">0</span>
         </button>
       </div>
