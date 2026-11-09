@@ -590,7 +590,7 @@ ws.onclose = () => {
       const tex = new THREE.CanvasTexture(cvs); tex.anisotropy = 16;
       const holoTex = new THREE.CanvasTexture(holoCvs); holoTex.anisotropy = 16;
 
-      const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/1068a1d908f149a8dce93ccdc86ad5f08ed68d2a/LC.svg';
+      const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/KremuaSVG.svg';
       const img = new Image(); img.crossOrigin = 'Anonymous'; img.src = svgUrl;
       let svgLoaded = false;
 
@@ -754,7 +754,13 @@ ws.onclose = () => {
           const box=new THREE.Box3().setFromObject(logoGroup);
           const center=box.getCenter(new THREE.Vector3());
           logoGroup.children.forEach(c=>c.geometry.translate(-center.x,-center.y,-center.z));
-          logoGroup.scale.set(0.0016,-0.0016,0.0016);
+          // Автоматический масштаб: логотип всегда вписывается в targetSize единиц сцены
+          const size=new THREE.Vector3();
+          box.getSize(size);
+          const maxDim=Math.max(size.x,size.y)||1;
+          const targetSize=1.1;
+          const s=targetSize/maxDim;
+          logoGroup.scale.set(s,-s,s);
           logoGroup.position.set(0,0.12,depth/2+0.04);
           card.add(logoGroup);
         });
