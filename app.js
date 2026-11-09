@@ -784,6 +784,16 @@ window.addEventListener('DOMContentLoaded', () => {
       // Убираем border-radius у header
       var header = clone.querySelector('.cform__header');
       if (header) header.style.borderRadius = '0';
+      // Убираем id у форм в клоне (дублирующиеся id ломают DOM)
+      // и блокируем нативный submit
+      clone.querySelectorAll('form').forEach(function(f) {
+        f.removeAttribute('id');
+        f.addEventListener('submit', function(e) { e.preventDefault(); });
+      });
+      // Убираем id у кнопок в клоне
+      clone.querySelectorAll('button[id]').forEach(function(b) {
+        b.removeAttribute('id');
+      });
       page.appendChild(clone);
     }
   });

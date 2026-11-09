@@ -456,7 +456,7 @@
                 src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/mail-alt-svgrepo-com.svg"
                 alt="" aria-hidden="true" />
             </div>
-            <form class="cform" id="feedbackForm" novalidate>
+            <form class="cform" id="feedbackForm" novalidate onsubmit="return false">
               <div class="cform__group">
                 <input class="cform__input" type="text" name="fb_contact" placeholder="@username" autocomplete="off" />
               </div>
@@ -464,7 +464,7 @@
                 <textarea class="cform__textarea cform__textarea--grow" name="fb_message" placeholder="Ваше сообщение…"></textarea>
               </div>
             </form>
-            <button type="submit" form="feedbackForm" class="btn btn--primary cform__submit cform__submit--green">
+            <button type="button" id="feedbackSubmitBtn" class="btn btn--primary cform__submit cform__submit--green">
               Отправить
               <img class="cform__submit-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ad65ebeebea40c5c3ed8df192b996d062cfbd698/telegram-svgrepo-com%20(2).svg" width="16" height="16" alt="" aria-hidden="true" />
               <span class="btn__shimmer"></span>
@@ -600,7 +600,7 @@
                 src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/order-svgrepo-com.svg"
                 alt="" aria-hidden="true" />
             </div>
-            <form class="cform" id="contactForm" novalidate>
+            <form class="cform" id="contactForm" novalidate onsubmit="return false">
 
               <fieldset class="cform__group">
                 <div class="cform__checks">
@@ -631,7 +631,7 @@
               </div>
 
             </form>
-            <button type="submit" form="contactForm" class="btn btn--primary cform__submit">
+            <button type="button" id="contactSubmitBtn" class="btn btn--primary cform__submit">
               Отправить заявку
               <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/bdbe9e1d0d06182689bebe0c47a75113961299f2/telegram-svgrepo-com%20(2).svg" width="18" height="18" alt="" class="cform__submit-icon" />
               <span class="btn__shimmer"></span>

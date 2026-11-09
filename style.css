@@ -1435,6 +1435,7 @@ body.theme-light .donate__qr-addr { color: var(--text-muted); }
     overflow-y: auto;
     flex: 1;
   }
+}
 
 /* ═══════════════════════
    MOBILE CONTACT FOLDER
