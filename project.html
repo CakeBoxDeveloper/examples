@@ -89,19 +89,18 @@
       min-height: 100svh;
       display: flex; align-items: center; justify-content: center;
       padding: 20px 24px 12px;
-      position: relative;
+      position: relative; z-index: 1;
       background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(77,175,106,0.06) 0%, transparent 70%);
     }
-    /* Плитки-фон — canvas на весь hero */
+    /* Плитки-фон — absolute внутри hero, не скроллится */
     .hero__tiles-canvas {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
       pointer-events: none; z-index: 0;
     }
-    .hero { overflow: hidden; }
     .hero__inner {
       display: flex; flex-direction: column; align-items: center;
-      gap: 28px; width: 100%;
+      gap: 0; width: 100%;
       position: relative; z-index: 1;
     }
     .holocard-wrap {
@@ -110,6 +109,7 @@
       aspect-ratio: 3 / 4;
       position: relative; cursor: grab;
       touch-action: none; user-select: none;
+      margin-bottom: -32px;
     }
     .holocard-wrap:active { cursor: grabbing; }
     .holocard-wrap canvas {
@@ -141,6 +141,7 @@
     .tech {
       padding: 0 24px 48px;
       display: flex; justify-content: center;
+      position: relative; z-index: 1;
     }
     .tech__inner {
       width: 100%; max-width: 640px;
@@ -190,6 +191,7 @@
     .article {
       padding: 0 24px 96px;
       display: flex; justify-content: center;
+      position: relative; z-index: 1;
     }
     .article__inner {
       width: 100%; max-width: 640px;
@@ -377,7 +379,7 @@
 
   <a href="index.html" class="topbar" id="topbar">
     <div class="topbar__lottie" id="topbarLottie"></div>
-    <span class="topbar__label">На главную</span>
+    <span class="topbar__label">на главную</span>
   </a>
 
   <section class="hero">
@@ -831,8 +833,9 @@ ws.onclose = () => {
     if (typeof THREE === 'undefined') return;
 
     const canvas = document.getElementById('tilesCanvas');
-    const hero   = canvas.parentElement;
+    const hero   = document.querySelector('.hero');
 
+    // canvas внутри hero, размер = размер hero
     function resize() {
       canvas.width  = hero.offsetWidth;
       canvas.height = hero.offsetHeight;
@@ -920,8 +923,8 @@ ws.onclose = () => {
       grp.children.forEach(c => c.geometry.translate(-ctr.x, -ctr.y, -ctr.z));
       const maxD = Math.max(sz.x, sz.y) || 1;
       const s = (TILE_S * 0.6) / maxD;
-      grp.scale.set(s, -s, s);
-      grp.position.z = DEPTH + 2;  // выступает над лицевой стороной плитки
+      grp.scale.set(s, s, s);           // без инверсии Y — лого смотрит вперёд
+      grp.position.z = DEPTH + 2;       // выступает над лицевой стороной
       logoTemplate = grp;
 
       // Создаём плитки
@@ -934,9 +937,9 @@ ws.onclose = () => {
       for (let i = 0; i < COUNT * 2; i++) {
         const tile = new THREE.Group();
 
-        // Корпус — сдвинут назад, лицевая сторона в z=0
+        // Корпус — задняя сторона в z=0, лицевая в z=DEPTH
         const body = new THREE.Mesh(tileGeo.clone(), tileMat.clone());
-        body.position.z = -DEPTH;
+        body.position.z = 0;
         tile.add(body);
 
         // Лого
@@ -979,12 +982,15 @@ ws.onclose = () => {
 
       // Зона центра (занята голограммой) — примерно 1/3 ширины
       const centerW = W / 3;
-      const sideW   = (W - centerW) / 2;  // ширина каждой боковой зоны
+      const sideW   = (W - centerW) / 2;
 
-      // Делим плитки COUNT штук на каждую сторону, раскладываем по сетке 2×4
+      // Отступ от краёв чтобы плитки не обрезались
+      const PAD_X = TILE_S * 0.7;
+      const PAD_Y = TILE_S * 0.7;
+
       const cols = 2, rows = Math.ceil(COUNT / cols);
-      const cellW = sideW / cols;
-      const cellH = H / rows;
+      const cellW = (sideW - PAD_X * 2) / cols;
+      const cellH = (H - PAD_Y * 2) / rows;
 
       tiles.forEach((tile, idx) => {
         const d = tile.userData;
@@ -997,16 +1003,16 @@ ws.onclose = () => {
         const col = localIdx % cols;
         const row = Math.floor(localIdx / cols);
 
-        // Центр ячейки
         let cx, cy;
         if (d.side === -1) {
-          // левая сторона
-          cx = -(centerW / 2) - sideW + col * cellW + cellW / 2;
+          // левая сторона — от левого края с отступом
+          cx = -(W / 2) + PAD_X + col * cellW + cellW / 2;
         } else {
-          // правая сторона
-          cx = (centerW / 2) + col * cellW + cellW / 2;
+          // правая сторона — от центра вправо
+          cx = (centerW / 2) + PAD_X + col * cellW + cellW / 2;
         }
-        cy = H / 2 - (row * cellH + cellH / 2);
+        // Вертикаль — с отступом сверху и снизу
+        cy = H / 2 - PAD_Y - row * cellH - cellH / 2;
 
         const r = ORBIT_R * (0.6 + d.z * 0.7);
         tile.position.x = cx + Math.cos(d.phase) * r;
@@ -1014,7 +1020,7 @@ ws.onclose = () => {
         tile.position.z = d.z * 20 - 10;
 
         tile.rotation.z = Math.sin(d.swayPhase) * SWAY_AMP;
-        tile.rotation.x = Math.PI + Math.sin(d.tiltX) * TILT_AMP;
+        tile.rotation.x = Math.sin(d.tiltX) * TILT_AMP;    // без Math.PI — камера смотрит на лицо
         tile.rotation.y = Math.sin(d.tiltY) * TILT_AMP;
       });
 
