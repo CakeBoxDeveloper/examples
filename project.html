@@ -109,7 +109,7 @@
       aspect-ratio: 3 / 4;
       position: relative; cursor: grab;
       touch-action: none; user-select: none;
-      margin-bottom: -32px;
+      margin-bottom: -48px;
     }
     .holocard-wrap:active { cursor: grabbing; }
     .holocard-wrap canvas {
@@ -986,9 +986,9 @@ ws.onclose = () => {
 
       // Отступ от краёв чтобы плитки не обрезались
       const PAD_X = TILE_S * 0.7;
-      const PAD_Y = TILE_S * 0.7;
+      const PAD_Y = TILE_S * 1.2; // увеличен снизу
 
-      const cols = 2, rows = Math.ceil(COUNT / cols);
+      const cols = 2, rows = 3; // фиксируем 3 ряда, нижний не обрезается
       const cellW = (sideW - PAD_X * 2) / cols;
       const cellH = (H - PAD_Y * 2) / rows;
 
