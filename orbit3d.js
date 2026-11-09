@@ -47,9 +47,9 @@
 
   const COLS = 4, ROWS = 3;
   const IS_MOBILE = window.innerWidth < 860;
-  const ORBIT_R    = IS_MOBILE ? 18 : 40;
-  const ACTUAL_COLS = IS_MOBILE ? 2 : COLS;
-  const ACTUAL_ROWS = IS_MOBILE ? 2 : ROWS;
+  const ORBIT_R    = IS_MOBILE ? 22 : 40;
+  const ACTUAL_COLS = IS_MOBILE ? 3 : COLS;
+  const ACTUAL_ROWS = IS_MOBILE ? 4 : ROWS;
   const ORBIT_SPD  = 0.00035;
   const SWAY_AMP   = 38 * Math.PI / 180;
   const SWAY_SPD   = 0.0006;
@@ -170,10 +170,10 @@
   var tiles = [];
   var plateIdx = 0;
 
-  for (var row = 0; row < ROWS; row++) {
-    for (var col = 0; col < COLS; col++) {
-      // Пропускаем центральные 2 ячейки средней строки
-      if (row === 1 && (col === 1 || col === 2)) continue;
+  for (var row = 0; row < (IS_MOBILE ? ACTUAL_ROWS : ROWS); row++) {
+    for (var col = 0; col < (IS_MOBILE ? ACTUAL_COLS : COLS); col++) {
+      // На десктопе пропускаем центральные 2 ячейки средней строки (там чат)
+      if (!IS_MOBILE && row === 1 && (col === 1 || col === 2)) continue;
 
       var idx  = (plateIdx++) % PLATES.length;
       var data = plateData[idx];
@@ -249,9 +249,11 @@
     lastTs = ts;
 
     var W2 = sec.offsetWidth, H2 = sec.offsetHeight;
-    var cellW = W2 / COLS, cellH = H2 / ROWS;
+    var activeCols = IS_MOBILE ? ACTUAL_COLS : COLS;
+    var activeRows = IS_MOBILE ? ACTUAL_ROWS : ROWS;
+    var cellW = W2 / activeCols, cellH = H2 / activeRows;
 
-    // На мобиле зажимаем позицию внутри ячейки
+    // На мобиле не зажимаем — плитки гуляют свободно
     var isMob = IS_MOBILE;
 
     tiles.forEach(function(t) {
@@ -266,14 +268,6 @@
 
       var px = cx + Math.cos(t.phase) * r;
       var py = cy + Math.sin(t.phase) * r;
-
-      // Зажимаем в пределах своей ячейки на мобиле
-      if (isMob) {
-        var halfW = cellW * 0.5 - 10;
-        var halfH = cellH * 0.5 - 10;
-        px = Math.max(cx - halfW, Math.min(cx + halfW, px));
-        py = Math.max(cy - halfH, Math.min(cy + halfH, py));
-      }
 
       t.mesh.position.set(px, py, t.z * 20 - 10);
       t.mesh.rotation.z = t.baseRotZ + t.phaseRot + Math.sin(t.swayPhase) * SWAY_AMP;
