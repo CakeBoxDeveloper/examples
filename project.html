@@ -770,6 +770,36 @@ ws.onclose = () => {
         });
         sc.globalCompositeOperation='source-in';
         sc.fillStyle=lg;sc.fillRect(0,0,w,h);
+
+        // Волнистый узор — как в оригинале
+        const wvCvs=document.createElement('canvas');wvCvs.width=w;wvCvs.height=h;
+        const wvCtx=wvCvs.getContext('2d');
+        wvCtx.save();
+        wvCtx.translate(w/2,h/2);
+        wvCtx.rotate(45*Math.PI/180);
+        wvCtx.strokeStyle='#ffffff';
+        wvCtx.lineWidth=2.5;
+        const wSpc=20,rX2=w*2.5,rY2=h*2.5;
+        for(let yp=-rY2;yp<rY2;yp+=wSpc){
+          wvCtx.beginPath();
+          for(let xp=-rX2;xp<rX2;xp+=15){
+            const yo=Math.sin((xp/30)+rX*3)*8;
+            if(xp===-rX2) wvCtx.moveTo(xp,yp+yo);
+            else wvCtx.lineTo(xp,yp+yo);
+          }
+          wvCtx.stroke();
+        }
+        wvCtx.restore();
+        const waveShift=(-rY*0.6)%1;
+        const wg=wvCtx.createLinearGradient(w,0,0,h);
+        [[0,0],[0.3,40],[0.6,90],[1.0,140]].forEach(([s,o])=>{
+          const dyn=(((waveShift+o/360)%1+1)%1)*360;
+          wg.addColorStop(s,getHarmonicColor(hueShiftDeg,0.85,0.55,60+dyn));
+        });
+        wvCtx.globalCompositeOperation='source-in';
+        wvCtx.fillStyle=wg;wvCtx.fillRect(0,0,w,h);
+
+        holoCtx.save();holoCtx.globalAlpha=0.25;holoCtx.drawImage(wvCvs,0,0);holoCtx.restore();
         holoCtx.save();holoCtx.globalAlpha=0.7;holoCtx.drawImage(sp,0,0);holoCtx.restore();
         holoCtx.drawImage(sp,0,0);
         const lx=w*(0.5+rX*0.55),ly=h*(0.5+rY*0.55);
