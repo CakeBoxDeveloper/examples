@@ -308,6 +308,15 @@
       grid-template-areas: "img text" "cap .";
       gap: 20px; align-items: start;
     }
+    .article__img--left .article__img-wrap {
+      grid-area: img;
+      aspect-ratio: 9 / 16;
+    }
+    /* Текст справа от картинки */
+    .article__img--left .article__img-caption-text {
+      grid-area: text;
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+    }
     .article__img--left .article__img-wrap::after {
       position: absolute;
       inset: 0 0 0 auto; width: 65%; height: 100%;
