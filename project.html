@@ -799,6 +799,17 @@ ws.onclose = () => {
         wvCtx.globalCompositeOperation='source-in';
         wvCtx.fillStyle=wg;wvCtx.fillRect(0,0,w,h);
 
+        // Spotlight на волны — зависит от наклона
+        const slx=w*(0.5+rX*0.55),sly=h*(0.5+rY*0.55);
+        const slg=wvCtx.createRadialGradient(slx,sly,0,slx,sly,w*1.0);
+        slg.addColorStop(0.0,'rgba(255,255,255,0.9)');
+        slg.addColorStop(0.3,'rgba(255,255,255,0.5)');
+        slg.addColorStop(0.6,'rgba(255,255,255,0.15)');
+        slg.addColorStop(1.0,'rgba(255,255,255,0.0)');
+        wvCtx.globalCompositeOperation='source-atop';
+        wvCtx.fillStyle=slg;wvCtx.fillRect(0,0,w,h);
+        wvCtx.globalCompositeOperation='source-over';
+
         holoCtx.save();holoCtx.globalAlpha=0.25;holoCtx.drawImage(wvCvs,0,0);holoCtx.restore();
         holoCtx.save();holoCtx.globalAlpha=0.7;holoCtx.drawImage(sp,0,0);holoCtx.restore();
         holoCtx.drawImage(sp,0,0);
