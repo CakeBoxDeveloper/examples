@@ -664,14 +664,39 @@
         <div class="article__img-wrap">
           <img src="https://i.ibb.co/G3pd7WGG/image.jpg" alt="Скриншот интерфейса">
         </div>
-        <p class="article__img-caption-text">Главный экран платформы — карта с кластеризацией объектов. Пользователь видит все 340+ объектов одновременно, может фильтровать по статусу и открыть паспорт любого за один клик.</p>
+        <p class="article__img-caption-text">Главный экран платформы — карта с кластеризацией объектов. Пользователь видит все 340+ объектов одновременно, может фильтровать по статусу и открыть паспорт любого за один клик.<br><br>Маркеры группируются в кластеры на малых масштабах и раскрываются при приближении. Цвет маркера отражает статус объекта: зелёный — норма, жёлтый — внимание, красный — авария.</p>
       </figure>
 
       <p>Картинка слева от текста — хороший вариант когда нужно совместить визуал с пояснением. Градиент справа мягко растворяет край картинки в фоне.</p>
 
-      <!-- Вариант 3: справа, текст слева, фейд влево -->
+      <!-- Вариант 3: справа, текст слева с деревом, фейд влево -->
       <figure class="article__img article__img--right">
-        <p class="article__img-caption-text">Мобильная версия работает на iOS и Android без отдельного приложения. Диспетчеры используют её на выездах — карта доступна офлайн благодаря Service Worker и кэшу тайлов.</p>
+        <div class="article__img-caption-text">
+          <p>Мобильная версия работает на iOS и Android без отдельного приложения. Диспетчеры используют её на выездах — карта доступна офлайн благодаря Service Worker и кэшу тайлов.</p>
+          <div class="think-tree" style="margin-top: 16px;">
+            <div class="think-tree__node think-tree__node--done">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">PWA без установки</div>
+                <div class="think-tree__desc">Открывается в браузере, работает как нативное</div>
+              </div>
+            </div>
+            <div class="think-tree__node think-tree__node--done">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">Офлайн-карта</div>
+                <div class="think-tree__desc">Service Worker кэширует тайлы при наличии сети</div>
+              </div>
+            </div>
+            <div class="think-tree__node think-tree__node--done">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">Адаптивный интерфейс</div>
+                <div class="think-tree__desc">Оптимизирован под сенсорное управление</div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="article__img-wrap">
           <img src="https://i.ibb.co/G3pd7WGG/image.jpg" alt="Скриншот мобильной версии">
         </div>
@@ -987,7 +1012,7 @@ ws.onclose = () => {
       const tex = new THREE.CanvasTexture(cvs); tex.anisotropy = 16;
       const holoTex = new THREE.CanvasTexture(holoCvs); holoTex.anisotropy = 16;
 
-      const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/KremuaSVG.svg';
+      const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/77591cc2f0cc579343f95a2418a5c0058739188e/K_Logo%20(1).svg';
       const img = new Image(); img.crossOrigin = 'Anonymous'; img.src = svgUrl;
       let svgLoaded = false;
 
@@ -1036,7 +1061,14 @@ ws.onclose = () => {
         patCtx.clearRect(0,0,w,h);
         patCtx.save();
         patCtx.translate(w/2,h/2); patCtx.rotate(30*Math.PI/180);
-        const iW=180,iH=180,gX=280,gY=280;
+        // Сохраняем пропорции SVG, вписываем в квадрат 180px
+        const cell = 180;
+        const nw = img.naturalWidth || cell;
+        const nh = img.naturalHeight || cell;
+        const ratio = nw / nh;
+        const iW = ratio >= 1 ? cell : cell * ratio;
+        const iH = ratio >= 1 ? cell / ratio : cell;
+        const gX=280,gY=280;
         for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) {
           const offX=(r%2!==0)?gX/2:0;
           patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH);
@@ -1319,7 +1351,7 @@ ws.onclose = () => {
       side: THREE.DoubleSide
     });
 
-    const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/KremuaSVG.svg';
+    const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/77591cc2f0cc579343f95a2418a5c0058739188e/K_Logo%20(1).svg';
     let logoTemplate = null;
 
     const loader = new THREE.SVGLoader();
@@ -1342,7 +1374,7 @@ ws.onclose = () => {
       grp.children.forEach(c => c.geometry.translate(-ctr.x, -ctr.y, -ctr.z));
       const maxD = Math.max(sz.x, sz.y) || 1;
       const s = (TILE_S * 0.6) / maxD;
-      grp.scale.set(s, s, s);           // без инверсии Y — лого смотрит вперёд
+      grp.scale.set(s, -s, s);          // -Y чтобы SVG не был вверх ногами
       grp.position.z = DEPTH + 2;       // выступает над лицевой стороной
       logoTemplate = grp;
 
