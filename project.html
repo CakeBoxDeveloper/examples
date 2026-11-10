@@ -520,6 +520,14 @@ ws.onclose = () => {
       </div>
 
       <div class="article__reactions">
+        <button class="reaction-btn" data-reaction="like" onclick="handleReaction(this)">
+          <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ad1086f6b591ad08751b0964e821b902841912e6/like-svgrepo-com.svg" alt="лайк">
+          <span class="reaction-btn__count">0</span>
+        </button>
+        <button class="reaction-btn" data-reaction="dislike" onclick="handleReaction(this)">
+          <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ad1086f6b591ad08751b0964e821b902841912e6/like-svgrepo-com.svg" alt="дизлайк" style="transform: scaleY(-1); display:block;">
+          <span class="reaction-btn__count">0</span>
+        </button>
         <button class="reaction-btn" data-reaction="fire" onclick="handleReaction(this)">
           <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/12042b4a847ee5b7ffb58b5a5175ff37803d9378/fire-svgrepo-com.svg" alt="огонь">
           <span class="reaction-btn__count">0</span>
@@ -702,10 +710,10 @@ ws.onclose = () => {
           ctx.moveTo(0,-r); ctx.quadraticCurveTo(0,-ir,r,0);
           ctx.quadraticCurveTo(0,ir,0,r); ctx.quadraticCurveTo(0,ir,-r,0);
           ctx.quadraticCurveTo(0,-ir,0,-r); ctx.closePath();
-          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 0.45, 0.92);
+          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.65);  /* насыщенный зелёный */
           ctx.fill();
           ctx.beginPath(); ctx.arc(0,0,ir*0.7,0,Math.PI*2);
-          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 0.3, 0.95);
+          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.82); /* светлый но зелёный */
           ctx.fill();
           ctx.restore();
         }
