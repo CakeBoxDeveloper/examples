@@ -266,7 +266,7 @@
 
     /* ── Картинки в статье — три варианта ── */
 
-    /* Общее */
+    /* ── Картинки в статье — три варианта ── */
     .article__img { margin: 28px 0; }
     .article__img figcaption {
       font-size: 0.72rem; color: var(--text-dim);
@@ -276,93 +276,83 @@
       position: relative; border-radius: 12px;
       overflow: hidden; display: block;
     }
-    /* Рамка поверх картинки через ::before, z-index: 2 */
-    .article__img-wrap::before {
-      content: ''; position: absolute; inset: 0;
-      border-radius: 12px; z-index: 2; pointer-events: none;
-      box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, #fff 14%, transparent),
-        inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 70%, transparent),
-        inset -2px -2px 0px -2px color-mix(in srgb, #fff 55%, transparent),
-        inset -0.3px -1px 4px 0px color-mix(in srgb, #000 18%, transparent);
-    }
     .article__img-wrap img {
       display: block; width: 100%; height: 100%;
-      object-fit: cover; position: relative; z-index: 0;
+      object-fit: cover;
     }
-    /* Фейдаут — z-index: 3, накрывает рамку тоже */
+    /* Фейдаут в цвет фона */
     .article__img-wrap::after {
-      content: ''; position: absolute; pointer-events: none; z-index: 3;
+      content: ''; position: absolute; pointer-events: none; z-index: 1;
     }
 
-    /* 1. Центральная — 60% ширины, по центру, фейд только 15% снизу */
+    /* 1. Центральная — 60% ширины, естественная высота, фейд 15% снизу */
     .article__img--center {
       display: flex; flex-direction: column; align-items: center;
     }
     .article__img--center .article__img-wrap {
-      width: 60%; height: 320px;
+      width: 60%;
     }
     .article__img--center .article__img-wrap img {
-      object-position: top;
+      height: auto; object-position: top;
     }
     .article__img--center .article__img-wrap::after {
-      inset: auto 0 0 0; height: 15%;
+      inset: auto 0 0 0; height: 20%;
       background: linear-gradient(to bottom, transparent, var(--bg));
     }
     .article__img--center figcaption { text-align: center; }
 
-    /* 2. Слева — картинка слева, фейд вправо 55% */
+    /* 2. Слева — картинка слева 50%, текст справа */
     .article__img--left {
       display: grid;
-      grid-template-columns: 200px 1fr;
+      grid-template-columns: 50% 1fr;
+      grid-template-areas: "img text" "cap .";
       gap: 20px; align-items: start;
     }
-    .article__img--left .article__img-wrap {
-      height: 260px;
-    }
     .article__img--left .article__img-wrap::after {
-      inset: 0 0 0 auto; width: 55%;
+      position: absolute;
+      inset: 0 0 0 auto; width: 65%; height: 100%;
       background: linear-gradient(to right, transparent, var(--bg));
     }
     .article__img--left figcaption {
-      grid-column: 1; font-size: 0.68rem; margin-top: 6px;
+      grid-area: cap; font-size: 0.68rem; margin-top: 0;
     }
 
-    /* 3. Справа — картинка справа, фейд влево 55% */
+    /* 3. Справа — текст слева, картинка справа 50% */
     .article__img--right {
       display: grid;
-      grid-template-columns: 1fr 200px;
+      grid-template-columns: 1fr 50%;
+      grid-template-areas: "text img" ". cap";
       gap: 20px; align-items: start;
     }
     .article__img--right .article__img-wrap {
-      grid-column: 2; grid-row: 1;
-      height: 260px;
+      grid-area: img;
+      aspect-ratio: 9 / 16;
     }
     .article__img--right .article__img-wrap::after {
-      inset: 0 auto 0 0; width: 55%;
+      position: absolute;
+      inset: 0 auto 0 0; width: 65%; height: 100%;
       background: linear-gradient(to left, transparent, var(--bg));
     }
     .article__img--right .article__img-caption-text {
-      grid-column: 1; grid-row: 1;
+      grid-area: text;
       font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
     }
     .article__img--right figcaption {
-      grid-column: 2; grid-row: 2; font-size: 0.68rem; margin-top: 6px;
+      grid-area: cap; font-size: 0.68rem; margin-top: 0;
     }
 
     @media (max-width: 480px) {
+      .article__img--center .article__img-wrap { width: 85%; }
       .article__img--left,
       .article__img--right { grid-template-columns: 1fr; }
-      .article__img--center .article__img-wrap { width: 85%; }
       .article__img--right .article__img-wrap { grid-column: 1; }
       .article__img--right .article__img-caption-text { grid-row: 2; }
       .article__img--left .article__img-wrap::after,
       .article__img--right .article__img-wrap::after {
-        inset: auto 0 0 0; width: 100%; height: 15%;
+        inset: auto 0 0 0; width: 100%; height: 20%;
         background: linear-gradient(to bottom, transparent, var(--bg));
       }
     }
-
     /* Code block */
     .article__code {
       margin: 24px 0; border-radius: var(--r);
@@ -416,7 +406,87 @@
       margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.7;
     }
 
-    /* Separator — убран */
+    /* ── CHECKPOINT — разделитель ── */
+    .checkpoint {
+      display: flex; align-items: center; gap: 12px;
+      margin: 36px 0; color: var(--text-dim);
+      user-select: none;
+    }
+    .checkpoint__line {
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, transparent, var(--border-accent), transparent);
+    }
+    .checkpoint__badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 5px 14px; border-radius: 20px;
+      border: 1px solid var(--border-accent);
+      background: var(--bg-card);
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--accent);
+      white-space: nowrap;
+    }
+    .checkpoint__badge svg { flex-shrink: 0; }
+
+    /* ── THINKING TREE — дерево шагов/визуализация ── */
+    .think-tree {
+      margin: 24px 0;
+      display: flex; flex-direction: column; gap: 0;
+      position: relative; padding-left: 20px;
+    }
+    /* Вертикальная линия слева */
+    .think-tree::before {
+      content: ''; position: absolute;
+      left: 7px; top: 12px; bottom: 12px; width: 1px;
+      background: linear-gradient(to bottom,
+        var(--border-accent) 0%,
+        hsla(var(--hue), 55%, 48%, 0.1) 100%);
+    }
+    .think-tree__node {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 10px 0; position: relative;
+    }
+    /* Точка на линии */
+    .think-tree__dot {
+      flex-shrink: 0; width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--border-accent);
+      background: var(--bg-card);
+      margin-left: -20px; margin-top: 2px;
+      position: relative; z-index: 1;
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .think-tree__node--done .think-tree__dot {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .think-tree__node--active .think-tree__dot {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px hsla(var(--hue), 55%, 48%, 0.2);
+    }
+    /* Контент узла */
+    .think-tree__content {
+      flex: 1; padding-bottom: 2px;
+    }
+    .think-tree__label {
+      font-size: 0.88rem; font-weight: 600; color: var(--text);
+      line-height: 1.4;
+    }
+    .think-tree__node--done .think-tree__label { color: var(--text-muted); }
+    .think-tree__desc {
+      font-size: 0.78rem; color: var(--text-dim);
+      margin-top: 3px; line-height: 1.6;
+    }
+    /* Вложенные узлы */
+    .think-tree__children {
+      margin-left: 14px; margin-top: 2px;
+      border-left: 1px solid hsla(var(--hue), 55%, 48%, 0.2);
+      padding-left: 14px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .think-tree__children .think-tree__node { padding: 6px 0; }
+    .think-tree__children .think-tree__dot {
+      width: 10px; height: 10px; margin-left: -20px;
+    }
 
     /* ── Реакции ── */
     .article__reactions {
@@ -461,9 +531,27 @@
       .tech { padding: 0 16px 48px; }
       .article { padding: 0 16px 72px; }
     }
+    /* ── LOADER ── */
+    .page-loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .page-loader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .page-loader__lottie {
+      width: 100px; height: 100px;
+      filter: invert(60%) sepia(40%) saturate(400%) hue-rotate(calc(var(--hue) * 1deg - 30deg)) brightness(90%);
+    }
+
   </style>
 </head>
 <body>
+
+  <!-- Loader -->
+  <div class="page-loader" id="pageLoader">
+    <div class="page-loader__lottie" id="loaderLottie"></div>
+  </div>
 
   <a href="index.html" class="topbar" id="topbar">
     <div class="topbar__lottie" id="topbarLottie"></div>
@@ -528,7 +616,14 @@
     <div class="article__inner">
       <div class="article__divider"></div>
 
-      <h2>О проекте</h2>
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg>
+          О проекте
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
       <p>Заказчик — компания, управляющая сетью из 340+ объектов по всей стране: подстанциями, узловыми пунктами и вспомогательными сооружениями. Задача — единая платформа мониторинга с возможностью быстрого доступа к паспорту каждого объекта, истории событий и статусу в реальном времени.</p>
 
       <blockquote>
@@ -536,7 +631,14 @@
         <cite>— Дмитрий Г., технический директор заказчика</cite>
       </blockquote>
 
-      <h2>Архитектура</h2>
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Архитектура
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
       <p>Фронтенд построен на React с использованием Mapbox GL JS для рендера карты. Вся бизнес-логика разделена на независимые модули: слой геоданных, слой событий и слой документов. Обновление в реальном времени реализовано через WebSocket с delta-синхронизацией — только изменённые объекты.</p>
 
       <!-- Вариант 1: центральная — 60% ширины, фейд снизу -->
@@ -544,31 +646,40 @@
         <div class="article__img-wrap">
           <img src="https://i.ibb.co/G3pd7WGG/image.jpg" alt="Скриншот интерфейса">
         </div>
-        <figcaption>Центральная — 60% ширины, фейд снизу</figcaption>
       </figure>
 
       <p>Вертикальная картинка по центру хорошо работает для скриншотов мобильных экранов — не растягивается на весь экран, сохраняет пропорции и фокусирует взгляд на контенте.</p>
 
-      <!-- Вариант 2: слева, фейд вправо -->
+      <!-- Вариант 2: слева, текст справа, фейд вправо -->
       <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <img src="https://i.ibb.co/G3pd7WGG/image.jpg" alt="Скриншот интерфейса">
         </div>
-        <figcaption>Слева — фейд вправо</figcaption>
+        <p class="article__img-caption-text">Главный экран платформы — карта с кластеризацией объектов. Пользователь видит все 340+ объектов одновременно, может фильтровать по статусу и открыть паспорт любого за один клик.</p>
       </figure>
 
       <p>Картинка слева от текста — хороший вариант когда нужно совместить визуал с пояснением. Градиент справа мягко растворяет край картинки в фоне.</p>
 
       <!-- Вариант 3: справа, текст слева, фейд влево -->
       <figure class="article__img article__img--right">
-        <p class="article__img-caption-text">Текст статьи рядом с картинкой — описание, пояснение или цитата. Картинка справа, фейд уходит влево в фон.</p>
+        <p class="article__img-caption-text">Мобильная версия работает на iOS и Android без отдельного приложения. Диспетчеры используют её на выездах — карта доступна офлайн благодаря Service Worker и кэшу тайлов.</p>
         <div class="article__img-wrap">
-          <img src="https://i.ibb.co/G3pd7WGG/image.jpg" alt="Скриншот интерфейса">
+          <img src="https://i.ibb.co/G3pd7WGG/image.jpg" alt="Скриншот мобильной версии">
         </div>
-        <figcaption>Справа — фейд влево</figcaption>
       </figure>
 
-      <h3>Стек подробно</h3>
+      <!-- Checkpoint внутри статьи -->
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+          Технологии
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
       <ul>
         <li><strong>React 18</strong> + Zustand для стейт-менеджмента — минимальный bundle, предсказуемые обновления</li>
         <li><strong>Mapbox GL JS</strong> с кастомными слоями на WebGL — плавная работа с 10 000+ точек</li>
@@ -595,7 +706,14 @@ ws.onclose = () => {
 };</code></pre>
       </div>
 
-      <h2>Сложности и решения</h2>
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Сложности и решения
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
 
       <div class="article__callout article__callout--warn">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/attention-svgrepo-com.svg" alt="">
@@ -610,17 +728,107 @@ ws.onclose = () => {
         <li>Service Worker для кэша тайлов — карта работает офлайн при плохом сигнале</li>
       </ol>
 
+      <!-- Дерево в середине статьи — этапы решения -->
+      <div class="think-tree">
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Инстанс-рендеринг на WebGL</div>
+            <div class="think-tree__desc">x40 к производительности vs DOM-маркеры</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Виртуальный скролл</div>
+            <div class="think-tree__desc">Список из 340 объектов без лагов в боковой панели</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Service Worker + кэш тайлов</div>
+            <div class="think-tree__desc">Карта работает офлайн при плохом сигнале</div>
+          </div>
+        </div>
+      </div>
+
       <div class="article__callout article__callout--tip">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/bulb-on-svgrepo-com.svg" alt="">
         <p>Для быстрого radius-search в PostGIS достаточно добавить <code style="color:var(--accent);font-family:monospace;">GIST-индекс</code> по geometry-колонке — время запроса падает с 200 мс до 5 мс на таблице из 50 000 строк.</p>
       </div>
 
-      <h2>Результат</h2>
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Результат
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
       <p>Платформа принята в эксплуатацию в марте 2024. Время на поиск нужного объекта сократилось с ~4 минут (переключение между системами) до 15 секунд. Команда из 12 диспетчеров работает в системе ежедневно.</p>
 
       <div class="article__callout article__callout--info">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/info-svgrepo-com.svg" alt="">
         <p>Проект выполнен в рамках NDA — скриншоты интерфейса и название заказчика не раскрываются. Демонстрация возможна по запросу.</p>
+      </div>
+
+      <!-- Checkpoint — разделитель -->
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+          Итог
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <!-- Дерево размышлений — план реализации -->
+      <div class="think-tree">
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Анализ требований</div>
+            <div class="think-tree__desc">Интервью с заказчиком, карта пользовательских сценариев</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Проектирование архитектуры</div>
+            <div class="think-tree__desc">React + Mapbox GL JS + PostGIS + WebSocket</div>
+            <div class="think-tree__children">
+              <div class="think-tree__node think-tree__node--done">
+                <div class="think-tree__dot"></div>
+                <div class="think-tree__content"><div class="think-tree__label">Слой геоданных и PostGIS-индексы</div></div>
+              </div>
+              <div class="think-tree__node think-tree__node--done">
+                <div class="think-tree__dot"></div>
+                <div class="think-tree__content"><div class="think-tree__label">Delta-синхронизация через WebSocket</div></div>
+              </div>
+              <div class="think-tree__node think-tree__node--done">
+                <div class="think-tree__dot"></div>
+                <div class="think-tree__content"><div class="think-tree__label">WebGL-инстансинг для 10 000+ маркеров</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Разработка и тестирование</div>
+            <div class="think-tree__desc">3 месяца, 2 разработчика, нагрузочное тестирование</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Запуск в продакшн</div>
+            <div class="think-tree__desc">Docker, VPS, мониторинг Grafana — март 2024</div>
+          </div>
+        </div>
       </div>
 
       <div class="article__reactions">
@@ -654,17 +862,6 @@ ws.onclose = () => {
   </article>
 
   <script>
-  // Lottie в topbar
-  if (typeof lottie !== 'undefined') {
-    lottie.loadAnimation({
-      container: document.getElementById('topbarLottie'),
-      renderer: 'svg',
-      loop: true,
-      autoplay: true,
-      path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json'
-    });
-  }
-
   // ── Лучи за голографической карточкой ──
   (function() {
     const canvas = document.getElementById('holoRaysCanvas');
@@ -903,18 +1100,9 @@ ws.onclose = () => {
         wvCtx.globalCompositeOperation='source-in';
         wvCtx.fillStyle=wg;wvCtx.fillRect(0,0,w,h);
 
-        // Spotlight на волны — зависит от наклона
-        const slx=w*(0.5+rX*0.55),sly=h*(0.5+rY*0.55);
-        const slg=wvCtx.createRadialGradient(slx,sly,0,slx,sly,w*1.0);
-        slg.addColorStop(0.0,'rgba(255,255,255,0.9)');
-        slg.addColorStop(0.3,'rgba(255,255,255,0.5)');
-        slg.addColorStop(0.6,'rgba(255,255,255,0.15)');
-        slg.addColorStop(1.0,'rgba(255,255,255,0.0)');
-        wvCtx.globalCompositeOperation='source-atop';
-        wvCtx.fillStyle=slg;wvCtx.fillRect(0,0,w,h);
-        wvCtx.globalCompositeOperation='source-over';
-
+        // Волны сначала (под паттерном)
         holoCtx.save();holoCtx.globalAlpha=0.25;holoCtx.drawImage(wvCvs,0,0);holoCtx.restore();
+        // Паттерн поверх волн
         holoCtx.save();holoCtx.globalAlpha=0.7;holoCtx.drawImage(sp,0,0);holoCtx.restore();
         holoCtx.drawImage(sp,0,0);
         const lx=w*(0.5+rX*0.55),ly=h*(0.5+rY*0.55);
@@ -1253,17 +1441,6 @@ ws.onclose = () => {
   </script>
 
   <script>
-  // Lottie в topbar
-  if (typeof lottie !== 'undefined') {
-    lottie.loadAnimation({
-      container: document.getElementById('topbarLottie'),
-      renderer: 'svg',
-      loop: true,
-      autoplay: true,
-      path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json'
-    });
-  }
-
   // ── Лучи за голографической карточкой ──
   (function() {
     const canvas = document.getElementById('holoRaysCanvas');
@@ -1348,6 +1525,24 @@ ws.onclose = () => {
     }
     requestAnimationFrame(draw);
   })();
+
+  // Lottie в topbar + лоадер
+  (function initLottie() {
+    if (typeof lottie === 'undefined') return;
+    lottie.loadAnimation({
+      container: document.getElementById('topbarLottie'),
+      renderer: 'svg', loop: true, autoplay: true,
+      path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json'
+    });
+    lottie.loadAnimation({
+      container: document.getElementById('loaderLottie'),
+      renderer: 'svg', loop: true, autoplay: true,
+      path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json'
+    });
+  })();
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('pageLoader').classList.add('is-hidden'), 500);
+  });
 
   function handleReaction(btn) {
     const isActive = btn.classList.contains('is-active');
