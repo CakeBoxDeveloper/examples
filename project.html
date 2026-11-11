@@ -69,11 +69,16 @@
       white-space: nowrap;
       cursor: pointer;
       text-decoration: none;
-      transition: background-color 0.25s, box-shadow 0.25s;
+      transition: background-color 0.25s, box-shadow 0.25s, transform 0.3s ease, opacity 0.3s ease;
     }
     .topbar:hover {
       background-color: color-mix(in srgb, #88aa8e 22%, transparent);
       text-decoration: none;
+    }
+    .topbar.is-hidden {
+      transform: translateX(-50%) translateY(-80px);
+      opacity: 0;
+      pointer-events: none;
     }
     .topbar__lottie {
       width: 36px; height: 36px; flex-shrink: 0;
@@ -272,23 +277,33 @@
       position: relative; border-radius: 12px;
       overflow: hidden; display: block;
     }
-    .article__img-wrap img {
+    /* Скругление только там где нет фейдаута */
+    .article__img--left  .article__img-wrap { border-radius: 12px 0 0 12px; }
+    .article__img--right .article__img-wrap { border-radius: 0 12px 12px 0; }
+    .article__img--center .article__img-wrap { border-radius: 12px 12px 0 0; }
+    /* img и video — одинаковые правила заполнения */
+    .article__img-wrap img,
+    .article__img-wrap video {
       display: block; width: 100%; height: 100%;
       object-fit: cover;
+    }
+    /* video без интерфейса плеера */
+    .article__img-wrap video { pointer-events: none; }
+    /* центральная: естественная высота */
+    .article__img--center .article__img-wrap img,
+    .article__img--center .article__img-wrap video {
+      height: auto; object-position: top;
     }
     .article__img-wrap::after {
       content: ''; position: absolute; pointer-events: none; z-index: 1;
     }
 
-    /* 1. Центральная — десктоп: полная ширина, мобиле: 85% */
+    /* 1. Центральная — десктоп: полная ширина */
     .article__img--center {
       display: flex; flex-direction: column; align-items: center;
     }
     .article__img--center .article__img-wrap {
       width: 100%; border-radius: 10px;
-    }
-    .article__img--center .article__img-wrap img {
-      height: auto; object-position: top;
     }
     .article__img--center .article__img-wrap::after {
       inset: auto 0 0 0; height: 20%;
@@ -312,8 +327,13 @@
     }
     .article__img--left .article__img-wrap::after {
       position: absolute;
-      inset: 0 0 0 auto; width: 65%; height: 100%;
-      background: linear-gradient(to right, transparent, var(--bg));
+      inset: 0 0 0 auto; width: 80%; height: 100%;
+      background: linear-gradient(to right, transparent 0%, var(--bg) 85%);
+    }
+    .article__img--left .article__img-caption-text {
+      grid-area: text;
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+      align-self: start;
     }
 
     /* 3. Справа — текст слева на всю высоту, картинка справа 50% */
@@ -328,13 +348,13 @@
     }
     .article__img--right .article__img-wrap::after {
       position: absolute;
-      inset: 0 auto 0 0; width: 65%; height: 100%;
-      background: linear-gradient(to left, transparent, var(--bg));
+      inset: 0 auto 0 0; width: 80%; height: 100%;
+      background: linear-gradient(to left, transparent 0%, var(--bg) 85%);
     }
     .article__img--right .article__img-caption-text {
       grid-area: text;
       font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
-      align-self: center;
+      align-self: start;
     }
 
     /* ── File Tree ── */
@@ -1676,6 +1696,21 @@ ws.onclose = () => {
   window.addEventListener('load', () => {
     setTimeout(() => document.getElementById('pageLoader').classList.add('is-hidden'), 500);
   });
+
+  // Скрываем таблетку при скролле вниз, показываем при скролле вверх
+  (function() {
+    const topbar = document.getElementById('topbar');
+    let lastY = 0;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y > lastY && y > 60) {
+        topbar.classList.add('is-hidden');
+      } else {
+        topbar.classList.remove('is-hidden');
+      }
+      lastY = y;
+    }, { passive: true });
+  })();
 
   function handleReaction(btn) {
     const isActive = btn.classList.contains('is-active');
