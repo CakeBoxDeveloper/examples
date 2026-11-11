@@ -193,7 +193,7 @@
       font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
     }
     .badge--done { background: hsla(var(--hue), 55%, 48%, 0.15); color: hsl(var(--hue), 55%, 55%); border: 1px solid hsla(var(--hue), 55%, 48%, 0.3); }
-    .badge--wip  { background: rgba(255,193,7,0.12);  color: #ffc107; border: 1px solid rgba(255,193,7,0.3); }
+    .badge--wip  { background: hsla(var(--hue), 55%, 48%, 0.15); color: hsl(var(--hue), 55%, 65%); border: 1px solid hsla(var(--hue), 55%, 48%, 0.3); }
     .badge--nda  { background: rgba(255,82,82,0.12);  color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
 
     /* ── ARTICLE ── */
@@ -432,21 +432,41 @@
     @media (max-width: 860px) {
       .article__img--center .article__img-wrap { width: 85%; }
     }
+    /* На планшете боковые картинки чуть уже */
+    @media (max-width: 640px) {
+      .article__img--left  { grid-template-columns: 45% 1fr; }
+      .article__img--right { grid-template-columns: 1fr 45%; }
+    }
     @media (max-width: 480px) {
       .article__img--center .article__img-wrap { width: 100%; }
-      .article__img--left,
+      /* На телефоне — боковые в мини-формате: картинка 40%, текст 60% */
+      .article__img--left  {
+        grid-template-columns: 42% 1fr;
+        grid-template-areas: "img text";
+        align-items: start;
+      }
       .article__img--right {
-        grid-template-columns: 1fr;
-        grid-template-areas: "img" "text";
+        grid-template-columns: 1fr 42%;
+        grid-template-areas: "text img";
+        align-items: start;
       }
       .article__img--left .article__img-wrap,
       .article__img--right .article__img-wrap {
-        height: 300px; min-height: unset;
+        height: 220px; min-height: unset;
       }
-      .article__img--left .article__img-wrap::after,
+      .article__img--left .article__img-caption-text,
+      .article__img--right .article__img-caption-text {
+        font-size: 0.82rem;
+        align-self: start;
+      }
+      /* Фейд остаётся боковым */
+      .article__img--left .article__img-wrap::after {
+        inset: 0 0 0 auto !important; width: 55% !important; height: 100% !important;
+        background: linear-gradient(to right, transparent, var(--bg)) !important;
+      }
       .article__img--right .article__img-wrap::after {
-        inset: auto 0 0 0 !important; width: 100% !important; height: 25% !important;
-        background: linear-gradient(to bottom, transparent, var(--bg)) !important;
+        inset: 0 auto 0 0 !important; width: 55% !important; height: 100% !important;
+        background: linear-gradient(to left, transparent, var(--bg)) !important;
       }
     }
     /* Code block */
