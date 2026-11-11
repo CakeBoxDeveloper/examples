@@ -108,11 +108,12 @@
     .article__img--left { display: grid; grid-template-columns: 50% 1fr; grid-template-areas: "img text"; gap: 20px; align-items: stretch; }
     .article__img--left .article__img-wrap { grid-area: img; height: 100%; min-height: 200px; }
     .article__img--left .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: center; }
-    .article__img--left .article__img-wrap::after { position: absolute; inset: 0 0 0 auto; width: 80%; height: 100%; background: linear-gradient(to right, transparent 20%, var(--bg)); }
+    .article__img--left .article__img-wrap::after { position: absolute; inset: 0 0 0 auto; width: 80%; height: 100%; background: linear-gradient(to right, transparent 0%, var(--bg) 85%); }
     .article__img--right { display: grid; grid-template-columns: 1fr 50%; grid-template-areas: "text img"; gap: 20px; align-items: stretch; }
     .article__img--right .article__img-wrap { grid-area: img; height: 100%; min-height: 200px; }
-    .article__img--right .article__img-wrap::after { position: absolute; inset: 0 auto 0 0; width: 80%; height: 100%; background: linear-gradient(to left, transparent 20%, var(--bg)); }
-    .article__img--right .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: center; }
+    .article__img--right .article__img-wrap::after { position: absolute; inset: 0 auto 0 0; width: 80%; height: 100%; background: linear-gradient(to left, transparent 0%, var(--bg) 85%); }
+    .article__img--left .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: start; }
+    .article__img--right .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: start; }
     @media (max-width: 860px) { .article__img--center .article__img-wrap { width: 85%; } }
     @media (max-width: 640px) {
       .article__img--left  { grid-template-columns: 45% 1fr; }
@@ -254,7 +255,7 @@
     <div class="article__inner">
 
       <p class="article__h1">Веб-приложение для кондитерской из Николаева</p>
-      <p>«Кремуа» — кондитерская на заказ, которая начиналась как обычный Instagram-аккаунт с переписками в директе. Задача — создать полноценный онлайн-магазин с узнаваемым визуальным стилем, который работает как сайт и одновременно открывается прямо в Telegram без установки.</p>
+      <p>«Кремуа» — кондитерская на заказ из Николаева, которая начиналась как Instagram-аккаунт с переписками в директе. Задача — создать онлайн-присутствие с узнаваемым визуальным стилем, которое одинаково хорошо работает как Telegram Mini App, как сайт с ПК, как PWA на телефоне — одна кодовая база, все платформы.</p>
 
       <blockquote>
         <p>«Мне важно было чтобы клиент открывал и сразу понимал — это не просто магазин, это Кремуа. Своя атмосфера, свои цвета, своя анимация.»</p>
@@ -262,7 +263,7 @@
       </blockquote>
 
       <p class="article__h1">Как это работает</p>
-      <p>Приложение открывается кнопкой из Telegram-бота и одновременно доступно как обычный сайт — одна кодовая база, два канала. На главной: лого с анимацией Lottie, счётчики категорий и позиций, кнопки в каталог и соцсети.</p>
+      <p>Одна верстка — несколько каналов. Открывается кнопкой из Telegram-бота, добавляется на рабочий стол как PWA, работает в браузере с ПК и мобильного. На главной: анимированный аватар кондитера, счётчики категорий и позиций, кнопки в каталог и соцсети.</p>
 
       <!-- KremuaRecs1 — главный экран, по центру -->
       <figure class="article__img article__img--center">
@@ -272,7 +273,7 @@
         </div>
       </figure>
 
-      <p>Весь визуальный стиль построен на векторной эстетике и web3-эффектах: анимированные иконки, переходы с размытием, голографические обводки. Lottie-анимации написаны под каждый раздел — их больше 60.</p>
+      <p>Весь визуальный язык построен на векторной эстетике и web3-эффектах: анимированные иконки, переходы с размытием, голографические обводки. Аватар кондитера — сложная векторная анимация, отрендеренная с альфа-каналом и сжатая в webm через VP8. Выглядит как 3D, весит как иконка.</p>
 
       <!-- KremuaRecs2 — каталог, слева -->
       <figure class="article__img article__img--left">
@@ -280,7 +281,7 @@
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs2.mp4"
                  autoplay muted loop playsinline></video>
         </div>
-        <p class="article__img-caption-text">Каталог — 15 категорий, 26 начинок, 390 комбинаций. Каждая позиция открывает детальную страницу с фото, видео-превью и описанием вкуса.<br><br>Фильтры по категориям работают мгновенно — без перезагрузки, только анимация смены контента.</p>
+        <p class="article__img-caption-text">Каталог — 15 категорий, 26 начинок, сотни комбинаций. Каждая позиция открывает детальную страницу с фото, видео-превью и описанием вкуса.<br><br>Фильтры по категориям работают мгновенно — без перезагрузки, только анимация смены контента.</p>
       </figure>
 
       <div class="checkpoint">
@@ -293,7 +294,7 @@
       </div>
 
       <p class="article__h1">Собери свой торт</p>
-      <p>Конструктор позволяет собрать торт из нуля: выбрать начинку, размер, покрытие и декор. Итоговая комбинация отображается в реальном времени — цена пересчитывается при каждом шаге без обращения к серверу.</p>
+      <p>Конструктор позволяет собрать торт из нуля: выбрать начинку, добавки и размер. Итоговая комбинация отображается в реальном времени — цена пересчитывается при каждом шаге без обращения к серверу. Заказ отправляется боту одной кнопкой, кондитер получает уведомление с полными деталями.</p>
 
       <!-- KremuaRecs4 — конструктор, справа -->
       <figure class="article__img article__img--right">
@@ -303,22 +304,22 @@
             <div class="think-tree__node think-tree__node--done">
               <div class="think-tree__dot"></div>
               <div class="think-tree__content">
-                <div class="think-tree__label">390 комбинаций</div>
-                <div class="think-tree__desc">Расчёт цены на стороне клиента — мгновенно</div>
+                <div class="think-tree__label">Расчёт на стороне клиента</div>
+                <div class="think-tree__desc">Мгновенно, без запросов к серверу</div>
               </div>
             </div>
             <div class="think-tree__node think-tree__node--done">
               <div class="think-tree__dot"></div>
               <div class="think-tree__content">
-                <div class="think-tree__label">Без перезагрузки</div>
-                <div class="think-tree__desc">Всё состояние хранится локально, анимации плавные</div>
+                <div class="think-tree__label">Уведомления кондитеру через бота</div>
+                <div class="think-tree__desc">Заказ с деталями приходит автоматически</div>
               </div>
             </div>
             <div class="think-tree__node think-tree__node--done">
               <div class="think-tree__dot"></div>
               <div class="think-tree__content">
-                <div class="think-tree__label">Прямо в Telegram</div>
-                <div class="think-tree__desc">Заказ отправляется боту одной кнопкой</div>
+                <div class="think-tree__label">Без базы данных</div>
+                <div class="think-tree__desc">Вся логика в коде — хостинг на GitHub Pages</div>
               </div>
             </div>
           </div>
@@ -346,11 +347,9 @@
           <span class="article__code-lang">JavaScript</span>
           <button class="article__code-copy">Копировать</button>
         </div>
-        <pre><code>// Промокод проверяется без сервера — дата зашита в саму строку
-// TTM + день(hex) + месяц(hex) + контрольный символ + 5 случайных
-// Бот просто декодирует и сравнивает с сегодняшней датой
-return 'TTM' + day.toString(16).toUpperCase().padStart(2,'0') +
-               mon.toString(16).toUpperCase().padStart(2,'0') + chk + rand;</code></pre>
+        <pre><code>// Вся проверка промокода — одна строчка на стороне бота.
+// Никакой базы данных, никакого хранения кодов на сервере.
+const isValid = decodeDate(code) === today();</code></pre>
       </div>
 
       <div class="article__callout article__callout--tip">
@@ -360,20 +359,22 @@ return 'TTM' + day.toString(16).toUpperCase().padStart(2,'0') +
 
       <p class="article__h1">Визуальный стиль и анимации</p>
 
-      <!-- KremuaRecs3 — аватар/анимации, справа -->
+      <!-- KremuaRecs3 — аватар/анимации, слева -->
       <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs3.mp4"
                  autoplay muted loop playsinline></video>
         </div>
-        <p class="article__img-caption-text">Lottie-анимации — не просто украшение. Каждая реагирует на действие пользователя: нажал на категорию — иконка «ожила», открыл торт — появляется анимация вкуса.<br><br>Аватар кондитера на главной — это тоже Lottie, а не 3D. Лёгкий, быстрый, работает даже на слабых устройствах.</p>
+        <p class="article__img-caption-text">Иконки в каталоге — Lottie-анимации. Каждая написана в After Effects под конкретную категорию и экспортирована в JSON. При нажатии иконка «оживает» — маленький момент, который делает интерфейс живым.<br><br>Аватар кондитера на главной — сложная векторная анимация из After Effects, отрендеренная с альфа-каналом в webm. Слишком много эффектов для Lottie, поэтому пошли на рендер — выглядит как 3D, весит минимально.</p>
       </figure>
+
+      <p>Всё это работает в рамках одной верстки — без отдельных версий для мобилки и десктопа, без нативных приложений, без лишних зависимостей.</p>
 
       <!-- KremuaRecs5 — ещё один экран, слева или справа -->
       <figure class="article__img article__img--right">
         <div class="article__img-caption-text">
-          <p>Каждый тип торта имеет свою цветовую схему — акцентный цвет страницы меняется под выбранную позицию. Тёмный шоколад — тёплые коричневые тона, матча — зелёные, черника — синие.</p>
-          <p>Это создаёт ощущение живого, персонализированного продукта — а не просто таблицы с ценами.</p>
+          <p>Верстка универсальная — одинаково хорошо смотрится на экране смартфона, планшета и монитора. Ни один элемент не выглядит «съехавшим» при переходе между платформами.</p>
+          <p>Прирост аудитории шёл стабильно каждый день с момента запуска — без платной рекламы, только через сарафанное радио в чатах и промокодную механику.</p>
         </div>
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs5.mp4"
@@ -391,7 +392,7 @@ return 'TTM' + day.toString(16).toUpperCase().padStart(2,'0') +
       </div>
 
       <p class="article__h1">Результат</p>
-      <p>Приложение работает с 2024 года — и как Telegram Mini App, и как полноценный сайт. Аудитория выросла органически: клиенты делятся ссылкой в чатах, промокодная механика возвращает их ежедневно.</p>
+      <p>Работает как Telegram Mini App, как PWA и как обычный сайт — одна кодовая база, все платформы. Аудитория растёт стабильно каждый день — без платной рекламы, через сарафанное радио и промокодную механику.</p>
 
       <div class="article__callout article__callout--info">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/info-svgrepo-com.svg" alt="">
