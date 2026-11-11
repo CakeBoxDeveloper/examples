@@ -340,41 +340,91 @@
     /* ── File Tree ── */
     .file-tree {
       margin: 20px 0;
-      background: var(--bg-card);
-      border: 1px solid var(--border-accent);
+      border: 1px solid var(--border);
       border-radius: var(--r);
       overflow: hidden;
       font-size: 0.85rem;
     }
-    .file-tree__item {
+    .file-tree__group { position: relative; }
+
+    /* Папка */
+    .file-tree__item--folder {
       display: flex; align-items: center; gap: 10px;
-      padding: 9px 16px;
+      padding: 10px 16px 10px 14px;
+      background: var(--bg-alt);
       border-bottom: 1px solid var(--border);
-      color: var(--text-muted);
-      cursor: default;
-      transition: background 0.15s;
+      color: var(--text); font-weight: 600;
     }
-    .file-tree__item:last-child { border-bottom: none; }
-    .file-tree__item:hover { background: rgba(255,255,255,0.03); }
-    .file-tree__item--folder { color: var(--accent); font-weight: 600; }
-    .file-tree__item--child {
-      padding-left: 36px;
-      font-size: 0.8rem;
-    }
-    .file-tree__item--grandchild {
-      padding-left: 56px;
-      font-size: 0.78rem;
+    .file-tree__roman {
+      flex-shrink: 0;
+      font-size: 0.72rem; font-weight: 700;
       color: var(--text-dim);
+      width: 18px; text-align: center;
+      font-variant-numeric: normal;
     }
-    .file-tree__icon { flex-shrink: 0; opacity: 0.7; }
-    .file-tree__item--folder .file-tree__icon { opacity: 1; }
+
+    /* Вертикальная линия слева от дочерних */
+    .file-tree__children {
+      position: relative;
+    }
+    .file-tree__children::before {
+      content: '';
+      position: absolute;
+      left: 23px; top: 0; bottom: 0;
+      width: 1px;
+      background: var(--border);
+    }
+
+    /* Дочерний элемент */
+    .file-tree__item--child {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 16px 8px 14px;
+      color: var(--text-muted);
+      position: relative;
+    }
+    .file-tree__item--child:hover { background: rgba(255,255,255,0.025); }
+
+    /* Горизонтальный коннектор + точка */
+    .file-tree__connector {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* Горизонтальная черта */
+    .file-tree__connector::before {
+      content: '';
+      position: absolute;
+      left: 9px; top: 50%;
+      width: 9px; height: 1px;
+      background: var(--border);
+    }
+    /* Точка */
+    .file-tree__connector::after {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      border: 1px solid var(--text-dim);
+      background: var(--bg-alt);
+      flex-shrink: 0;
+      position: relative; z-index: 1;
+    }
+
     .file-tree__badge {
-      margin-left: auto;
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em;
-      padding: 2px 7px; border-radius: 4px;
-      background: hsla(var(--hue), 55%, 48%, 0.12);
+      margin-left: auto; flex-shrink: 0;
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.03em;
+      padding: 2px 8px; border-radius: 4px;
+      background: hsla(var(--hue), 55%, 48%, 0.1);
       color: var(--accent);
-      border: 1px solid hsla(var(--hue), 55%, 48%, 0.25);
+      border: 1px solid hsla(var(--hue), 55%, 48%, 0.2);
+    }
+
+    /* ── H1 в статье (выше чем checkpoint) ── */
+    .article__inner .article__h1 {
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      font-weight: 800; letter-spacing: -0.025em;
+      line-height: 1.2; color: var(--text);
+      margin: 56px 0 8px;
     }
 
     @media (max-width: 860px) {
@@ -658,14 +708,7 @@
 
   <article class="article">
     <div class="article__inner">
-      <div class="checkpoint">
-        <div class="checkpoint__line"></div>
-        <div class="checkpoint__badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg>
-          О проекте
-        </div>
-        <div class="checkpoint__line"></div>
-      </div>
+      <p class="article__h1">Единая платформа управления объектами инфраструктуры</p>
       <p>Заказчик — компания, управляющая сетью из 340+ объектов по всей стране: подстанциями, узловыми пунктами и вспомогательными сооружениями. Задача — единая платформа мониторинга с возможностью быстрого доступа к паспорту каждого объекта, истории событий и статусу в реальном времени.</p>
 
       <blockquote>
@@ -673,14 +716,7 @@
         <cite>— Дмитрий Г., технический директор заказчика</cite>
       </blockquote>
 
-      <div class="checkpoint">
-        <div class="checkpoint__line"></div>
-        <div class="checkpoint__badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-          Архитектура
-        </div>
-        <div class="checkpoint__line"></div>
-      </div>
+      <p class="article__h1">Архитектура</p>
       <p>Фронтенд построен на React с использованием Mapbox GL JS для рендера карты. Вся бизнес-логика разделена на независимые модули: слой геоданных, слой событий и слой документов. Обновление в реальном времени реализовано через WebSocket с delta-синхронизацией — только изменённые объекты.</p>
 
       <!-- Вариант 1: центральная — 60% ширины, фейд снизу -->
@@ -773,14 +809,7 @@ ws.onclose = () => {
 };</code></pre>
       </div>
 
-      <div class="checkpoint">
-        <div class="checkpoint__line"></div>
-        <div class="checkpoint__badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Сложности и решения
-        </div>
-        <div class="checkpoint__line"></div>
-      </div>
+      <p class="article__h1">Сложности и решения</p>
 
       <div class="article__callout article__callout--warn">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/attention-svgrepo-com.svg" alt="">
@@ -825,14 +854,7 @@ ws.onclose = () => {
         <p>Для быстрого radius-search в PostGIS достаточно добавить <code style="color:var(--accent);font-family:monospace;">GIST-индекс</code> по geometry-колонке — время запроса падает с 200 мс до 5 мс на таблице из 50 000 строк.</p>
       </div>
 
-      <div class="checkpoint">
-        <div class="checkpoint__line"></div>
-        <div class="checkpoint__badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Результат
-        </div>
-        <div class="checkpoint__line"></div>
-      </div>
+      <p class="article__h1">Результат</p>
       <p>Платформа принята в эксплуатацию в марте 2024. Время на поиск нужного объекта сократилось с ~4 минут (переключение между системами) до 15 секунд. Команда из 12 диспетчеров работает в системе ежедневно.</p>
 
       <div class="article__callout article__callout--info">
@@ -854,51 +876,64 @@ ws.onclose = () => {
 
       <!-- File Tree — структура проекта -->
       <div class="file-tree">
-        <div class="file-tree__item file-tree__item--folder">
-          <svg class="file-tree__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Анализ и проектирование
-          <span class="file-tree__badge">Done</span>
+        <div class="file-tree__group">
+          <div class="file-tree__item--folder">
+            <span class="file-tree__roman">I</span>
+            Анализ и проектирование
+            <span class="file-tree__badge">Done</span>
+          </div>
+          <div class="file-tree__children">
+            <div class="file-tree__item--child">
+              <span class="file-tree__connector"></span>
+              Интервью с заказчиком, карта сценариев
+            </div>
+            <div class="file-tree__item--child">
+              <span class="file-tree__connector"></span>
+              Выбор стека: React + Mapbox + PostGIS
+            </div>
+          </div>
         </div>
-        <div class="file-tree__item file-tree__item--child">
-          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-          Интервью с заказчиком, карта сценариев
+        <div class="file-tree__group">
+          <div class="file-tree__item--folder">
+            <span class="file-tree__roman">II</span>
+            Разработка
+            <span class="file-tree__badge">3 мес</span>
+          </div>
+          <div class="file-tree__children">
+            <div class="file-tree__item--child">
+              <span class="file-tree__connector"></span>
+              Слой геоданных + PostGIS-индексы
+            </div>
+            <div class="file-tree__item--child">
+              <span class="file-tree__connector"></span>
+              Delta-синхронизация через WebSocket
+            </div>
+            <div class="file-tree__item--child">
+              <span class="file-tree__connector"></span>
+              WebGL-инстансинг для 10 000+ маркеров
+            </div>
+          </div>
         </div>
-        <div class="file-tree__item file-tree__item--child">
-          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-          Выбор стека: React + Mapbox + PostGIS
-        </div>
-        <div class="file-tree__item file-tree__item--folder">
-          <svg class="file-tree__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Разработка
-          <span class="file-tree__badge">3 мес</span>
-        </div>
-        <div class="file-tree__item file-tree__item--child">
-          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-          Слой геоданных + PostGIS-индексы
-        </div>
-        <div class="file-tree__item file-tree__item--child">
-          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-          Delta-синхронизация через WebSocket
-        </div>
-        <div class="file-tree__item file-tree__item--child">
-          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-          WebGL-инстансинг для 10 000+ маркеров
-        </div>
-        <div class="file-tree__item file-tree__item--folder">
-          <svg class="file-tree__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Запуск и мониторинг
-          <span class="file-tree__badge">Март 2024</span>
-        </div>
-        <div class="file-tree__item file-tree__item--child">
-          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-          Docker + VPS, CI/CD pipeline
-        </div>
-        <div class="file-tree__item file-tree__item--child">
-          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
-          Мониторинг Grafana + алерты
+        <div class="file-tree__group">
+          <div class="file-tree__item--folder">
+            <span class="file-tree__roman">III</span>
+            Запуск и мониторинг
+            <span class="file-tree__badge">Март 2024</span>
+          </div>
+          <div class="file-tree__children">
+            <div class="file-tree__item--child">
+              <span class="file-tree__connector"></span>
+              Docker + VPS, CI/CD pipeline
+            </div>
+            <div class="file-tree__item--child">
+              <span class="file-tree__connector"></span>
+              Мониторинг Grafana + алерты
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- REACTIONS COMMENTED OUT
       <div class="article__reactions">
         <button class="reaction-btn" data-reaction="like" onclick="handleReaction(this)">
           <img class="reaction-btn__icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ad1086f6b591ad08751b0964e821b902841912e6/like-svgrepo-com.svg" alt="лайк">
@@ -925,6 +960,7 @@ ws.onclose = () => {
           <span class="reaction-btn__count">0</span>
         </button>
       </div>
+      END REACTIONS -->
 
     </div>
   </article>
