@@ -205,10 +205,6 @@
     .article__inner {
       width: 100%; max-width: 640px;
     }
-    .article__divider {
-      height: 1px; background: var(--border); margin-bottom: 48px;
-    }
-
     .article__inner h2 {
       font-size: clamp(1.2rem, 3vw, 1.5rem);
       font-weight: 800; letter-spacing: -0.02em;
@@ -280,17 +276,16 @@
       display: block; width: 100%; height: 100%;
       object-fit: cover;
     }
-    /* Фейдаут в цвет фона */
     .article__img-wrap::after {
       content: ''; position: absolute; pointer-events: none; z-index: 1;
     }
 
-    /* 1. Центральная — 60% ширины, естественная высота, фейд 15% снизу */
+    /* 1. Центральная — десктоп: полная ширина, мобиле: 85% */
     .article__img--center {
       display: flex; flex-direction: column; align-items: center;
     }
     .article__img--center .article__img-wrap {
-      width: 60%;
+      width: 100%; border-radius: 10px;
     }
     .article__img--center .article__img-wrap img {
       height: auto; object-position: top;
@@ -299,43 +294,37 @@
       inset: auto 0 0 0; height: 20%;
       background: linear-gradient(to bottom, transparent, var(--bg));
     }
-    .article__img--center figcaption { text-align: center; }
 
-    /* 2. Слева — картинка слева 50%, текст справа */
+    /* 2. Слева — картинка 50%, текст справа на всю высоту */
     .article__img--left {
       display: grid;
       grid-template-columns: 50% 1fr;
-      grid-template-areas: "img text" "cap .";
-      gap: 20px; align-items: start;
+      grid-template-areas: "img text";
+      gap: 20px; align-items: stretch;
     }
     .article__img--left .article__img-wrap {
-      grid-area: img;
-      aspect-ratio: 9 / 16;
+      grid-area: img; height: 100%; min-height: 200px;
     }
-    /* Текст справа от картинки */
     .article__img--left .article__img-caption-text {
       grid-area: text;
       font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+      align-self: center;
     }
     .article__img--left .article__img-wrap::after {
       position: absolute;
       inset: 0 0 0 auto; width: 65%; height: 100%;
       background: linear-gradient(to right, transparent, var(--bg));
     }
-    .article__img--left figcaption {
-      grid-area: cap; font-size: 0.68rem; margin-top: 0;
-    }
 
-    /* 3. Справа — текст слева, картинка справа 50% */
+    /* 3. Справа — текст слева на всю высоту, картинка справа 50% */
     .article__img--right {
       display: grid;
       grid-template-columns: 1fr 50%;
-      grid-template-areas: "text img" ". cap";
-      gap: 20px; align-items: start;
+      grid-template-areas: "text img";
+      gap: 20px; align-items: stretch;
     }
     .article__img--right .article__img-wrap {
-      grid-area: img;
-      aspect-ratio: 9 / 16;
+      grid-area: img; height: 100%; min-height: 200px;
     }
     .article__img--right .article__img-wrap::after {
       position: absolute;
@@ -345,21 +334,67 @@
     .article__img--right .article__img-caption-text {
       grid-area: text;
       font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
-    }
-    .article__img--right figcaption {
-      grid-area: cap; font-size: 0.68rem; margin-top: 0;
+      align-self: center;
     }
 
-    @media (max-width: 480px) {
+    /* ── File Tree ── */
+    .file-tree {
+      margin: 20px 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--r);
+      overflow: hidden;
+      font-size: 0.85rem;
+    }
+    .file-tree__item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: default;
+      transition: background 0.15s;
+    }
+    .file-tree__item:last-child { border-bottom: none; }
+    .file-tree__item:hover { background: rgba(255,255,255,0.03); }
+    .file-tree__item--folder { color: var(--accent); font-weight: 600; }
+    .file-tree__item--child {
+      padding-left: 36px;
+      font-size: 0.8rem;
+    }
+    .file-tree__item--grandchild {
+      padding-left: 56px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+    .file-tree__icon { flex-shrink: 0; opacity: 0.7; }
+    .file-tree__item--folder .file-tree__icon { opacity: 1; }
+    .file-tree__badge {
+      margin-left: auto;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em;
+      padding: 2px 7px; border-radius: 4px;
+      background: hsla(var(--hue), 55%, 48%, 0.12);
+      color: var(--accent);
+      border: 1px solid hsla(var(--hue), 55%, 48%, 0.25);
+    }
+
+    @media (max-width: 860px) {
       .article__img--center .article__img-wrap { width: 85%; }
+    }
+    @media (max-width: 480px) {
+      .article__img--center .article__img-wrap { width: 100%; }
       .article__img--left,
-      .article__img--right { grid-template-columns: 1fr; }
-      .article__img--right .article__img-wrap { grid-column: 1; }
-      .article__img--right .article__img-caption-text { grid-row: 2; }
+      .article__img--right {
+        grid-template-columns: 1fr;
+        grid-template-areas: "img" "text";
+      }
+      .article__img--left .article__img-wrap,
+      .article__img--right .article__img-wrap {
+        height: 300px; min-height: unset;
+      }
       .article__img--left .article__img-wrap::after,
       .article__img--right .article__img-wrap::after {
-        inset: auto 0 0 0; width: 100%; height: 20%;
-        background: linear-gradient(to bottom, transparent, var(--bg));
+        inset: auto 0 0 0 !important; width: 100% !important; height: 25% !important;
+        background: linear-gradient(to bottom, transparent, var(--bg)) !important;
       }
     }
     /* Code block */
@@ -623,8 +658,6 @@
 
   <article class="article">
     <div class="article__inner">
-      <div class="article__divider"></div>
-
       <div class="checkpoint">
         <div class="checkpoint__line"></div>
         <div class="checkpoint__badge">
@@ -819,49 +852,50 @@ ws.onclose = () => {
         <div class="checkpoint__line"></div>
       </div>
 
-      <!-- Дерево размышлений — план реализации -->
-      <div class="think-tree">
-        <div class="think-tree__node think-tree__node--done">
-          <div class="think-tree__dot"></div>
-          <div class="think-tree__content">
-            <div class="think-tree__label">Анализ требований</div>
-            <div class="think-tree__desc">Интервью с заказчиком, карта пользовательских сценариев</div>
-          </div>
+      <!-- File Tree — структура проекта -->
+      <div class="file-tree">
+        <div class="file-tree__item file-tree__item--folder">
+          <svg class="file-tree__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Анализ и проектирование
+          <span class="file-tree__badge">Done</span>
         </div>
-        <div class="think-tree__node think-tree__node--done">
-          <div class="think-tree__dot"></div>
-          <div class="think-tree__content">
-            <div class="think-tree__label">Проектирование архитектуры</div>
-            <div class="think-tree__desc">React + Mapbox GL JS + PostGIS + WebSocket</div>
-            <div class="think-tree__children">
-              <div class="think-tree__node think-tree__node--done">
-                <div class="think-tree__dot"></div>
-                <div class="think-tree__content"><div class="think-tree__label">Слой геоданных и PostGIS-индексы</div></div>
-              </div>
-              <div class="think-tree__node think-tree__node--done">
-                <div class="think-tree__dot"></div>
-                <div class="think-tree__content"><div class="think-tree__label">Delta-синхронизация через WebSocket</div></div>
-              </div>
-              <div class="think-tree__node think-tree__node--done">
-                <div class="think-tree__dot"></div>
-                <div class="think-tree__content"><div class="think-tree__label">WebGL-инстансинг для 10 000+ маркеров</div></div>
-              </div>
-            </div>
-          </div>
+        <div class="file-tree__item file-tree__item--child">
+          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          Интервью с заказчиком, карта сценариев
         </div>
-        <div class="think-tree__node think-tree__node--done">
-          <div class="think-tree__dot"></div>
-          <div class="think-tree__content">
-            <div class="think-tree__label">Разработка и тестирование</div>
-            <div class="think-tree__desc">3 месяца, 2 разработчика, нагрузочное тестирование</div>
-          </div>
+        <div class="file-tree__item file-tree__item--child">
+          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          Выбор стека: React + Mapbox + PostGIS
         </div>
-        <div class="think-tree__node think-tree__node--done">
-          <div class="think-tree__dot"></div>
-          <div class="think-tree__content">
-            <div class="think-tree__label">Запуск в продакшн</div>
-            <div class="think-tree__desc">Docker, VPS, мониторинг Grafana — март 2024</div>
-          </div>
+        <div class="file-tree__item file-tree__item--folder">
+          <svg class="file-tree__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Разработка
+          <span class="file-tree__badge">3 мес</span>
+        </div>
+        <div class="file-tree__item file-tree__item--child">
+          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          Слой геоданных + PostGIS-индексы
+        </div>
+        <div class="file-tree__item file-tree__item--child">
+          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          Delta-синхронизация через WebSocket
+        </div>
+        <div class="file-tree__item file-tree__item--child">
+          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          WebGL-инстансинг для 10 000+ маркеров
+        </div>
+        <div class="file-tree__item file-tree__item--folder">
+          <svg class="file-tree__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Запуск и мониторинг
+          <span class="file-tree__badge">Март 2024</span>
+        </div>
+        <div class="file-tree__item file-tree__item--child">
+          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          Docker + VPS, CI/CD pipeline
+        </div>
+        <div class="file-tree__item file-tree__item--child">
+          <svg class="file-tree__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+          Мониторинг Grafana + алерты
         </div>
       </div>
 
