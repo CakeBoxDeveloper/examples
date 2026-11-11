@@ -108,10 +108,10 @@
     .article__img--left { display: grid; grid-template-columns: 50% 1fr; grid-template-areas: "img text"; gap: 20px; align-items: stretch; }
     .article__img--left .article__img-wrap { grid-area: img; height: 100%; min-height: 200px; }
     .article__img--left .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: center; }
-    .article__img--left .article__img-wrap::after { position: absolute; inset: 0 0 0 auto; width: 65%; height: 100%; background: linear-gradient(to right, transparent, var(--bg)); }
+    .article__img--left .article__img-wrap::after { position: absolute; inset: 0 0 0 auto; width: 80%; height: 100%; background: linear-gradient(to right, transparent 20%, var(--bg)); }
     .article__img--right { display: grid; grid-template-columns: 1fr 50%; grid-template-areas: "text img"; gap: 20px; align-items: stretch; }
     .article__img--right .article__img-wrap { grid-area: img; height: 100%; min-height: 200px; }
-    .article__img--right .article__img-wrap::after { position: absolute; inset: 0 auto 0 0; width: 65%; height: 100%; background: linear-gradient(to left, transparent, var(--bg)); }
+    .article__img--right .article__img-wrap::after { position: absolute; inset: 0 auto 0 0; width: 80%; height: 100%; background: linear-gradient(to left, transparent 20%, var(--bg)); }
     .article__img--right .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: center; }
     @media (max-width: 860px) { .article__img--center .article__img-wrap { width: 85%; } }
     @media (max-width: 640px) {
@@ -253,18 +253,18 @@
   <article class="article">
     <div class="article__inner">
 
-      <p class="article__h1">Telegram Mini App для кондитерской на заказ</p>
-      <p>«Кремуа» — кондитер-одиночка из Киева, специализирующийся на тортах по индивидуальным рецептам и дизайну. Задача — заменить хаотичные переписки в Telegram на полноценный интерфейс внутри мессенджера: каталог, конструктор заказа, промокоды и живая аудитория.</p>
+      <p class="article__h1">Веб-приложение для кондитерской из Николаева</p>
+      <p>«Кремуа» — кондитерская на заказ, которая начиналась как обычный Instagram-аккаунт с переписками в директе. Задача — создать полноценный онлайн-магазин с узнаваемым визуальным стилем, который работает как сайт и одновременно открывается прямо в Telegram без установки.</p>
 
       <blockquote>
-        <p>«Мне нужно было что-то, что клиент открывает прямо в Telegram — без перехода в браузер, без установки, без лишних шагов. Просто нажал — и уже выбирает торт.»</p>
+        <p>«Мне важно было чтобы клиент открывал и сразу понимал — это не просто магазин, это Кремуа. Своя атмосфера, свои цвета, своя анимация.»</p>
         <cite>— Нікол, владелица Кремуа</cite>
       </blockquote>
 
-      <p class="article__h1">Что внутри</p>
-      <p>Приложение открывается кнопкой из Telegram-бота и работает как нативное — на iOS и Android, без установки. Внутри: каталог тортов с фильтрами по категориям, детальные страницы с видео-превью на webm, система промокодов со скретч-картой и 3D-аватар кондитера.</p>
+      <p class="article__h1">Как это работает</p>
+      <p>Приложение открывается кнопкой из Telegram-бота и одновременно доступно как обычный сайт — одна кодовая база, два канала. На главной: лого с анимацией Lottie, счётчики категорий и позиций, кнопки в каталог и соцсети.</p>
 
-      <!-- Главный экран — центральная картинка -->
+      <!-- KremuaRecs1 — главный экран, по центру -->
       <figure class="article__img article__img--center">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs1.mp4"
@@ -272,13 +272,61 @@
         </div>
       </figure>
 
-      <!-- Каталог — слева, текст справа -->
+      <p>Весь визуальный стиль построен на векторной эстетике и web3-эффектах: анимированные иконки, переходы с размытием, голографические обводки. Lottie-анимации написаны под каждый раздел — их больше 60.</p>
+
+      <!-- KremuaRecs2 — каталог, слева -->
       <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs2.mp4"
                  autoplay muted loop playsinline></video>
         </div>
-        <p class="article__img-caption-text">Каталог разбит по категориям — торты, вафли, капкейки, конфеты. Каждая позиция открывает детальную страницу с фото, видео-превью на webm и описанием вкуса.<br><br>60+ кастомных Lottie-анимаций задают настроение каждому разделу — созданы специально под бренд.</p>
+        <p class="article__img-caption-text">Каталог — 15 категорий, 26 начинок, 390 комбинаций. Каждая позиция открывает детальную страницу с фото, видео-превью и описанием вкуса.<br><br>Фильтры по категориям работают мгновенно — без перезагрузки, только анимация смены контента.</p>
+      </figure>
+
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Конструктор тортов
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <p class="article__h1">Собери свой торт</p>
+      <p>Конструктор позволяет собрать торт из нуля: выбрать начинку, размер, покрытие и декор. Итоговая комбинация отображается в реальном времени — цена пересчитывается при каждом шаге без обращения к серверу.</p>
+
+      <!-- KremuaRecs4 — конструктор, справа -->
+      <figure class="article__img article__img--right">
+        <div class="article__img-caption-text">
+          <p>Конструктор — одна из главных фич приложения. Клиент сам собирает заказ и сразу видит итоговую стоимость. Это снижает нагрузку на владелицу и уменьшает количество уточняющих переписок.</p>
+          <div class="think-tree" style="margin-top: 16px;">
+            <div class="think-tree__node think-tree__node--done">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">390 комбинаций</div>
+                <div class="think-tree__desc">Расчёт цены на стороне клиента — мгновенно</div>
+              </div>
+            </div>
+            <div class="think-tree__node think-tree__node--done">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">Без перезагрузки</div>
+                <div class="think-tree__desc">Всё состояние хранится локально, анимации плавные</div>
+              </div>
+            </div>
+            <div class="think-tree__node think-tree__node--done">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">Прямо в Telegram</div>
+                <div class="think-tree__desc">Заказ отправляется боту одной кнопкой</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="article__img-wrap">
+          <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs4.mp4"
+                 autoplay muted loop playsinline></video>
+        </div>
       </figure>
 
       <div class="checkpoint">
@@ -290,63 +338,45 @@
         <div class="checkpoint__line"></div>
       </div>
 
-      <p class="article__h1">Скретч-карта и анимация сгорания</p>
-      <p>Раз в день пользователь получает промокод через скретч-механику — стирает слой на Canvas и видит код. Если промокод не использован до конца дня, он «сгорает»: анимация стирает карту диагональным ластиком с частицами, улетающими вверх-влево.</p>
+      <p class="article__h1">Скретч-карта: раз в день — бонус</p>
+      <p>Раз в день пользователь получает промокод через скретч-механику — стирает слой на Canvas пальцем и видит код. Если не использовал до конца дня — промокод «сгорает» с анимацией частиц. Код можно отправить боту прямо из приложения.</p>
 
       <div class="article__code">
         <div class="article__code-header">
           <span class="article__code-lang">JavaScript</span>
           <button class="article__code-copy">Копировать</button>
         </div>
-        <pre><code>// Генерация промокода с проверкой по дате
-function generatePromoCode() {
-  const d = new Date();
-  const day = d.getDate(), mon = d.getMonth() + 1;
-  const chk = CHARS[(day ^ mon ^ 0x5A) % 32];
-  let rand = '';
-  for (let i = 0; i < 5; i++) rand += CHARS[Math.floor(Math.random() * 32)];
-  return 'TTM' + day.toString(16).toUpperCase().padStart(2,'0') +
-                 mon.toString(16).toUpperCase().padStart(2,'0') + chk + rand;
-}</code></pre>
+        <pre><code>// Промокод проверяется без сервера — дата зашита в саму строку
+// TTM + день(hex) + месяц(hex) + контрольный символ + 5 случайных
+// Бот просто декодирует и сравнивает с сегодняшней датой
+return 'TTM' + day.toString(16).toUpperCase().padStart(2,'0') +
+               mon.toString(16).toUpperCase().padStart(2,'0') + chk + rand;</code></pre>
       </div>
 
       <div class="article__callout article__callout--tip">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/bulb-on-svgrepo-com.svg" alt="">
-        <p>Код содержит дату в hex — бот может проверить актуальность без базы данных, только декодировав строку.</p>
+        <p>Вся проверка промокода — на стороне бота без базы данных. Дата зашита в структуру кода — это экономит и хостинг, и деньги.</p>
       </div>
 
-      <p class="article__h1">3D-аватар и визуальный стиль</p>
+      <p class="article__h1">Визуальный стиль и анимации</p>
 
-      <!-- Аватар — справа, текст с деревом слева -->
-      <figure class="article__img article__img--right">
-        <div class="article__img-caption-text">
-          <p>Аватар кондитера — 3D-модель с idle-анимацией, рендерится через Three.js прямо в браузере. При загрузке появляется с эффектом glow через CSS drop-shadow.</p>
-          <div class="think-tree" style="margin-top: 16px;">
-            <div class="think-tree__node think-tree__node--done">
-              <div class="think-tree__dot"></div>
-              <div class="think-tree__content">
-                <div class="think-tree__label">3D-модель в Three.js</div>
-                <div class="think-tree__desc">GLB-файл, idle-анимация, glow при загрузке</div>
-              </div>
-            </div>
-            <div class="think-tree__node think-tree__node--done">
-              <div class="think-tree__dot"></div>
-              <div class="think-tree__content">
-                <div class="think-tree__label">60+ Lottie-анимаций</div>
-                <div class="think-tree__desc">Кастомные под каждый раздел и событие</div>
-              </div>
-            </div>
-            <div class="think-tree__node think-tree__node--done">
-              <div class="think-tree__dot"></div>
-              <div class="think-tree__content">
-                <div class="think-tree__label">Динамические цветовые темы</div>
-                <div class="think-tree__desc">Акцент меняется под выбранный торт</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- KremuaRecs3 — аватар/анимации, справа -->
+      <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs3.mp4"
+                 autoplay muted loop playsinline></video>
+        </div>
+        <p class="article__img-caption-text">Lottie-анимации — не просто украшение. Каждая реагирует на действие пользователя: нажал на категорию — иконка «ожила», открыл торт — появляется анимация вкуса.<br><br>Аватар кондитера на главной — это тоже Lottie, а не 3D. Лёгкий, быстрый, работает даже на слабых устройствах.</p>
+      </figure>
+
+      <!-- KremuaRecs5 — ещё один экран, слева или справа -->
+      <figure class="article__img article__img--right">
+        <div class="article__img-caption-text">
+          <p>Каждый тип торта имеет свою цветовую схему — акцентный цвет страницы меняется под выбранную позицию. Тёмный шоколад — тёплые коричневые тона, матча — зелёные, черника — синие.</p>
+          <p>Это создаёт ощущение живого, персонализированного продукта — а не просто таблицы с ценами.</p>
+        </div>
+        <div class="article__img-wrap">
+          <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs5.mp4"
                  autoplay muted loop playsinline></video>
         </div>
       </figure>
@@ -361,11 +391,11 @@ function generatePromoCode() {
       </div>
 
       <p class="article__h1">Результат</p>
-      <p>Приложение запущено в 2024. Аудитория выросла с 0 до 1 200+ активных пользователей за первые три месяца. Конверсия из каталога в заказ выше чем через Instagram — благодаря интеграции с ботом и промокодной механике.</p>
+      <p>Приложение работает с 2024 года — и как Telegram Mini App, и как полноценный сайт. Аудитория выросла органически: клиенты делятся ссылкой в чатах, промокодная механика возвращает их ежедневно.</p>
 
       <div class="article__callout article__callout--info">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/info-svgrepo-com.svg" alt="">
-        <p>Проект продолжает развиваться — в планах конструктор торта с визуальным редактором слоёв и интеграция с платёжной системой.</p>
+        <p>В разработке остаётся только интеграция с платёжной системой. Всё остальное — каталог, конструктор, промокоды, аватар — работает в полном объёме.</p>
       </div>
 
       <div class="checkpoint">
@@ -381,12 +411,13 @@ function generatePromoCode() {
         <div class="file-tree__group">
           <div class="file-tree__item--folder">
             <span class="file-tree__roman">I</span>
-            Дизайн и концепция
+            Дизайн и визуальный язык
             <span class="file-tree__badge">Done</span>
           </div>
           <div class="file-tree__children">
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Брендинг: цвета, типографика, иконки</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Брендинг: цвета, типографика, web3-эстетика</div>
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>60+ Lottie-анимаций под каждый раздел</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Динамические цветовые темы под каждый торт</div>
           </div>
         </div>
         <div class="file-tree__group">
@@ -397,20 +428,19 @@ function generatePromoCode() {
           </div>
           <div class="file-tree__children">
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>Каталог с фильтрами и видео-превью</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Конструктор торта — 390 комбинаций</div>
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>Скретч-карта промокода на Canvas</div>
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>3D-аватар кондитера на Three.js</div>
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Telegram Bot API + Mini App SDK</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Telegram Mini App SDK + сайт</div>
           </div>
         </div>
         <div class="file-tree__group">
           <div class="file-tree__item--folder">
             <span class="file-tree__roman">III</span>
-            Запуск и рост
+            В работе
             <span class="file-tree__badge">В работе</span>
           </div>
           <div class="file-tree__children">
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>1 200+ пользователей за 3 месяца</div>
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Конструктор торта — в разработке</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Интеграция платёжной системы</div>
           </div>
         </div>
       </div>
