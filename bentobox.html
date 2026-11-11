@@ -185,7 +185,30 @@
     .file-tree__connector::after { content: ''; width: 5px; height: 5px; border-radius: 50%; border: 1px solid var(--text-dim); background: var(--bg-alt); flex-shrink: 0; position: relative; z-index: 1; }
     .file-tree__badge { margin-left: auto; flex-shrink: 0; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 4px; background: hsla(var(--hue), 55%, 48%, 0.1); color: var(--accent); border: 1px solid hsla(var(--hue), 55%, 48%, 0.2); }
 
-    /* Loader */
+    /* ── Блок сравнения Lottie vs Render ── */
+    .anim-compare {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0;
+    }
+    .anim-compare__item {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .anim-compare__preview {
+      border-radius: 10px; overflow: hidden;
+      background: var(--bg-card); aspect-ratio: 1 / 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .anim-compare__preview dotlottie-player,
+    .anim-compare__preview video,
+    .anim-compare__preview img {
+      width: 100%; height: 100%; object-fit: contain;
+    }
+    .anim-compare__label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .anim-compare__desc {
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;
+    }
     .page-loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease, visibility 0.3s ease; }
     .page-loader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .page-loader__lottie { width: 100px; height: 100px; filter: invert(60%) sepia(40%) saturate(400%) hue-rotate(calc(var(--hue) * 1deg - 30deg)) brightness(90%); }
@@ -267,10 +290,10 @@
       <p class="article__h1">Веб-приложение для кондитерской из Николаева</p>
       <p>«Кремуа» — кондитерская на заказ из Николаева, которая начиналась как Instagram-аккаунт с переписками в директе. Задача — создать онлайн-присутствие с узнаваемым визуальным стилем, которое одинаково хорошо работает как Telegram Mini App, как сайт с ПК, как PWA на телефоне — одна кодовая база, все платформы.</p>
 
-      <blockquote>
-        <p>«Мне важно было чтобы клиент открывал и сразу понимал — это не просто магазин, это Кремуа. Своя атмосфера, свои цвета, своя анимация.»</p>
-        <cite>— Нікол, владелица Кремуа</cite>
-      </blockquote>
+      <div class="article__callout article__callout--info">
+        <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/info-svgrepo-com.svg" alt="">
+        <p>15 категорий, 26 начинок, сотни комбинаций. Работает как Telegram Mini App, как сайт и как PWA — без отдельных сборок и нативных приложений.</p>
+      </div>
 
       <p class="article__h1">Как это работает</p>
       <p>Одна верстка — несколько каналов. Открывается кнопкой из Telegram-бота, добавляется на рабочий стол как PWA, работает в браузере с ПК и мобильного. На главной: анимированный аватар кондитера, счётчики категорий и позиций, кнопки в каталог и соцсети.</p>
@@ -283,7 +306,7 @@
         </div>
       </figure>
 
-      <p>Весь визуальный язык построен на векторной эстетике и web3-эффектах: анимированные иконки, переходы с размытием, голографические обводки. Аватар кондитера — сложная векторная анимация, отрендеренная с альфа-каналом и сжатая в webm через VP8. Выглядит как 3D, весит как иконка.</p>
+      <p>Весь визуальный язык построен на векторной эстетике и web3-эффектах: анимированные иконки, переходы с размытием, голографические обводки. Анимаций много — и большая часть это Lottie, но некоторые слишком сложные для экспорта, поэтому они отрендерены с альфа-каналом и сжаты в webm через VP8.</p>
 
       <!-- KremuaRecs2 — каталог, слева -->
       <figure class="article__img article__img--left">
@@ -304,12 +327,12 @@
       </div>
 
       <p class="article__h1">Собери свой торт</p>
-      <p>Конструктор позволяет собрать торт из нуля: выбрать начинку, добавки и размер. Итоговая комбинация отображается в реальном времени — цена пересчитывается при каждом шаге без обращения к серверу. Заказ отправляется боту одной кнопкой, кондитер получает уведомление с полными деталями.</p>
+      <p>Конструктор позволяет собрать торт из нуля: выбрать начинку, добавки и размер. Итоговая комбинация отображается в реальном времени — цена пересчитывается при каждом шаге без обращения к серверу. В конце генерируется технический чертёж торта, который отправляется кондитеру одной кнопкой прямо из бота.</p>
 
       <!-- KremuaRecs4 — конструктор, справа -->
       <figure class="article__img article__img--right">
         <div class="article__img-caption-text">
-          <p>Конструктор — одна из главных фич приложения. Клиент сам собирает заказ и сразу видит итоговую стоимость. Это снижает нагрузку на владелицу и уменьшает количество уточняющих переписок.</p>
+          <p>Конструктор снижает нагрузку на владелицу и убирает уточняющие переписки — клиент сам собирает заказ, кондитер получает готовое техзадание.</p>
           <div class="think-tree" style="margin-top: 16px;">
             <div class="think-tree__node think-tree__node--done">
               <div class="think-tree__dot"></div>
@@ -321,15 +344,15 @@
             <div class="think-tree__node think-tree__node--done">
               <div class="think-tree__dot"></div>
               <div class="think-tree__content">
-                <div class="think-tree__label">Уведомления кондитеру через бота</div>
-                <div class="think-tree__desc">Заказ с деталями приходит автоматически</div>
+                <div class="think-tree__label">Технический чертёж в конце</div>
+                <div class="think-tree__desc">Генерируется на основе выбора и уходит кондитеру</div>
               </div>
             </div>
             <div class="think-tree__node think-tree__node--done">
               <div class="think-tree__dot"></div>
               <div class="think-tree__content">
                 <div class="think-tree__label">Без базы данных</div>
-                <div class="think-tree__desc">Вся логика в коде — хостинг на GitHub Pages</div>
+                <div class="think-tree__desc">Вся логика в коде, уведомления через бота</div>
               </div>
             </div>
           </div>
@@ -349,38 +372,40 @@
         <div class="checkpoint__line"></div>
       </div>
 
-      <p class="article__h1">Скретч-карта: раз в день — бонус</p>
-      <p>Раз в день пользователь получает промокод через скретч-механику — стирает слой на Canvas пальцем и видит код. Если не использовал до конца дня — промокод «сгорает» с анимацией частиц. Код можно отправить боту прямо из приложения.</p>
+      <p class="article__h1">Купон: раз в день — бонус</p>
+      <p>Раз в день пользователь получает промокод — он буквально сгорает с анимацией частиц, если не использовал до конца дня. Код проверяется без сервера и без базы данных: внутри строки зашифровано несколько слоёв — шифр Виженера, перестановочный шифр и цифровая контрольная сумма. Бот просто декодирует и сравнивает с текущей датой.</p>
 
       <div class="article__code">
         <div class="article__code-header">
           <span class="article__code-lang">JavaScript</span>
           <button class="article__code-copy">Копировать</button>
         </div>
-        <pre><code>// Вся проверка промокода — одна строчка на стороне бота.
-// Никакой базы данных, никакого хранения кодов на сервере.
-const isValid = decodeDate(code) === today();</code></pre>
+        <pre><code>// Три шифра наложены друг на друга:
+// Vigenère (ключ — дата) → перестановка → контрольная сумма
+// Бот декодирует строку и сравнивает результат с сегодняшней датой
+const isValid = decode(code, key) === today();</code></pre>
       </div>
 
       <div class="article__callout article__callout--tip">
         <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/bulb-on-svgrepo-com.svg" alt="">
-        <p>Вся проверка промокода — на стороне бота без базы данных. Дата зашита в структуру кода — это экономит и хостинг, и деньги.</p>
+        <p>Промокод живёт ровно один день и проверяется без сервера — это экономит и хостинг, и деньги, и время на поддержку.</p>
       </div>
 
       <p class="article__h1">Визуальный стиль и анимации</p>
+      <p>Большая часть анимаций — Lottie в стиле web3 и Telegram: глоу-эффекты, неоновые обводки, иконки с «живым» откликом на нажатие. Некоторые анимации слишком сложные для Lottie — они отрендерены в After Effects с альфа-каналом и сжаты в webm через VP8. Попробуйте угадать где что — стиль намеренно выровнен так, чтобы разница не бросалась в глаза.</p>
 
-      <!-- KremuaRecs3 — аватар/анимации, слева -->
+      <!-- KremuaRecs3 — анимации, слева -->
       <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs3.mp4"
                  autoplay muted loop playsinline></video>
         </div>
-        <p class="article__img-caption-text">Иконки в каталоге — Lottie-анимации. Каждая написана в After Effects под конкретную категорию и экспортирована в JSON. При нажатии иконка «оживает» — маленький момент, который делает интерфейс живым.<br><br>Аватар кондитера на главной — сложная векторная анимация из After Effects, отрендеренная с альфа-каналом в webm. Слишком много эффектов для Lottie, поэтому пошли на рендер — выглядит как 3D, весит минимально.</p>
+        <p class="article__img-caption-text">Иконки в каталоге реагируют на каждое действие: нажал на категорию — иконка «ожила», открыл торт — появляется анимация вкуса. Маленький момент, который делает интерфейс живым.<br><br>Аватар кондитера на главной — один из таких рендеров. Слишком много эффектов для Lottie, поэтому пошли на рендер — выглядит как 3D, весит минимально.</p>
       </figure>
 
       <p>Всё это работает в рамках одной верстки — без отдельных версий для мобилки и десктопа, без нативных приложений, без лишних зависимостей.</p>
 
-      <!-- KremuaRecs5 — ещё один экран, слева или справа -->
+      <!-- KremuaRecs5 — ещё один экран, справа -->
       <figure class="article__img article__img--right">
         <div class="article__img-caption-text">
           <p>Верстка универсальная — одинаково хорошо смотрится на экране смартфона, планшета и монитора. Ни один элемент не выглядит «съехавшим» при переходе между платформами.</p>
@@ -391,6 +416,33 @@ const isValid = decodeDate(code) === today();</code></pre>
                  autoplay muted loop playsinline></video>
         </div>
       </figure>
+
+      <!-- Блок: что такое Lottie -->
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          Что такое Lottie
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <p>Lottie — это анимация из After Effects, экспортированная в JSON. Браузер воспроизводит её как векторную — бесконечное масштабирование без потери качества, крошечный вес файла. Рендер — это видео с прозрачным фоном, когда эффекты слишком сложные для экспорта.</p>
+
+      <div class="anim-compare">
+        <div class="anim-compare__item">
+          <div class="anim-compare__preview" id="lottiePreview"></div>
+          <div class="anim-compare__label">Lottie</div>
+          <div class="anim-compare__desc">Векторная анимация в JSON. Идеальное качество на любом экране, нет артефактов сжатия.</div>
+        </div>
+        <div class="anim-compare__item">
+          <div class="anim-compare__preview">
+            <img src="https://github.com/CakeBoxDeveloper/kremua/blob/main/Cinnabon.webp?raw=true" alt="Рендер Cinnabon">
+          </div>
+          <div class="anim-compare__label">Рендер (webp)</div>
+          <div class="anim-compare__desc">Когда эффекты слишком сложные для Lottie — рендерим с альфа-каналом и сжимаем. Результат неотличим, но это уже растр.</div>
+        </div>
+      </div>
 
       <div class="checkpoint">
         <div class="checkpoint__line"></div>
@@ -427,8 +479,8 @@ const isValid = decodeDate(code) === today();</code></pre>
           </div>
           <div class="file-tree__children">
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>Брендинг: цвета, типографика, web3-эстетика</div>
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>60+ Lottie-анимаций под каждый раздел</div>
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Динамические цветовые темы под каждый торт</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Анимации в стиле web3 и Telegram — Lottie и VP8-рендеры</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Аватар кондитера с альфа-каналом</div>
           </div>
         </div>
         <div class="file-tree__group">
@@ -439,8 +491,8 @@ const isValid = decodeDate(code) === today();</code></pre>
           </div>
           <div class="file-tree__children">
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>Каталог с фильтрами и видео-превью</div>
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Конструктор торта — 390 комбинаций</div>
-            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Скретч-карта промокода на Canvas</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Конструктор торта с генерацией чертежа</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Сгорающий купон с Canvas-анимацией</div>
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>Telegram Mini App SDK + сайт</div>
           </div>
         </div>
@@ -762,6 +814,17 @@ const isValid = decodeDate(code) === today();</code></pre>
     if (typeof lottie === 'undefined') return;
     lottie.loadAnimation({ container: document.getElementById('topbarLottie'), renderer: 'svg', loop: true, autoplay: true, path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json' });
     lottie.loadAnimation({ container: document.getElementById('loaderLottie'), renderer: 'svg', loop: true, autoplay: true, path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json' });
+    // Lottie в блоке сравнения
+    const lottiePreview = document.getElementById('lottiePreview');
+    if (lottiePreview) {
+      lottie.loadAnimation({
+        container: lottiePreview,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/kremua/main/Cinnabon.json'
+      });
+    }
   })();
   window.addEventListener('load', () => { setTimeout(() => document.getElementById('pageLoader').classList.add('is-hidden'), 500); });
 
