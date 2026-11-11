@@ -96,6 +96,10 @@
     /* Картинки */
     .article__img { margin: 28px 0; }
     .article__img-wrap { position: relative; border-radius: 12px; overflow: hidden; display: block; }
+    /* Скругление только там где нет фейдаута */
+    .article__img--left  .article__img-wrap { border-radius: 12px 0 0 12px; }
+    .article__img--right .article__img-wrap { border-radius: 0 12px 12px 0; }
+    .article__img--center .article__img-wrap { border-radius: 12px 12px 0 0; }
     .article__img-wrap img { display: block; width: 100%; height: 100%; object-fit: cover; }
     .article__img-wrap::after { content: ''; position: absolute; pointer-events: none; z-index: 1; }
     .article__img-wrap img, .article__img-wrap video { display: block; width: 100%; height: 100%; object-fit: cover; }
