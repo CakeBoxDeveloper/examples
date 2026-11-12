@@ -302,7 +302,7 @@
       <figure class="article__img article__img--center">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs1.mp4"
-                 autoplay muted loop playsinline></video>
+                 autoplay muted loop playsinline preload="auto"></video>
         </div>
       </figure>
 
@@ -312,7 +312,7 @@
       <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs2.mp4"
-                 autoplay muted loop playsinline></video>
+                 autoplay muted loop playsinline preload="auto"></video>
         </div>
         <p class="article__img-caption-text">Каталог — 15 категорий, 26 начинок, сотни комбинаций. Каждая позиция открывает детальную страницу с фото, видео-превью и описанием вкуса.<br><br>Фильтры по категориям работают мгновенно — без перезагрузки, только анимация смены контента.</p>
       </figure>
@@ -359,7 +359,7 @@
         </div>
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs4.mp4"
-                 autoplay muted loop playsinline></video>
+                 autoplay muted loop playsinline preload="auto"></video>
         </div>
       </figure>
 
@@ -392,30 +392,7 @@ const isValid = decode(code, key) === today();</code></pre>
       </div>
 
       <p class="article__h1">Визуальный стиль и анимации</p>
-      <p>Большая часть анимаций — Lottie в стиле web3 и Telegram: глоу-эффекты, неоновые обводки, иконки с «живым» откликом на нажатие. Некоторые анимации слишком сложные для Lottie — они отрендерены в After Effects с альфа-каналом и сжаты в webm через VP8. Попробуйте угадать где что — стиль намеренно выровнен так, чтобы разница не бросалась в глаза.</p>
-
-      <!-- KremuaRecs3 — анимации, слева -->
-      <figure class="article__img article__img--left">
-        <div class="article__img-wrap">
-          <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs3.mp4"
-                 autoplay muted loop playsinline></video>
-        </div>
-        <p class="article__img-caption-text">Иконки в каталоге реагируют на каждое действие: нажал на категорию — иконка «ожила», открыл торт — появляется анимация вкуса. Маленький момент, который делает интерфейс живым.<br><br>Аватар кондитера на главной — один из таких рендеров. Слишком много эффектов для Lottie, поэтому пошли на рендер — выглядит как 3D, весит минимально.</p>
-      </figure>
-
-      <p>Всё это работает в рамках одной верстки — без отдельных версий для мобилки и десктопа, без нативных приложений, без лишних зависимостей.</p>
-
-      <!-- KremuaRecs5 — ещё один экран, справа -->
-      <figure class="article__img article__img--right">
-        <div class="article__img-caption-text">
-          <p>Верстка универсальная — одинаково хорошо смотрится на экране смартфона, планшета и монитора. Ни один элемент не выглядит «съехавшим» при переходе между платформами.</p>
-          <p>Прирост аудитории шёл стабильно каждый день с момента запуска — без платной рекламы, только через сарафанное радио в чатах и промокодную механику.</p>
-        </div>
-        <div class="article__img-wrap">
-          <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs5.mp4"
-                 autoplay muted loop playsinline></video>
-        </div>
-      </figure>
+      <p>Большая часть анимаций — Lottie в стиле web3 и Telegram: глоу-эффекты, неоновые обводки, иконки с «живым» откликом на нажатие.</p>
 
       <!-- Блок: что такое Lottie -->
       <div class="checkpoint">
@@ -427,7 +404,7 @@ const isValid = decode(code, key) === today();</code></pre>
         <div class="checkpoint__line"></div>
       </div>
 
-      <p>Lottie — это анимация из After Effects, экспортированная в JSON. Браузер воспроизводит её как векторную — бесконечное масштабирование без потери качества, крошечный вес файла. Рендер — это видео с прозрачным фоном, когда эффекты слишком сложные для экспорта.</p>
+      <p>Lottie — это анимация из After Effects, экспортированная в JSON. Браузер воспроизводит её как векторную — бесконечное масштабирование без потери качества, крошечный вес. Некоторые анимации слишком сложные для Lottie — они отрендерены с альфа-каналом и сжаты в webm/webp. Попробуйте угадать где что — стиль намеренно выровнен так, чтобы разница не бросалась в глаза.</p>
 
       <div class="anim-compare">
         <div class="anim-compare__item">
@@ -443,6 +420,29 @@ const isValid = decode(code, key) === today();</code></pre>
           <div class="anim-compare__desc">Когда эффекты слишком сложные для Lottie — рендерим с альфа-каналом и сжимаем. Результат неотличим, но это уже растр.</div>
         </div>
       </div>
+
+      <!-- KremuaRecs3 — анимации, слева -->
+      <figure class="article__img article__img--left">
+        <div class="article__img-wrap">
+          <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs3.mp4"
+                 autoplay muted loop playsinline preload="auto"></video>
+        </div>
+        <p class="article__img-caption-text">Каждая анимация создавалась под конкретный экран — не из стоков, не адаптированная. Всё нарисовано с нуля в After Effects под визуальный язык бренда.<br><br>Аватар кондитера на главной — один из рендеров. Слишком много эффектов для Lottie, поэтому пошли на рендер — выглядит как 3D, весит минимально.</p>
+      </figure>
+
+      <p>Всё это работает в рамках одной верстки — без отдельных версий для мобилки и десктопа, без нативных приложений, без лишних зависимостей.</p>
+
+      <!-- KremuaRecs5 — ещё один экран, справа -->
+      <figure class="article__img article__img--right">
+        <div class="article__img-caption-text">
+          <p>Верстка универсальная — одинаково хорошо смотрится на экране смартфона, планшета и монитора. Ни один элемент не выглядит «съехавшим» при переходе между платформами.</p>
+          <p>Прирост аудитории шёл стабильно каждый день с момента запуска — без платной рекламы, только через сарафанное радио в чатах и промокодную механику.</p>
+        </div>
+        <div class="article__img-wrap">
+          <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs5.mp4"
+                 autoplay muted loop playsinline preload="auto"></video>
+        </div>
+      </figure>
 
       <div class="checkpoint">
         <div class="checkpoint__line"></div>
