@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Panacea — AI-пространство для психологии и эзотерики</title>
+  <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/31a84ffdfe125dd9756dadd19d72da85ce18bd6a/EdelFav.svg" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/SVGLoader.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --hue: 30; /* Тёплая бежево-коричневая тема */
+      --bg:            hsl(35, 25%, 6%);
+      --bg-alt:        hsl(35, 22%, 9%);
+      --bg-card:       hsl(35, 20%, 11%);
+      --accent:        hsl(28, 55%, 48%);
+      --text:          hsl(35, 25%, 78%);
+      --text-muted:    hsl(35, 18%, 60%);
+      --text-dim:      hsl(35, 12%, 35%);
+      --border:        hsla(35, 20%, 100%, 0.07);
+      --border-accent: hsla(28, 55%, 48%, 0.35);
+      --font: 'Inter', system-ui, sans-serif;
+      --r: 6px;
+      --block-w: calc((100vw - 80px) / 3);
+      --glass-shadow:
+        inset 0 0 0 1.3px color-mix(in srgb, var(--accent) 25%, color-mix(in srgb, #fff 8%, transparent)),
+        inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 55%, transparent),
+        inset -2px -2px 0px -2px color-mix(in srgb, #fff 40%, transparent),
+        inset -0.3px -1px 4px 0px color-mix(in srgb, #000 18%, transparent),
+        inset -1.5px 2.5px 0px -2px color-mix(in srgb, #000 22%, transparent),
+        inset 0px 3px 4px -2px color-mix(in srgb, #000 20%, transparent);
+    }
+
+    html { scroll-behavior: smooth; }
+    html, body { overflow-x: hidden; max-width: 100vw; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+    a { color: var(--accent); text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* TOPBAR */
+    .topbar {
+      position: fixed; top: 20px; left: 50vw; transform: translateX(-50%); z-index: 100;
+      display: inline-flex; align-items: center; gap: 12px; padding: 10px 26px 10px 12px;
+      background-color: hsla(35, 25%, 50%, 0.12);
+      backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
+      border: none; border-radius: 100px;
+      box-shadow: var(--glass-shadow);
+      white-space: nowrap; cursor: pointer; text-decoration: none;
+      transition: background-color 0.25s, transform 0.3s ease, opacity 0.3s ease;
+    }
+    .topbar:hover { background-color: hsla(35, 25%, 50%, 0.22); text-decoration: none; }
+    .topbar.is-hidden { transform: translateX(-50%) translateY(-80px); opacity: 0; pointer-events: none; }
+    .topbar__lottie { width: 36px; height: 36px; flex-shrink: 0; filter: invert(60%) sepia(30%) saturate(400%) hue-rotate(10deg) brightness(90%); }
+    .topbar__label { font-size: 1.06rem; font-weight: 800; letter-spacing: 0.01em; color: var(--text-muted); text-transform: lowercase; }
+
+    /* HERO */
+    .hero { min-height: 100svh; display: flex; align-items: center; justify-content: center; padding: 20px 24px 12px; position: relative; z-index: 1; background: radial-gradient(ellipse 60% 50% at 50% 40%, hsla(28, 55%, 35%, 0.08) 0%, transparent 70%); }
+    .hero__tiles-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .hero__inner { display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%; position: relative; z-index: 1; }
+    .holocard-wrap { width: var(--block-w); min-width: 240px; max-width: 480px; aspect-ratio: 3 / 4; position: relative; cursor: grab; touch-action: none; user-select: none; margin-bottom: -48px; }
+    .holocard-rays { position: absolute; pointer-events: none; z-index: 0; }
+    .holocard-wrap:active { cursor: grabbing; }
+    .holocard-wrap canvas:not(.holocard-rays) { width: 100% !important; height: 100% !important; border-radius: 18px; display: block; position: relative; z-index: 1; }
+    .hero__meta { text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; width: var(--block-w); min-width: 240px; max-width: 480px; }
+    .hero__tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-accent); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+    .hero__title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: var(--text); }
+    .hero__desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* TECH */
+    .tech { padding: 0 24px 48px; display: flex; justify-content: center; position: relative; z-index: 1; }
+    .tech__inner { width: 100%; max-width: 640px; }
+    .tech__grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-accent); border-radius: var(--r); overflow: hidden; }
+    .tech__cell { background: var(--bg-card); padding: 14px 18px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid var(--border-accent); border-bottom: 1px solid var(--border-accent); }
+    .tech__cell:nth-child(2n) { border-right: none; }
+    .tech__cell:nth-last-child(-n+3):not(.tech__cell--status) { border-bottom: none; }
+    .tech__cell--status { grid-column: 1 / -1; align-items: center; justify-content: center; border-right: none; border-bottom: none; border-top: 1px solid var(--border-accent); padding: 14px 18px; }
+    .tech__cell-key { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+    .tech__cell-val { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .badge--done { background: hsla(28, 55%, 48%, 0.15); color: hsl(28, 55%, 62%); border: 1px solid hsla(28, 55%, 48%, 0.3); }
+    .badge--wip  { background: hsla(28, 55%, 48%, 0.15); color: hsl(28, 55%, 62%); border: 1px solid hsla(28, 55%, 48%, 0.3); }
+    .badge--nda  { background: rgba(255,82,82,0.12); color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
+
+    /* ARTICLE */
+    .article { padding: 0 24px 96px; display: flex; justify-content: center; position: relative; z-index: 1; }
+    .article__inner { width: 100%; max-width: 640px; }
+    .article__inner p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 18px; }
+    .article__inner ul { padding-left: 0; margin-bottom: 18px; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .article__inner ul li { font-size: 0.93rem; color: var(--text-muted); line-height: 1.7; padding-left: 18px; position: relative; list-style: none; }
+    .article__inner ul li::before { content: ''; position: absolute; left: 0; top: 0.65em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+    .article__inner blockquote { margin: 24px 0; padding: 18px 22px; border-left: 2px solid var(--accent); background: var(--bg-alt); border-radius: 0 var(--r) var(--r) 0; }
+    .article__inner blockquote p { margin: 0; font-style: italic; font-size: 1rem; color: var(--text); line-height: 1.7; }
+    .article__inner .article__h1 { font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.2; color: var(--text); margin: 56px 0 8px; }
+
+    /* Картинки */
+    .article__img { margin: 28px 0; }
+    .article__img-wrap { position: relative; overflow: hidden; display: block; }
+    .article__img-wrap img, .article__img-wrap video { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .article__img-wrap video { pointer-events: none; }
+    .article__img-wrap::after { content: ''; position: absolute; pointer-events: none; z-index: 1; }
+    .article__img--center { display: flex; flex-direction: column; align-items: center; }
+    .article__img--center .article__img-wrap { width: 100%; border-radius: 10px 10px 0 0; }
+    .article__img--center .article__img-wrap img, .article__img--center .article__img-wrap video { height: auto; object-position: top; }
+    .article__img--center .article__img-wrap::after { inset: auto 0 0 0; height: 20%; background: linear-gradient(to bottom, transparent, var(--bg)); }
+    .article__img--left { display: grid; grid-template-columns: 50% 1fr; grid-template-areas: "img text"; gap: 20px; align-items: stretch; }
+    .article__img--left .article__img-wrap { grid-area: img; height: 100%; min-height: 200px; border-radius: 12px 0 0 12px; }
+    .article__img--left .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: start; }
+    .article__img--left .article__img-wrap::after { position: absolute; inset: 0 0 0 auto; width: 80%; height: 100%; background: linear-gradient(to right, transparent 0%, var(--bg) 85%); }
+    .article__img--right { display: grid; grid-template-columns: 1fr 50%; grid-template-areas: "text img"; gap: 20px; align-items: stretch; }
+    .article__img--right .article__img-wrap { grid-area: img; height: 100%; min-height: 200px; border-radius: 0 12px 12px 0; }
+    .article__img--right .article__img-wrap::after { position: absolute; inset: 0 auto 0 0; width: 80%; height: 100%; background: linear-gradient(to left, transparent 0%, var(--bg) 85%); }
+    .article__img--right .article__img-caption-text { grid-area: text; font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; align-self: start; }
+    @media (max-width: 480px) {
+      .article__img--left, .article__img--right { grid-template-columns: 1fr; grid-template-areas: "img" "text"; }
+      .article__img--left .article__img-wrap, .article__img--right .article__img-wrap { height: 220px; min-height: unset; border-radius: 12px 12px 0 0; }
+      .article__img--left .article__img-wrap::after, .article__img--right .article__img-wrap::after { inset: auto 0 0 0 !important; width: 100% !important; height: 25% !important; background: linear-gradient(to bottom, transparent, var(--bg)) !important; }
+    }
+
+    /* Code */
+    .article__code { margin: 24px 0; border-radius: var(--r); border: 1px solid var(--border-accent); overflow: hidden; }
+    .article__code-header { display: flex; align-items: center; justify-content: space-between; padding: 7px 14px; background: var(--bg-alt); border-bottom: 1px solid var(--border); }
+    .article__code-lang { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--accent); }
+    .article__code-copy { font-size: 0.68rem; color: var(--text-dim); background: none; border: none; cursor: pointer; font-family: var(--font); }
+    .article__code pre { padding: 18px; background: var(--bg-card); overflow-x: auto; margin: 0; }
+    .article__code code { font-family: 'Menlo', monospace; font-size: 0.8rem; line-height: 1.7; color: hsl(28, 40%, 72%); tab-size: 2; }
+
+    /* Callout */
+    .article__callout { margin: 20px 0; padding: 14px 18px; border-radius: var(--r); display: flex; gap: 12px; align-items: flex-start; }
+    .article__callout--info, .article__callout--warn, .article__callout--tip { background: hsla(28, 55%, 48%, 0.07); border: 1px solid hsla(28, 55%, 48%, 0.22); }
+    .article__callout-icon { flex-shrink: 0; width: 16px; height: 16px; margin-top: 2px; filter: invert(60%) sepia(30%) saturate(400%) hue-rotate(10deg) brightness(110%); }
+    .article__callout p { margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* Checkpoint */
+    .checkpoint { display: flex; align-items: center; gap: 12px; margin: 36px 0; user-select: none; }
+    .checkpoint__line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--border-accent), transparent); }
+    .checkpoint__badge { display: inline-flex; align-items: center; gap: 7px; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border-accent); background: var(--bg-card); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+    .checkpoint__badge svg { flex-shrink: 0; }
+
+    /* Think Tree */
+    .think-tree { margin: 24px 0; display: flex; flex-direction: column; position: relative; padding-left: 20px; }
+    .think-tree::before { content: ''; position: absolute; left: 7px; top: 12px; bottom: 12px; width: 1px; background: linear-gradient(to bottom, var(--border-accent) 0%, hsla(28, 55%, 48%, 0.1) 100%); }
+    .think-tree__node { display: flex; align-items: flex-start; gap: 14px; padding: 10px 0; }
+    .think-tree__dot { flex-shrink: 0; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border-accent); background: var(--bg-card); margin-left: -20px; margin-top: 2px; position: relative; z-index: 1; }
+    .think-tree__node--done .think-tree__dot { background: var(--accent); border-color: var(--accent); }
+    .think-tree__label { font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+    .think-tree__node--done .think-tree__label { color: var(--text-muted); }
+    .think-tree__desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 3px; line-height: 1.6; }
+
+    /* File Tree */
+    .file-tree { margin: 20px 0; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; font-size: 0.85rem; }
+    .file-tree__group { position: relative; }
+    .file-tree__item--folder { display: flex; align-items: center; gap: 10px; padding: 10px 16px 10px 14px; background: var(--bg-alt); border-bottom: 1px solid var(--border); color: var(--text); font-weight: 600; }
+    .file-tree__roman { flex-shrink: 0; font-size: 0.72rem; font-weight: 700; color: var(--text-dim); width: 18px; text-align: center; }
+    .file-tree__children { position: relative; }
+    .file-tree__children::before { content: ''; position: absolute; left: 23px; top: 0; bottom: 17px; width: 1px; background: var(--border); }
+    .file-tree__item--child { display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 14px; color: var(--text-muted); position: relative; }
+    .file-tree__item--child:hover { background: rgba(255,255,255,0.025); }
+    .file-tree__connector { flex-shrink: 0; width: 18px; height: 18px; position: relative; display: flex; align-items: center; justify-content: center; }
+    .file-tree__connector::before { content: ''; position: absolute; left: 9px; top: 50%; width: 9px; height: 1px; background: var(--border); }
+    .file-tree__connector::after { content: ''; width: 5px; height: 5px; border-radius: 50%; border: 1px solid var(--text-dim); background: var(--bg-alt); flex-shrink: 0; position: relative; z-index: 1; }
+    .file-tree__badge { margin-left: auto; flex-shrink: 0; font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: hsla(28, 55%, 48%, 0.1); color: var(--accent); border: 1px solid hsla(28, 55%, 48%, 0.2); }
+
+    /* Модели — сетка карточек */
+    .models-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+    .model-card { background: var(--bg-card); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--glass-shadow); }
+    .model-card__name { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+    .model-card__spec { font-size: 0.72rem; color: var(--accent); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    .model-card__desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+    .model-card--plus { border: 1px solid hsla(28, 55%, 48%, 0.3); }
+    .model-card--plus .model-card__name::after { content: ' ✦'; font-size: 0.65rem; color: var(--accent); vertical-align: super; }
+    @media (max-width: 480px) { .models-grid { grid-template-columns: 1fr 1fr; } }
+
+    /* Loader */
+    .page-loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease, visibility 0.3s ease; }
+    .page-loader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .page-loader__lottie { width: 100px; height: 100px; filter: invert(60%) sepia(30%) saturate(400%) hue-rotate(10deg) brightness(90%); }
+
+    @media (max-width: 480px) {
+      :root { --block-w: calc(100vw - 32px); }
+      .hero { padding: 16px 16px 8px; }
+      .tech { padding: 0 16px 48px; }
+      .article { padding: 0 16px 72px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-loader" id="pageLoader">
+    <div class="page-loader__lottie" id="loaderLottie"></div>
+  </div>
+
+  <a href="index.html" class="topbar" id="topbar">
+    <div class="topbar__lottie" id="topbarLottie"></div>
+    <span class="topbar__label">на главную</span>
+  </a>
+
+  <section class="hero">
+    <canvas class="hero__tiles-canvas" id="tilesCanvas"></canvas>
+    <canvas class="holocard-rays" id="holoRaysCanvas"></canvas>
+    <div class="hero__inner">
+      <div class="holocard-wrap" id="holowrap"></div>
+      <div class="hero__meta">
+        <span class="hero__tag">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/>
+          </svg>
+          AI-пространство
+        </span>
+        <h1 class="hero__title">Panacea</h1>
+        <p class="hero__desc">Платформа для диалога с AI-моделями в сфере психологии, астрологии, таро и работы с подсознанием.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tech">
+    <div class="tech__inner">
+      <div class="tech__grid">
+        <div class="tech__cell">
+          <span class="tech__cell-key">Платформа</span>
+          <span class="tech__cell-val">Telegram + Веб + PWA</span>
+        </div>
+        <div class="tech__cell">
+          <span class="tech__cell-key">AI-модели</span>
+          <span class="tech__cell-val">6 специализаций</span>
+        </div>
+        <div class="tech__cell">
+          <span class="tech__cell-key">Подписка</span>
+          <span class="tech__cell-val">Telegram Stars / Крипта</span>
+        </div>
+        <div class="tech__cell">
+          <span class="tech__cell-key">База данных</span>
+          <span class="tech__cell-val">История сеансов + PDF</span>
+        </div>
+        <div class="tech__cell">
+          <span class="tech__cell-key">Голос</span>
+          <span class="tech__cell-val">Whisper (Groq)</span>
+        </div>
+        <div class="tech__cell">
+          <span class="tech__cell-key">Деплой</span>
+          <span class="tech__cell-val">Vercel</span>
+        </div>
+        <div class="tech__cell tech__cell--status">
+          <span class="badge badge--wip">В работе</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <article class="article">
+    <div class="article__inner">
+
+      <p class="article__h1">Пространство для внутреннего диалога</p>
+      <p>Panacea — это не чатбот и не гороскоп. Это среда, где можно поговорить с AI-моделью, специализирующейся именно в той области, которая нужна сейчас: разобрать сон, прочитать карту Таро, понять кармический сценарий или просто выговориться психологу, у которого есть время.</p>
+      <p>Работает как Telegram Mini App, как сайт и как PWA — одна кодовая база. Войти можно через Google или Apple, либо как гость — в этом случае история хранится в localStorage и очищается через 24 часа. Проект условно-бесплатный: базовые функции доступны всем, расширенные — по подписке.</p>
+
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Интерфейс
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <p class="article__h1">Одна карточка — весь интерфейс</p>
+      <p>Вся навигация построена на одном экране: это физическая карточка с двумя сторонами. Лицевая — анкета перед сеансом. Обратная — архив всех прошлых разговоров. Переключение происходит по клику на угол карточки: карточка плавно переворачивается, как игральная.</p>
+
+      <div class="article__callout article__callout--info">
+        <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/info-svgrepo-com.svg" alt="">
+        <p>Никакого меню, никаких вкладок. Одна карточка → флип → архив. Это намеренное решение: меньше интерфейса — больше фокуса на самом разговоре.</p>
+      </div>
+
+      <p>Из архива доступен чат поддержки, скачивание PDF-протоколов сеансов и выход из аккаунта. Всё — в рамках того же единого экрана. Переход в чат происходит после анкеты: выбор запроса, состояния и нескольких параметров — и загрузочный экран с каруселью цитат запускает сеанс.</p>
+
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Модели
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <p class="article__h1">Шесть AI-моделей с личностями</p>
+      <p>Каждая модель — не просто набор промптов. У каждой есть имя, стиль речи, область знаний и характер. Они обучены на реальной литературе: юнгианская психология, нарративная терапия, классическая астрология, Таро Уэйта, нумерология Пифагора, тексты по регрессионной терапии. Датасет формировался вручную — из первоисточников, не из Википедии.</p>
+
+      <div class="models-grid">
+        <div class="model-card">
+          <div class="model-card__spec">Таро</div>
+          <div class="model-card__name">Тара</div>
+          <div class="model-card__desc">Символический язык карт. Говорит образами, не советами. Помогает увидеть скрытое за поверхностью событий.</div>
+        </div>
+        <div class="model-card">
+          <div class="model-card__spec">Кармология</div>
+          <div class="model-card__name">Карма</div>
+          <div class="model-card__desc">Читает повторяющиеся сценарии и незакрытые циклы. Опирается на концепции индийской философии — без эзотерического флёра.</div>
+        </div>
+        <div class="model-card">
+          <div class="model-card__spec">Астрология</div>
+          <div class="model-card__name">Астра</div>
+          <div class="model-card__desc">Натальные карты, транзиты, планетарные циклы. Объясняет механику, а не предсказывает будущее.</div>
+        </div>
+        <div class="model-card">
+          <div class="model-card__spec">Регрессология</div>
+          <div class="model-card__name">Ева</div>
+          <div class="model-card__desc">Работает с памятью и корнями притяжений. Мягкий проводник — не давит, не интерпретирует за тебя.</div>
+        </div>
+        <div class="model-card">
+          <div class="model-card__spec">Психология</div>
+          <div class="model-card__name">Психея</div>
+          <div class="model-card__desc">Юнгианский анализ и нарративная терапия. Слышит не только слова, но и то, что стоит за ними.</div>
+        </div>
+        <div class="model-card">
+          <div class="model-card__spec">Нумерология</div>
+          <div class="model-card__name">Гера</div>
+          <div class="model-card__desc">Числа, даты, имена. Расшифровывает числовой код — без мистики, с логикой системы.</div>
+        </div>
+      </div>
+
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v4H4zM4 12h16v4H4zM4 20h16"/></svg>
+          Обучение
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <p class="article__h1">RAG, индексация и реальная литература</p>
+      <p>Модели работают не просто на системных промптах — они подключены к индексированной базе знаний через RAG (Retrieval-Augmented Generation). При каждом запросе система ищет релевантные фрагменты из датасета и передаёт их в контекст модели вместе с вопросом пользователя.</p>
+
+      <div class="think-tree">
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Датасет из первоисточников</div>
+            <div class="think-tree__desc">Юнг, Уэйт, Пифагорейская нумерология, Бхагавад-гита, Ньютон-Хоуэлл — реальная литература, не агрегаторы</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Векторная индексация</div>
+            <div class="think-tree__desc">Тексты разбиты на чанки, векторизованы и хранятся в индексе для семантического поиска</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Контекст = личность + знание + запрос</div>
+            <div class="think-tree__desc">Каждый запрос обогащается релевантными фрагментами базы и передаётся в модель с характером конкретного персонажа</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Контент внутри сеанса</div>
+            <div class="think-tree__desc">Модель может прислать тест, притчу или карточку-вложение — не случайно, а по контексту разговора</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="article__code">
+        <div class="article__code-header">
+          <span class="article__code-lang">RAG — упрощённая схема</span>
+          <button class="article__code-copy">Копировать</button>
+        </div>
+        <pre><code>// 1. Векторизуем запрос пользователя
+const queryVector = await embed(userMessage);
+
+// 2. Ищем ближайшие чанки в индексе базы знаний
+const context = await vectorDB.search(queryVector, topK: 5);
+
+// 3. Строим промпт: личность модели + знание + вопрос
+const prompt = buildPrompt(modelPersonality, context, userMessage);
+
+// 4. Отправляем в LLM — модель отвечает с опорой на источник
+const response = await llm.complete(prompt);</code></pre>
+      </div>
+
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Panacea Plus
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <p class="article__h1">Премиум-функции</p>
+      <p>Подписка Panacea Plus доступна за Telegram Stars или криптовалюту — без карты, без банка. Открывает расширенные режимы и снимает ограничения. Функции постоянно развиваются: к эндпоинтам подключаются API лучших сервисов — лучшая озвучка, точнее распознавание речи, новые модели.</p>
+
+      <div class="think-tree">
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Оракул</div>
+            <div class="think-tree__desc">Анализирует запрос мета-моделью и автоматически выбирает нужную из шести</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Консилиум</div>
+            <div class="think-tree__desc">Все шесть отвечают одновременно — параллельные запросы, шесть точек зрения на один вопрос</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">Голосовой ввод и озвучивание</div>
+            <div class="think-tree__desc">Whisper (Groq) распознаёт речь, TTS озвучивает ответы моделей</div>
+          </div>
+        </div>
+        <div class="think-tree__node think-tree__node--done">
+          <div class="think-tree__dot"></div>
+          <div class="think-tree__content">
+            <div class="think-tree__label">PDF-протокол сеанса</div>
+            <div class="think-tree__desc">AI генерирует саммари на стороне клиента: вопрос, обсуждение, вывод</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="article__callout article__callout--tip">
+        <img class="article__callout-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/5be0ebe96952423e33590c003c2c07aefb0927bf/bulb-on-svgrepo-com.svg" alt="">
+        <p>Telegram Stars не требуют карты — достаточно внутреннего баланса. Крипто-опция для тех, кто за пределами Telegram.</p>
+      </div>
+
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Архитектура
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <p class="article__h1">Как устроено внутри</p>
+      <p>Одна кодовая база — три канала. Telegram Mini App открывается кнопкой из бота, сайт работает в браузере, PWA устанавливается на рабочий стол. История сеансов хранится в облаке для авторизованных пользователей, гостевой режим очищается через 24 часа.</p>
+
+      <div class="article__code">
+        <div class="article__code-header">
+          <span class="article__code-lang">Оракул — выбор модели</span>
+          <button class="article__code-copy">Копировать</button>
+        </div>
+        <pre><code>// Мета-модель анализирует запрос и выбирает одну из шести
+// Temperature: 0.3 — точный выбор, а не творческий
+// Max tokens: 50 — только название модели в ответе
+const chosen = await selectModel(query, { temp: 0.3, max: 50 });
+// Выбранная модель отвечает, подписывает ответ: «— Тара»</code></pre>
+      </div>
+
+      <div class="checkpoint">
+        <div class="checkpoint__line"></div>
+        <div class="checkpoint__badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Этапы
+        </div>
+        <div class="checkpoint__line"></div>
+      </div>
+
+      <div class="file-tree">
+        <div class="file-tree__group">
+          <div class="file-tree__item--folder">
+            <span class="file-tree__roman">I</span>
+            Дизайн и концепция
+            <span class="file-tree__badge">Done</span>
+          </div>
+          <div class="file-tree__children">
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Бренд: бежевые тона, векторный ключ Panacea</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Флип-карточка (анкета ↔ архив)</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Интерфейс чата с переключением моделей</div>
+          </div>
+        </div>
+        <div class="file-tree__group">
+          <div class="file-tree__item--folder">
+            <span class="file-tree__roman">II</span>
+            Разработка
+            <span class="file-tree__badge">Done</span>
+          </div>
+          <div class="file-tree__children">
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>6 AI-моделей с личностями и датасетом</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>RAG — векторная индексация базы знаний</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Оракул и Консилиум (Plus-режимы)</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Голосовой ввод — Whisper (Groq)</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Telegram Stars + крипто-оплата</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>PDF-протокол + тесты + притчи</div>
+          </div>
+        </div>
+        <div class="file-tree__group">
+          <div class="file-tree__item--folder">
+            <span class="file-tree__roman">III</span>
+            В работе
+            <span class="file-tree__badge">В работе</span>
+          </div>
+          <div class="file-tree__children">
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Лучшие API озвучки и распознавания</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Расширение датасета и новые модели</div>
+            <div class="file-tree__item--child"><span class="file-tree__connector"></span>Персонализация под анкету пользователя</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+  <script>
+  // Лучи
+  (function() {
+    const canvas = document.getElementById('holoRaysCanvas');
+    const wrap   = document.getElementById('holowrap');
+    if (!canvas || !wrap) return;
+    const ctx = canvas.getContext('2d');
+    const RAY_COUNT = 18;
+    let t = 0, lastTs = 0;
+    // Тёплый коричневый акцент
+    const R = 180, G = 130, B = 80;
+    let dprApplied = false;
+    function positionCanvas() {
+      const rect = wrap.getBoundingClientRect();
+      const heroRect = wrap.closest('.hero').getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 2.4;
+      const cx = rect.left - heroRect.left + rect.width / 2;
+      const cy = rect.top  - heroRect.top  + rect.height / 2;
+      canvas.style.width  = size + 'px'; canvas.style.height = size + 'px';
+      canvas.style.left   = (cx - size / 2) + 'px'; canvas.style.top = (cy - size / 2) + 'px';
+      const dpr = window.devicePixelRatio || 1;
+      const w = Math.round(size * dpr), h = Math.round(size * dpr);
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; dprApplied = false; }
+      if (!dprApplied) { ctx.scale(dpr, dpr); dprApplied = true; }
+    }
+    window.addEventListener('resize', () => { dprApplied = false; positionCanvas(); });
+    positionCanvas();
+    function draw(ts) {
+      const dt = Math.min(ts - lastTs, 50); lastTs = ts; t += dt * 0.001;
+      const size = parseFloat(canvas.style.width) || canvas.offsetWidth;
+      if (!size) { requestAnimationFrame(draw); return; }
+      ctx.clearRect(0, 0, size, size);
+      const cx = size / 2, cy = size / 2;
+      for (let i = 0; i < RAY_COUNT; i++) {
+        const angle = (i / RAY_COUNT) * Math.PI * 2 + 0.04 * Math.sin(t * 0.9 + i * 1.3);
+        const pulse = 0.5 + 0.5 * Math.sin(t * 1.4 + i * 0.8);
+        const len   = (0.21 + 0.05 * pulse) * size;
+        const halfW = (6.24 + 12.48 * Math.sin(Math.PI * i / RAY_COUNT)) * (0.7 + 0.3 * pulse);
+        const ex = cx + Math.cos(angle) * len, ey = cy + Math.sin(angle) * len;
+        const nx = Math.sin(angle), ny = -Math.cos(angle);
+        const alpha = (0.22 + 0.15 * pulse) * 0.14;
+        const grad = ctx.createLinearGradient(cx, cy, ex, ey);
+        grad.addColorStop(0, `rgba(${R},${G},${B},0)`);
+        grad.addColorStop(0.2, `rgba(${R},${G},${B},${(alpha*0.5).toFixed(3)})`);
+        grad.addColorStop(0.55, `rgba(${R},${G},${B},${alpha.toFixed(3)})`);
+        grad.addColorStop(1, `rgba(${R},${G},${B},0)`);
+        ctx.beginPath();
+        ctx.moveTo(cx+nx, cy+ny); ctx.lineTo(ex+nx*halfW, ey+ny*halfW);
+        ctx.lineTo(ex-nx*halfW, ey-ny*halfW); ctx.lineTo(cx-nx, cy-ny);
+        ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+  </script>
+
+  <script>
+  // Голографическая карточка
+  (function() {
+    function init() {
+      const wrap = document.getElementById('holowrap');
+      if (!wrap || typeof THREE === 'undefined') return;
+      const W = wrap.offsetWidth, H = wrap.offsetHeight;
+      if (!W || !H) { requestAnimationFrame(init); return; }
+
+      // Бежево-коричневая гамма — hue ~28
+      let hueShiftDeg = 28;
+      let shimmerOffset = -1.0;
+
+      function getHarmonicColor(baseHue, sat, lig, offset = 0) {
+        const c = new THREE.Color();
+        const h = (((baseHue + offset) % 360) + 360) % 360;
+        c.setHSL(h / 360, sat, lig);
+        return '#' + c.getHexString();
+      }
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+      camera.position.z = 6.5;
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(W, H); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      wrap.appendChild(renderer.domElement);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+      const mainL = new THREE.DirectionalLight(0xffffff, 2.0); mainL.position.set(5, 5, 8); scene.add(mainL);
+      const sideL = new THREE.DirectionalLight(0xffcc80, 1.0); sideL.position.set(-5, -3, 4); scene.add(sideL);
+
+      const cvs = document.createElement('canvas'); cvs.width = 1024; cvs.height = 1365;
+      const ctx = cvs.getContext('2d');
+      const holoCvs = document.createElement('canvas'); holoCvs.width = 1024; holoCvs.height = 1365;
+      const holoCtx = holoCvs.getContext('2d');
+      const patCvs = document.createElement('canvas'); patCvs.width = 1024; patCvs.height = 1365;
+      const patCtx = patCvs.getContext('2d');
+
+      const tex = new THREE.CanvasTexture(cvs); tex.anisotropy = 16;
+      const holoTex = new THREE.CanvasTexture(holoCvs); holoTex.anisotropy = 16;
+
+      // SVG — ключ Panacea (уже повёрнут на 45°, ставим как есть)
+      const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/Psy/5fe6a798475b75749a5b3b0b6d19dd9eb93812e7/PanaceaKey45Fill.svg';
+      const img = new Image(); img.crossOrigin = 'Anonymous'; img.src = svgUrl;
+      let svgLoaded = false;
+
+      class Sparkle {
+        constructor() { this.reset(); }
+        reset() {
+          const pad = 60;
+          this.x = pad + Math.random() * (cvs.width - pad * 2);
+          this.y = pad + Math.random() * (cvs.height - pad * 2);
+          this.maxR = 8 + Math.random() * 10;
+          this.progress = 0; this.speed = 0.008 + Math.random() * 0.01;
+          this.rotation = Math.random() * Math.PI; this.rotSpeed = (Math.random() - 0.5) * 0.015;
+          this.delay = Math.random() * 180;
+        }
+        update() { if (this.delay > 0) { this.delay--; return; } this.progress += this.speed; this.rotation += this.rotSpeed; if (this.progress >= 1) this.reset(); }
+        draw(ctx) {
+          if (this.delay > 0 || this.progress <= 0) return;
+          const scale = Math.sin(this.progress * Math.PI), r = this.maxR * scale, ir = r * 0.22;
+          ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+          ctx.beginPath(); ctx.moveTo(0,-r); ctx.quadraticCurveTo(0,-ir,r,0); ctx.quadraticCurveTo(0,ir,0,r); ctx.quadraticCurveTo(0,ir,-r,0); ctx.quadraticCurveTo(0,-ir,0,-r); ctx.closePath();
+          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.75); ctx.fill();
+          ctx.beginPath(); ctx.arc(0,0,ir*0.7,0,Math.PI*2);
+          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.88); ctx.fill();
+          ctx.restore();
+        }
+      }
+      const sparkles = Array.from({length: 5}, () => new Sparkle());
+
+      function drawBase() {
+        if (!svgLoaded) return;
+        const w = cvs.width, h = cvs.height;
+        patCtx.clearRect(0,0,w,h); patCtx.save();
+        patCtx.translate(w/2,h/2);
+        // НЕ поворачиваем — SVG уже на 45°
+        const cell=180, nw=img.naturalWidth||cell, nh=img.naturalHeight||cell, ratio=nw/nh;
+        const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
+        for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) {
+          const offX=(r%2!==0)?gX/2:0;
+          patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH);
+        }
+        patCtx.restore();
+        ctx.fillStyle=getHarmonicColor(hueShiftDeg,0.3,0.14); ctx.fillRect(0,0,w,h);
+        ctx.save(); ctx.globalAlpha=0.1; ctx.drawImage(patCvs,0,0); ctx.restore();
+        ctx.save();
+        const cr=30; ctx.beginPath();
+        ctx.moveTo(cr,0);ctx.lineTo(w-cr,0);ctx.quadraticCurveTo(w,0,w,cr);
+        ctx.lineTo(w,h-cr);ctx.quadraticCurveTo(w,h,w-cr,h);
+        ctx.lineTo(cr,h);ctx.quadraticCurveTo(0,h,0,h-cr);
+        ctx.lineTo(0,cr);ctx.quadraticCurveTo(0,0,cr,0);
+        ctx.closePath(); ctx.clip();
+        ctx.translate(0,h); ctx.rotate(-30*Math.PI/180);
+        const sW=w*3,cur=shimmerOffset*w*3;
+        const sg=ctx.createLinearGradient(cur-sW/2,0,cur+sW/2,0);
+        sg.addColorStop(0,'rgba(255,220,180,0)'); sg.addColorStop(0.5,'rgba(255,220,180,0.05)'); sg.addColorStop(1,'rgba(255,220,180,0)');
+        ctx.fillStyle=sg; ctx.fillRect(-w*3,-h*3,w*7,h*7); ctx.restore();
+        sparkles.forEach(s=>{s.update();s.draw(ctx);}); tex.needsUpdate=true;
+      }
+
+      function updateHolo(rX,rY) {
+        if (!svgLoaded) return;
+        const w=holoCvs.width,h=holoCvs.height; holoCtx.clearRect(0,0,w,h);
+        if (Math.hypot(rX,rY)<0.001){holoTex.needsUpdate=true;return;}
+        const sp=document.createElement('canvas');sp.width=w;sp.height=h;
+        const sc=sp.getContext('2d'); sc.drawImage(patCvs,0,0);
+        const shift=(rX*0.5)%1;
+        const lg=sc.createLinearGradient(0,0,w,h);
+        [0,45,90,135,180].forEach((o,i)=>{lg.addColorStop(i/4,getHarmonicColor(hueShiftDeg,0.75,0.6,((shift*360+o)%360)));});
+        sc.globalCompositeOperation='source-in'; sc.fillStyle=lg; sc.fillRect(0,0,w,h);
+        const wvCvs=document.createElement('canvas');wvCvs.width=w;wvCvs.height=h;
+        const wvCtx=wvCvs.getContext('2d');
+        wvCtx.save(); wvCtx.translate(w/2,h/2); wvCtx.rotate(45*Math.PI/180);
+        wvCtx.strokeStyle='rgba(255,220,180,0.8)'; wvCtx.lineWidth=2.5;
+        const wSpc=20,rX2=w*2.5,rY2=h*2.5;
+        for(let yp=-rY2;yp<rY2;yp+=wSpc){wvCtx.beginPath();for(let xp=-rX2;xp<rX2;xp+=15){const yo=Math.sin((xp/30)+rX*3)*8;if(xp===-rX2)wvCtx.moveTo(xp,yp+yo);else wvCtx.lineTo(xp,yp+yo);}wvCtx.stroke();}
+        wvCtx.restore();
+        const waveShift=(-rY*0.6)%1;
+        const wg=wvCtx.createLinearGradient(w,0,0,h);
+        [[0,0],[0.3,40],[0.6,90],[1.0,140]].forEach(([s,o])=>{const dyn=(((waveShift+o/360)%1+1)%1)*360;wg.addColorStop(s,getHarmonicColor(hueShiftDeg,0.85,0.55,60+dyn));});
+        wvCtx.globalCompositeOperation='source-in'; wvCtx.fillStyle=wg; wvCtx.fillRect(0,0,w,h);
+        holoCtx.save();holoCtx.globalAlpha=0.25;holoCtx.drawImage(wvCvs,0,0);holoCtx.restore();
+        holoCtx.save();holoCtx.globalAlpha=0.7;holoCtx.drawImage(sp,0,0);holoCtx.restore();
+        holoCtx.drawImage(sp,0,0);
+        const lx=w*(0.5+rX*0.55),ly=h*(0.5+rY*0.55);
+        const rg=holoCtx.createRadialGradient(lx,ly,0,lx,ly,w*1.15);
+        rg.addColorStop(0,'rgba(255,255,255,1)');rg.addColorStop(0.3,'rgba(255,255,255,0.7)');rg.addColorStop(0.6,'rgba(255,255,255,0.3)');rg.addColorStop(1,'rgba(255,255,255,0)');
+        holoCtx.globalCompositeOperation='destination-in'; holoCtx.fillStyle=rg; holoCtx.fillRect(0,0,w,h);
+        const cr=30; holoCtx.globalCompositeOperation='destination-in'; holoCtx.beginPath();
+        holoCtx.moveTo(cr,0);holoCtx.lineTo(w-cr,0);holoCtx.quadraticCurveTo(w,0,w,cr);
+        holoCtx.lineTo(w,h-cr);holoCtx.quadraticCurveTo(w,h,w-cr,h);
+        holoCtx.lineTo(cr,h);holoCtx.quadraticCurveTo(0,h,0,h-cr);
+        holoCtx.lineTo(0,cr);holoCtx.quadraticCurveTo(0,0,cr,0);
+        holoCtx.closePath();holoCtx.fill(); holoCtx.globalCompositeOperation='source-over'; holoTex.needsUpdate=true;
+      }
+
+      const cW=2.4,cH=3.2,depth=0.08,cr=0.08;
+      const shape=new THREE.Shape();
+      const [sx,sy]=[-cW/2,-cH/2];
+      shape.moveTo(sx+cr,sy);shape.lineTo(sx+cW-cr,sy);shape.quadraticCurveTo(sx+cW,sy,sx+cW,sy+cr);
+      shape.lineTo(sx+cW,sy+cH-cr);shape.quadraticCurveTo(sx+cW,sy+cH,sx+cW-cr,sy+cH);
+      shape.lineTo(sx+cr,sy+cH);shape.quadraticCurveTo(sx,sy+cH,sx,sy+cH-cr);
+      shape.lineTo(sx,sy+cr);shape.quadraticCurveTo(sx,sy,sx+cr,sy);
+      const geo=new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:true,bevelSegments:5,steps:1,bevelSize:0.015,bevelThickness:0.015});
+      geo.center();geo.computeBoundingBox();
+      const bbox=geo.boundingBox,pos=geo.attributes.position;
+      const uvs=new Float32Array(pos.count*2);
+      for(let i=0;i<pos.count;i++){uvs[i*2]=(pos.getX(i)-bbox.min.x)/(bbox.max.x-bbox.min.x);uvs[i*2+1]=(pos.getY(i)-bbox.min.y)/(bbox.max.y-bbox.min.y);}
+      geo.setAttribute('uv',new THREE.BufferAttribute(uvs,2));
+      const baseMat=new THREE.MeshStandardMaterial({color:new THREE.Color(getHarmonicColor(hueShiftDeg,0.3,0.14)),roughness:0.6,metalness:0.1});
+      const frontMat=new THREE.MeshStandardMaterial({map:tex,roughness:0.9,metalness:0.0});
+      const card=new THREE.Mesh(geo,[frontMat,baseMat]); scene.add(card);
+      const holoGeo=new THREE.PlaneGeometry(cW+0.03,cH+0.03);
+      const holoMat=new THREE.MeshBasicMaterial({map:holoTex,transparent:true,blending:THREE.NormalBlending,depthWrite:false});
+      const holoMesh=new THREE.Mesh(holoGeo,holoMat); holoMesh.position.z=depth/2+0.016; card.add(holoMesh);
+
+      img.onload=function(){
+        svgLoaded=true; drawBase();
+        const loader=new THREE.SVGLoader();
+        loader.load(svgUrl,(data)=>{
+          const logoGroup=new THREE.Group();
+          const logoMat=new THREE.MeshStandardMaterial({color:new THREE.Color(getHarmonicColor(hueShiftDeg,0.65,0.72)),metalness:0.75,roughness:0.2,side:THREE.DoubleSide});
+          data.paths.forEach(path=>{THREE.SVGLoader.createShapes(path).forEach(shape=>{const g=new THREE.ExtrudeGeometry(shape,{depth:40,bevelEnabled:true,bevelSegments:4,steps:2,bevelSize:3,bevelThickness:3});g.computeVertexNormals();logoGroup.add(new THREE.Mesh(g,logoMat));});});
+          const box=new THREE.Box3().setFromObject(logoGroup);
+          const center=box.getCenter(new THREE.Vector3());
+          logoGroup.children.forEach(c=>c.geometry.translate(-center.x,-center.y,-center.z));
+          const size=new THREE.Vector3(); box.getSize(size);
+          const maxDim=Math.max(size.x,size.y)||1, targetSize=1.1, s=targetSize/maxDim;
+          logoGroup.scale.set(s,-s,s); logoGroup.position.set(0,0.12,depth/2+0.04); card.add(logoGroup);
+        });
+      };
+
+      const MAX_ROT=0.75; let isDrag=false,tRX=0,tRY=0,cRX=0,cRY=0,idle=0;
+      function onDown(){isDrag=true;}
+      function onMove(e){if(!isDrag)return;const cx=e.clientX||(e.touches&&e.touches[0].clientX);const cy=e.clientY||(e.touches&&e.touches[0].clientY);const rect=wrap.getBoundingClientRect();if(cx!==undefined){tRY=Math.max(-MAX_ROT,Math.min(MAX_ROT,((cx-rect.left)/rect.width-0.5)*2*1.0));tRX=Math.max(-MAX_ROT,Math.min(MAX_ROT,((cy-rect.top)/rect.height-0.5)*2*0.9));}}
+      function onUp(){isDrag=false;tRX=0;tRY=0;}
+      wrap.addEventListener('mousedown',onDown); window.addEventListener('mousemove',onMove); window.addEventListener('mouseup',onUp);
+      wrap.addEventListener('touchstart',onDown,{passive:true}); window.addEventListener('touchmove',onMove,{passive:true}); window.addEventListener('touchend',onUp);
+
+      function animate(){
+        requestAnimationFrame(animate); shimmerOffset+=0.012; if(shimmerOffset>2.0)shimmerOffset=-1.0;
+        drawBase(); baseMat.color.set(getHarmonicColor(hueShiftDeg,0.3,0.14)); idle+=0.015;
+        const atX=isDrag?tRX:Math.sin(idle*0.8)*0.12, atY=isDrag?tRY:Math.cos(idle*0.6)*0.18, lf=isDrag?0.15:0.05;
+        cRX+=(atX-cRX)*lf; cRY+=(atY-cRY)*lf;
+        cRX=Math.max(-MAX_ROT,Math.min(MAX_ROT,cRX)); cRY=Math.max(-MAX_ROT,Math.min(MAX_ROT,cRY));
+        card.rotation.x=cRX; card.rotation.y=cRY; updateHolo(cRY/1.0,cRX/0.9); renderer.render(scene,camera);
+      }
+      animate();
+    }
+    requestAnimationFrame(init);
+  })();
+  </script>
+
+  <script>
+  // Плитки
+  (function() {
+    if (typeof THREE === 'undefined') return;
+    const canvas = document.getElementById('tilesCanvas');
+    const hero   = document.querySelector('.hero');
+    function resize() {
+      canvas.width=hero.offsetWidth; canvas.height=hero.offsetHeight;
+      camera.left=-canvas.width/2; camera.right=canvas.width/2; camera.top=canvas.height/2; camera.bottom=-canvas.height/2;
+      camera.updateProjectionMatrix(); renderer.setSize(canvas.width,canvas.height);
+    }
+    const scene=new THREE.Scene(), camera=new THREE.OrthographicCamera(-1,1,1,-1,1,1000);
+    camera.position.z=500;
+    const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    scene.add(new THREE.AmbientLight(0xffffff,0.8));
+    const dir=new THREE.DirectionalLight(0xffffff,1.6); dir.position.set(200,300,400); scene.add(dir);
+    const rim=new THREE.DirectionalLight(0xffcc80,0.3); rim.position.set(-200,-100,100); scene.add(rim);
+    resize(); window.addEventListener('resize', resize);
+    function harmColor(h,s,l){const c=new THREE.Color();c.setHSL(((h%360)+360)/360,s,l);return c;}
+    const HUE=28, TILE_S=70, DEPTH=8, COUNT=8;
+    function makeTileGeo(size,r,d){const hw=size/2,shape=new THREE.Shape();shape.moveTo(-hw+r,-hw);shape.lineTo(hw-r,-hw);shape.quadraticCurveTo(hw,-hw,hw,-hw+r);shape.lineTo(hw,hw-r);shape.quadraticCurveTo(hw,hw,hw-r,hw);shape.lineTo(-hw+r,hw);shape.quadraticCurveTo(-hw,hw,-hw,hw-r);shape.lineTo(-hw,-hw+r);shape.quadraticCurveTo(-hw,-hw,-hw+r,-hw);return new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:1.5,bevelThickness:1.5});}
+    const tileGeo=makeTileGeo(TILE_S,10,DEPTH);
+    const tileMat=new THREE.MeshStandardMaterial({color:harmColor(HUE,0.3,0.14),roughness:0.5,metalness:0.15});
+    const logoMat=new THREE.MeshStandardMaterial({color:harmColor(HUE,0.5,0.72),metalness:0.6,roughness:0.2,side:THREE.DoubleSide});
+    const svgUrl='https://raw.githubusercontent.com/CakeBoxDeveloper/Psy/5fe6a798475b75749a5b3b0b6d19dd9eb93812e7/PanaceaKey45Fill.svg';
+    let logoTemplate=null;
+    const loader=new THREE.SVGLoader();
+    loader.load(svgUrl,(data)=>{
+      const grp=new THREE.Group();
+      data.paths.forEach(path=>{THREE.SVGLoader.createShapes(path).forEach(shape=>{const g=new THREE.ExtrudeGeometry(shape,{depth:12,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:2,bevelThickness:2});g.computeVertexNormals();grp.add(new THREE.Mesh(g,logoMat));});});
+      const box=new THREE.Box3().setFromObject(grp),ctr=box.getCenter(new THREE.Vector3()),sz=new THREE.Vector3();box.getSize(sz);
+      grp.children.forEach(c=>c.geometry.translate(-ctr.x,-ctr.y,-ctr.z));
+      const maxD=Math.max(sz.x,sz.y)||1,s=(TILE_S*0.6)/maxD;
+      grp.scale.set(s,-s,s); grp.position.z=DEPTH+2; logoTemplate=grp; buildTiles();
+    });
+    const tiles=[];
+    function buildTiles(){for(let i=0;i<COUNT*2;i++){const tile=new THREE.Group();const body=new THREE.Mesh(tileGeo.clone(),tileMat.clone());body.position.z=0;tile.add(body);if(logoTemplate)tile.add(logoTemplate.clone());const side=i<COUNT?-1:1;tile.userData={side,phase:Math.random()*Math.PI*2,swayPhase:Math.random()*Math.PI*2,tiltX:Math.random()*Math.PI*2,tiltY:Math.random()*Math.PI*2,orbitDir:Math.random()<0.5?1:-1,z:0.3+Math.random()*0.7};scene.add(tile);tiles.push(tile);}}
+    const ORBIT_R=28,ORBIT_SPD=0.00035,SWAY_AMP=38*Math.PI/180,SWAY_SPD=0.0006,TILT_AMP=48*Math.PI/180,TILT_SPD=0.00042;
+    let last=null;
+    function animate(ts){requestAnimationFrame(animate);if(!last)last=ts;const dt=Math.min(ts-last,50);last=ts;const W=canvas.width,H=canvas.height,centerW=W/3,sideW=(W-centerW)/2,PAD_X=TILE_S*0.7,PAD_Y=TILE_S*1.2,cols=2,rows=3,cellW=(sideW-PAD_X*2)/cols,cellH=(H-PAD_Y*2)/rows;
+    tiles.forEach((tile,idx)=>{const d=tile.userData;d.phase+=ORBIT_SPD*dt*d.orbitDir;d.swayPhase+=SWAY_SPD*dt;d.tiltX+=TILT_SPD*dt;d.tiltY+=TILT_SPD*0.9*dt;const localIdx=idx%COUNT,col=localIdx%cols,row=Math.floor(localIdx/cols);let cx,cy;if(d.side===-1){cx=-(W/2)+PAD_X+col*cellW+cellW/2;}else{cx=(centerW/2)+PAD_X+col*cellW+cellW/2;}cy=H/2-PAD_Y-row*cellH-cellH/2;const r=ORBIT_R*(0.6+d.z*0.7);tile.position.x=cx+Math.cos(d.phase)*r;tile.position.y=cy+Math.sin(d.phase)*r;tile.position.z=d.z*20-10;tile.rotation.z=Math.sin(d.swayPhase)*SWAY_AMP;tile.rotation.x=Math.sin(d.tiltX)*TILT_AMP;tile.rotation.y=Math.sin(d.tiltY)*TILT_AMP;});
+    renderer.render(scene,camera);}
+    requestAnimationFrame(animate);
+  })();
+  </script>
+
+  <script>
+  // Lottie + лоадер + скролл таблетки
+  (function initLottie() {
+    if (typeof lottie === 'undefined') return;
+    lottie.loadAnimation({ container: document.getElementById('topbarLottie'), renderer: 'svg', loop: true, autoplay: true, path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json' });
+    lottie.loadAnimation({ container: document.getElementById('loaderLottie'), renderer: 'svg', loop: true, autoplay: true, path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json' });
+  })();
+  window.addEventListener('load', () => { setTimeout(() => document.getElementById('pageLoader').classList.add('is-hidden'), 500); });
+  (function() {
+    const topbar = document.getElementById('topbar');
+    let lastY = 0;
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y > lastY && y > 60) topbar.classList.add('is-hidden');
+      else topbar.classList.remove('is-hidden');
+      lastY = y;
+    }, { passive: true });
+  })();
+  </script>
+
+</body>
+</html>
