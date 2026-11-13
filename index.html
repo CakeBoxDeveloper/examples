@@ -260,11 +260,32 @@
 
       <!-- Оверлей "О проектах" — поверх всего блока, исчезает по клику -->
       <div class="cases-folder__intro" id="casesFolderIntro" aria-live="polite">
-        <div class="cases-folder__intro-inner">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="cases-folder__intro-icon"><path d="M3 7a2 2 0 0 1 2-2h3.172a2 2 0 0 1 1.414.586L10.414 6.4A2 2 0 0 0 11.828 7H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
-          <p class="cases-folder__intro-text">Здесь собраны все мои проекты. <span class="disclaimer__badge disclaimer__badge--view">Смотреть</span> готовые можно прямо сейчас. Те, которые я <span class="disclaimer__badge disclaimer__badge--wip">ещё делаю</span> — бесплатные сервисы, их можно поддержать чтобы вышли быстрее. <span class="disclaimer__badge disclaimer__badge--nda">NDA</span> не смогу показать по условиям договора.</p>
-          <button class="cases-folder__intro-btn" id="casesFolderIntroDismiss">Смотреть</button>
+        <div class="cases-folder__intro-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="cases-folder__intro-icon"><path d="M3 7a2 2 0 0 1 2-2h3.172a2 2 0 0 1 1.414.586L10.414 6.4A2 2 0 0 0 11.828 7H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+          <h3 class="cases-folder__intro-title">Мои проекты</h3>
         </div>
+        <p class="cases-folder__intro-desc">Здесь собраны все мои работы. Показываю даже то, что ещё не сделал — потому что процесс интереснее результата. Каждый проект отмечен статусом:</p>
+        <ul class="cases-folder__intro-list">
+          <li class="cases-folder__intro-item">
+            <div class="cases-folder__intro-dot cases-folder__intro-dot--view"></div>
+            <div class="cases-folder__intro-item-text">
+              <strong>Смотреть</strong> — завершённые проекты, доступные для просмотра прямо сейчас
+            </div>
+          </li>
+          <li class="cases-folder__intro-item">
+            <div class="cases-folder__intro-dot cases-folder__intro-dot--wip"></div>
+            <div class="cases-folder__intro-item-text">
+              <strong>Ещё делаю</strong> — проекты в разработке, можно поддержать для ускорения релиза
+            </div>
+          </li>
+          <li class="cases-folder__intro-item">
+            <div class="cases-folder__intro-dot cases-folder__intro-dot--nda"></div>
+            <div class="cases-folder__intro-item-text">
+              <strong>NDA</strong> — проекты под договором конфиденциальности, показать не могу
+            </div>
+          </li>
+        </ul>
+        <button class="cases-folder__intro-btn" id="casesFolderIntroDismiss">Открыть проекты</button>
       </div>
 
       <div class="cases-folder__panel">
