@@ -54,7 +54,7 @@
     }
     .topbar:hover { background-color: hsla(0, 0%, 50%, 0.22); text-decoration: none; }
     .topbar.is-hidden { transform: translateX(-50%) translateY(-80px); opacity: 0; pointer-events: none; }
-    .topbar__lottie { width: 36px; height: 36px; flex-shrink: 0; filter: grayscale(1) brightness(1.2); }
+    .topbar__lottie { width: 36px; height: 36px; flex-shrink: 0; filter: brightness(0) invert(0.68); }
     .topbar__label { font-size: 1.06rem; font-weight: 800; letter-spacing: 0.01em; color: var(--text-muted); text-transform: lowercase; }
 
     /* HERO */
@@ -65,24 +65,25 @@
     .holocard-rays { position: absolute; pointer-events: none; z-index: 0; }
     .holocard-wrap:active { cursor: grabbing; }
     .holocard-wrap canvas:not(.holocard-rays) { width: 100% !important; height: 100% !important; border-radius: 18px; display: block; position: relative; z-index: 1; }
-    .hero__meta { text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; width: var(--block-w); min-width: 240px; max-width: 480px; }
+    .hero__meta { text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; }
     .hero__title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: var(--text); margin: 0; }
     .hero__tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-accent); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
     .hero__status-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; margin-top: 2px; }
-    .hero__desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; text-align: justify; hyphens: auto; -webkit-hyphens: auto; text-align: left; flex: 1; }
+    .hero__desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; text-align: justify; hyphens: auto; -webkit-hyphens: auto; width: 100%; max-width: 640px; }
     .hero__status-lottie { width: 36px; height: 36px; flex-shrink: 0; filter: grayscale(1) brightness(1.2); }
 
     /* TECH */
     .tech { padding: 0 24px 48px; display: flex; justify-content: center; position: relative; z-index: 1; }
-    .tech__inner { width: 100%; max-width: 640px; }
-    .tech__grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-accent); border-radius: var(--r); overflow: hidden; }
+    .tech__inner { width: 100%; max-width: 640px; display: flex; flex-direction: column; gap: 0; }
+    .tech__grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border-accent); border-radius: var(--r); overflow: hidden; }
     .tech__cell { background: var(--bg-card); padding: 14px 18px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid var(--border-accent); border-bottom: 1px solid var(--border-accent); }
-    .tech__cell:nth-child(2n) { border-right: none; }
-    .tech__cell:nth-last-child(-n+3):not(.tech__cell--status) { border-bottom: none; }
-    .tech__cell--status { grid-column: 1 / -1; align-items: center; justify-content: center; border-right: none; border-bottom: none; border-top: 1px solid var(--border-accent); padding: 14px 18px; display: flex; }
-    .tech__cell--status .badge { display: flex; justify-content: center; width: 100%; }
+    .tech__cell:nth-child(3n) { border-right: none; }
+    .tech__cell:nth-last-child(-n+3) { border-bottom: none; }
     .tech__cell-key { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
     .tech__cell-val { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+    .tech__status-wrap { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; max-width: inherit; border-top: 1px solid var(--border-accent); border-radius: 0 0 var(--r) var(--r); overflow: hidden; }
+    .tech__status { display: flex; justify-content: center; align-items: center; padding: 14px 18px; background: var(--bg-card); grid-column: 2; border: 1px solid var(--border-accent); border-radius: 0 0 var(--r) var(--r); }
+    .tech__status .badge { padding: 0; border-radius: 0; border: none; background: transparent; display: flex; justify-content: center; align-items: center; }
     .badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
     .badge--done { background: hsla(0, 0%, 95%, 0.15); color: hsl(0, 0%, 95%); border: 1px solid hsla(0, 0%, 95%, 0.3); }
     .badge--wip  { background: hsla(0, 0%, 95%, 0.15); color: hsl(0, 0%, 95%); border: 1px solid hsla(0, 0%, 95%, 0.3); }
@@ -170,7 +171,7 @@
     /* Loader */
     .page-loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease, visibility 0.3s ease; }
     .page-loader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .page-loader__lottie { width: 100px; height: 100px; filter: grayscale(1) brightness(1.2); }
+    .page-loader__lottie { width: 100px; height: 100px; filter: brightness(0) invert(0.68); }
 
     @media (max-width: 480px) {
       :root { --block-w: calc(100vw - 32px); }
@@ -237,8 +238,10 @@
           <span class="tech__cell-val">Instagram API</span>
         </div>
       </div>
-      <div class="tech__status">
-        <span class="badge badge--wip">В разработке</span>
+      <div class="tech__status-wrap">
+        <div class="tech__status">
+          <span class="badge badge--wip">В разработке</span>
+        </div>
       </div>
     </div>
   </section>
@@ -538,17 +541,8 @@ onValue(workoutsRef, (snapshot) => {
       const sparkles = Array.from({length: 5}, () => new Sparkle());
 
       function drawBase() {
-        if (!svgLoaded) return;
+        if (!patternReady) return;
         const w = cvs.width, h = cvs.height;
-        patCtx.clearRect(0,0,w,h); patCtx.save();
-        patCtx.translate(w/2,h/2);
-        const cell=180, nw=img.naturalWidth||cell, nh=img.naturalHeight||cell, ratio=nw/nh;
-        const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
-        for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) {
-          const offX=(r%2!==0)?gX/2:0;
-          patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH);
-        }
-        patCtx.restore();
         ctx.fillStyle=getHarmonicColor(hueShiftDeg,0.0,0.08); ctx.fillRect(0,0,w,h);
         ctx.save(); ctx.globalAlpha=0.1; ctx.drawImage(patCvs,0,0); ctx.restore();
         ctx.save();
@@ -622,8 +616,29 @@ onValue(workoutsRef, (snapshot) => {
       const holoMat=new THREE.MeshBasicMaterial({map:holoTex,transparent:true,blending:THREE.NormalBlending,depthWrite:false});
       const holoMesh=new THREE.Mesh(holoGeo,holoMat); holoMesh.position.z=depth/2+0.016; card.add(holoMesh);
 
+      let patternReady = false;
       img.onload=function(){
-        svgLoaded=true; drawBase();
+        svgLoaded=true;
+        // Отрисовываем паттерн ОДИН РАЗ после загрузки SVG
+        const w = patCvs.width, h = patCvs.height;
+        patCtx.clearRect(0,0,w,h); patCtx.save();
+        patCtx.translate(w/2,h/2);
+        patCtx.rotate(-30*Math.PI/180);
+        const cell=180, nw=img.naturalWidth||cell, nh=img.naturalHeight||cell, ratio=nw/nh;
+        const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
+        for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) {
+          const offX=(r%2!==0)?gX/2:0;
+          patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH);
+        }
+        patCtx.restore();
+        // Белый фильтр применяем один раз ко всему паттерну
+        patCtx.save();
+        patCtx.globalCompositeOperation = 'source-in';
+        patCtx.fillStyle = 'white';
+        patCtx.fillRect(0, 0, w, h);
+        patCtx.restore();
+        patternReady = true;
+        drawBase();
         const loader=new THREE.SVGLoader();
         loader.load(svgUrl,(data)=>{
           const logoGroup=new THREE.Group();
@@ -634,7 +649,7 @@ onValue(workoutsRef, (snapshot) => {
           logoGroup.children.forEach(c=>c.geometry.translate(-center.x,-center.y,-center.z));
           const size=new THREE.Vector3(); box.getSize(size);
           const maxDim=Math.max(size.x,size.y)||1, targetSize=1.1, s=targetSize/maxDim;
-          logoGroup.scale.set(s,-s,s); logoGroup.position.set(0,0.12,depth/2+0.04); card.add(logoGroup);
+          logoGroup.scale.set(s*1.3,-s*1.3,s*1.3); logoGroup.position.set(0,0.12,depth/2+0.04); card.add(logoGroup);
         });
       };
 

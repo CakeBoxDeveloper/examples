@@ -63,19 +63,33 @@
     .holocard-rays { position: absolute; pointer-events: none; z-index: 0; }
     .holocard-wrap:active { cursor: grabbing; }
     .holocard-wrap canvas:not(.holocard-rays) { width: 100% !important; height: 100% !important; border-radius: 18px; display: block; position: relative; z-index: 1; }
-    .hero__meta { text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; width: var(--block-w); min-width: 240px; max-width: 480px; }
+    .hero__meta { text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; }
     .hero__tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-accent); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
-    .hero__title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: var(--text); }
-    .hero__desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; }
+    .hero__title { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: var(--text); margin: 0; }
+    .hero__desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; text-align: justify; hyphens: auto; -webkit-hyphens: auto; width: 100%; max-width: 640px; }
 
     /* TECH */
     .tech { padding: 0 24px 48px; display: flex; justify-content: center; position: relative; z-index: 1; }
-    .tech__inner { width: 100%; max-width: 640px; }
-    .tech__grid { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-accent); border-radius: var(--r); overflow: hidden; }
+    .tech__inner { width: 100%; max-width: 640px; display: flex; flex-direction: column; gap: 0; }
+    .tech__grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--r); overflow: hidden;
+    }
+    .tech__cell {
+      background: var(--bg-card); padding: 14px 18px;
+      display: flex; flex-direction: column; gap: 5px;
+      border-right: 1px solid var(--border-accent);
+      border-bottom: 1px solid var(--border-accent);
+    }
+    .tech__cell:nth-child(3n) { border-right: none; }
+    .tech__cell:nth-last-child(-n+3) { border-bottom: none; }
+    .tech__status-wrap { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; max-width: inherit; border-top: 1px solid var(--border-accent); border-radius: 0 0 var(--r) var(--r); overflow: hidden; }
+    .tech__status { display: flex; justify-content: center; align-items: center; padding: 14px 18px; background: var(--bg-card); grid-column: 2; border: 1px solid var(--border-accent); border-radius: 0 0 var(--r) var(--r); }
+    .tech__status .badge { padding: 0; border-radius: 0; border: none; background: transparent; display: flex; justify-content: center; align-items: center; }
     .tech__cell { background: var(--bg-card); padding: 14px 18px; display: flex; flex-direction: column; gap: 5px; border-right: 1px solid var(--border-accent); border-bottom: 1px solid var(--border-accent); }
-    .tech__cell:nth-child(2n) { border-right: none; }
-    .tech__cell:nth-last-child(-n+3):not(.tech__cell--status) { border-bottom: none; }
-    .tech__cell--status { grid-column: 1 / -1; align-items: center; justify-content: center; border-right: none; border-bottom: none; border-top: 1px solid var(--border-accent); padding: 14px 18px; }
+    .tech__cell:nth-child(3n) { border-right: none; }
+    .tech__cell:nth-last-child(-n+3) { border-bottom: none; }
     .tech__cell-key { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
     .tech__cell-val { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
     .tech__cell-val--accent { color: var(--accent); }
@@ -185,6 +199,12 @@
     .file-tree__connector::after { content: ''; width: 5px; height: 5px; border-radius: 50%; border: 1px solid var(--text-dim); background: var(--bg-alt); flex-shrink: 0; position: relative; z-index: 1; }
     .file-tree__badge { margin-left: auto; flex-shrink: 0; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 4px; background: hsla(var(--hue), 55%, 48%, 0.1); color: var(--accent); border: 1px solid hsla(var(--hue), 55%, 48%, 0.2); }
 
+    /* Описание — justified с переносами */
+    .hero__desc {
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.7;
+      text-align: justify; hyphens: auto; -webkit-hyphens: auto;
+    }
+
     /* ── Блок сравнения Lottie vs Render ── */
     .anim-compare {
       display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0;
@@ -238,14 +258,14 @@
     <div class="hero__inner">
       <div class="holocard-wrap" id="holowrap"></div>
       <div class="hero__meta">
+        <h1 class="hero__title">Кремуа</h1>
         <span class="hero__tag">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
           </svg>
           Telegram Mini App
         </span>
-        <h1 class="hero__title">Кремуа</h1>
-        <p class="hero__desc">Telegram Mini App для кондитерской на заказ — каталог тортов, промокоды со скретч-картой и 3D-аватар кондитера.</p>
+        <p class="hero__desc">Кондитерская на заказ из Николаева — веб-приложение с каталогом тортов, конструктором заказа, сгорающим купоном и анимированным аватаром кондитера. Работает как Telegram Mini App, сайт и PWA.</p>
       </div>
     </div>
   </section>
@@ -277,7 +297,9 @@
           <span class="tech__cell-key">Деплой · 2024</span>
           <span class="tech__cell-val">GitHub Pages</span>
         </div>
-        <div class="tech__cell tech__cell--status">
+      </div>
+      <div class="tech__status-wrap">
+        <div class="tech__status">
           <span class="badge badge--wip">В работе</span>
         </div>
       </div>
@@ -378,7 +400,7 @@
       <div class="article__code">
         <div class="article__code-header">
           <span class="article__code-lang">JavaScript</span>
-          <button class="article__code-copy">Копировать</button>
+          <button class="article__code-copy" style="display:none"></button>
         </div>
         <pre><code>// Три шифра наложены друг на друга:
 // Vigenère (ключ — дата) → перестановка → контрольная сумма
@@ -475,7 +497,7 @@ const isValid = decode(code, key) === today();</code></pre>
           <div class="file-tree__item--folder">
             <span class="file-tree__roman">I</span>
             Дизайн и визуальный язык
-            <span class="file-tree__badge">Done</span>
+            <span class="file-tree__badge">Сделано</span>
           </div>
           <div class="file-tree__children">
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>Брендинг: цвета, типографика, web3-эстетика</div>
@@ -487,7 +509,7 @@ const isValid = decode(code, key) === today();</code></pre>
           <div class="file-tree__item--folder">
             <span class="file-tree__roman">II</span>
             Разработка
-            <span class="file-tree__badge">Done</span>
+            <span class="file-tree__badge">Сделано</span>
           </div>
           <div class="file-tree__children">
             <div class="file-tree__item--child"><span class="file-tree__connector"></span>Каталог с фильтрами и видео-превью</div>
@@ -814,7 +836,8 @@ const isValid = decode(code, key) === today();</code></pre>
     if (typeof lottie === 'undefined') return;
     lottie.loadAnimation({ container: document.getElementById('topbarLottie'), renderer: 'svg', loop: true, autoplay: true, path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json' });
     lottie.loadAnimation({ container: document.getElementById('loaderLottie'), renderer: 'svg', loop: true, autoplay: true, path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json' });
-    // Lottie в блоке сравнения
+    const statusElB = document.getElementById('statusLottie');
+    if (statusElB) lottie.loadAnimation({ container: statusElB, renderer: 'svg', loop: true, autoplay: true, path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Clock.json' });
     const lottiePreview = document.getElementById('lottiePreview');
     if (lottiePreview) {
       lottie.loadAnimation({
