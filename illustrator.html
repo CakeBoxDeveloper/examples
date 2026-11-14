@@ -557,7 +557,7 @@
         loader.load(svgUrl,(data)=>{
           const logoGroup=new THREE.Group();
           const logoMat=new THREE.MeshStandardMaterial({color:new THREE.Color(getHarmonicColor(hueShiftDeg,0.65,0.72)),metalness:0.75,roughness:0.2,side:THREE.DoubleSide});
-          data.paths.forEach(path=>{THREE.SVGLoader.createShapes(path).forEach(shape=>{const g=new THREE.ExtrudeGeometry(shape,{depth:40,bevelEnabled:true,bevelSegments:4,steps:2,bevelSize:3,bevelThickness:3});g.computeVertexNormals();logoGroup.add(new THREE.Mesh(g,logoMat));});});
+          data.paths.forEach(path=>{THREE.SVGLoader.createShapes(path).forEach(shape=>{const g=new THREE.ExtrudeGeometry(shape,{depth:13,bevelEnabled:false,steps:1});g.computeVertexNormals();logoGroup.add(new THREE.Mesh(g,logoMat));});});
           const box=new THREE.Box3().setFromObject(logoGroup);
           const center=box.getCenter(new THREE.Vector3());
           logoGroup.children.forEach(c=>c.geometry.translate(-center.x,-center.y,-center.z));
@@ -747,12 +747,12 @@
           data.paths.forEach(path => {
             THREE.SVGLoader.createShapes(path).forEach(shape => {
               const g = new THREE.ExtrudeGeometry(shape, {
-                depth: 12,
+                depth: 2,
                 bevelEnabled: true,
                 bevelSegments: 2,
                 steps: 1,
-                bevelSize: 2,
-                bevelThickness: 2
+                bevelSize: 0.5,
+                bevelThickness: 0.5
               });
               g.computeVertexNormals();
               grp.add(new THREE.Mesh(g, logoMat));
