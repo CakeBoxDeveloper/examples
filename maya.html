@@ -665,7 +665,7 @@
     const tileGeo = makeTileGeo(TILE_S, 10, DEPTH);
     
     // Конфигурация 6 плиток: Bambu (120°), Blender (30°), Cinema (240°), Maya (180°), Bambu (120°), Blender (30°)
-    const tileConfigs = [
+    const tileConfigsBase = [
       { hue: 120, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/bambulablogo.svg' },
       { hue: 30,  svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/blender.svg' },
       { hue: 240, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/Cinema-4d-Logo--Streamline-Ultimate.svg' },
@@ -673,6 +673,19 @@
       { hue: 120, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/bambulablogo.svg' },
       { hue: 30,  svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/blender.svg' }
     ];
+    
+    // Перемешиваем массив при каждой загрузке (Fisher-Yates shuffle)
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+    
+    const tileConfigs = shuffleArray(tileConfigsBase);
+    console.log('Tiles shuffled:', tileConfigs.map(c => c.hue));
     
     const tiles = [];
     const logoTemplates = [];
