@@ -149,6 +149,7 @@
     }
     .hero__desc {
       font-size: 0.95rem; color: var(--text-muted); line-height: 1.7;
+      text-align: justify; hyphens: auto; -webkit-hyphens: auto;
     }
 
     /* ── TECH TABLE ── */
@@ -174,15 +175,6 @@
     }
     .tech__cell:nth-child(2n) { border-right: none; }
     .tech__cell:nth-last-child(-n+3):not(.tech__cell--status) { border-bottom: none; }
-    /* Статус — нижняя строка на всю ширину, по центру, с разделителем */
-    .tech__cell--status {
-      grid-column: 1 / -1;
-      align-items: center; justify-content: center;
-      border-right: none;
-      border-bottom: none;
-      border-top: 1px solid var(--border-accent);
-      padding: 14px 18px;
-    }
     .tech__cell-key {
       font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em;
       text-transform: uppercase; color: var(--text-dim);
@@ -835,7 +827,7 @@
       <div class="article__code">
         <div class="article__code-header">
           <span class="article__code-lang">JavaScript</span>
-          <button class="article__code-copy">Копировать</button>
+          <button class="article__code-copy" style="display:none"></button>
         </div>
         <pre><code>// Подписка на реалтайм-обновления объектов
 const ws = new WebSocket('wss://api.example.com/objects/stream');
@@ -922,7 +914,7 @@ ws.onclose = () => {
           <div class="file-tree__item--folder">
             <span class="file-tree__roman">I</span>
             Анализ и проектирование
-            <span class="file-tree__badge">Done</span>
+            <span class="file-tree__badge">Сделано</span>
           </div>
           <div class="file-tree__children">
             <div class="file-tree__item--child">

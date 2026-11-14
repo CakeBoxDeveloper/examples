@@ -662,11 +662,11 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   const start = () => { if (!live && !calm) { live = true; raf = requestAnimationFrame(frame); } };
-  const stop  = () => { live = false; cancelAnimationFrame(raf); };
+  const stop  = () => { /* не останавливаем — мигание при скролле */ };
 
   size();
   if (calm) { for (let i = 0; i < 30; i++) draw(); }
-  else new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? start() : stop()), { threshold: 0 }).observe(root);
+  else start(); // всегда работает, не зависит от viewport
 
   let t;
   addEventListener('resize', () => {
@@ -999,4 +999,153 @@ window.addEventListener('DOMContentLoaded', () => {
       }).catch(function () {});
     });
   });
+})();
+
+
+/* ═══════════════════════════════════════
+   REASONING PLACEHOLDER ANIMATION
+═══════════════════════════════════════ */
+(function () {
+  var reasoningTextEl = document.getElementById('reasoningText');
+  if (!reasoningTextEl) return;
+
+  var phrases = [
+    'Deploying to production',
+    'Compiling sources',
+    'Running tests',
+    'Building artifacts',
+    'Pushing to remote',
+    'Installing dependencies',
+    'Analyzing bundle',
+    'Optimizing assets',
+    'Syncing database',
+    'Generating types',
+    'Linting codebase',
+    'Checking updates'
+  ];
+
+  var currentIndex = 0;
+
+  function updatePhrase() {
+    // Fade out
+    reasoningTextEl.style.transition = 'opacity 0.3s ease';
+    reasoningTextEl.style.opacity = '0';
+    
+    setTimeout(function() {
+      // Меняем текст
+      reasoningTextEl.textContent = phrases[currentIndex];
+      currentIndex = (currentIndex + 1) % phrases.length;
+      
+      // Fade in
+      reasoningTextEl.style.opacity = '1';
+    }, 300);
+  }
+
+  setInterval(updatePhrase, 4000);
+  
+  // Первый запуск
+  reasoningTextEl.textContent = phrases[0];
+  currentIndex = 1;
+})();
+
+
+/* ═══════════════════════════════════════
+   CASES FOLDER INTRO DISMISS
+═══════════════════════════════════════ */
+(function () {
+  var introEl = document.getElementById('casesFolderIntro');
+  var dismissBtn = document.getElementById('casesFolderIntroDismiss');
+  
+  if (!introEl || !dismissBtn) return;
+  
+  function hideIntro() {
+    introEl.classList.add('is-hidden');
+    setTimeout(function() {
+      introEl.style.display = 'none';
+    }, 300);
+  }
+  
+  dismissBtn.addEventListener('click', hideIntro);
+})();
+
+
+/* ═══════════════════════════════════════
+   BINARY GRID ANIMATION
+═══════════════════════════════════════ */
+(function () {
+  const grid = document.getElementById('binaryGrid');
+  if (!grid) return;
+
+  // Вычисляем количество ячеек на основе размера экрана
+  const cellSize = 48;
+  const cols = Math.ceil(window.innerWidth / cellSize);
+  const rows = Math.ceil(window.innerHeight / cellSize);
+  const totalCells = cols * rows;
+
+  // Создаём сетку с 0 и 1
+  for (let i = 0; i < totalCells; i++) {
+    const span = document.createElement('span');
+    span.textContent = Math.random() > 0.5 ? '0' : '1';
+    
+    // Случайная задержка для каждой ячейки (от 0 до 2.6 секунд)
+    const randomDelay = Math.random() * 2.6;
+    // Случайная длительность (от 2 до 4 секунд) — на 35% быстрее
+    const randomDuration = 2 + Math.random() * 2;
+    
+    span.style.animationDelay = `${randomDelay}s`;
+    span.style.animationDuration = `${randomDuration}s`;
+    
+    grid.appendChild(span);
+  }
+
+  // Пересоздаём сетку при изменении размера окна
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      grid.innerHTML = '';
+      const newCols = Math.ceil(window.innerWidth / cellSize);
+      const newRows = Math.ceil(window.innerHeight / cellSize);
+      const newTotal = newCols * newRows;
+      
+      for (let i = 0; i < newTotal; i++) {
+        const span = document.createElement('span');
+        span.textContent = Math.random() > 0.5 ? '0' : '1';
+        const randomDelay = Math.random() * 2.6;
+        const randomDuration = 2 + Math.random() * 2;
+        span.style.animationDelay = `${randomDelay}s`;
+        span.style.animationDuration = `${randomDuration}s`;
+        grid.appendChild(span);
+      }
+    }, 300);
+  });
+})();
+
+/* Mobile-friendly REASONING animation */
+(function () {
+  var el = document.getElementById('reasoningText');
+  if (!el) return;
+  var phrases = ['Deploying to production','Compiling sources','Running tests','Building artifacts','Pushing to remote','Installing dependencies','Analyzing bundle','Optimizing assets','Syncing database','Generating types','Linting codebase','Checking updates'];
+  var idx = 0, timer = null;
+  function update() {
+    el.style.opacity = '0';
+    setTimeout(function() {
+      el.textContent = phrases[idx];
+      idx = (idx + 1) % phrases.length;
+      el.style.opacity = '1';
+    }, 300);
+  }
+  function start() {
+    if (timer) return;
+    el.textContent = phrases[0];
+    el.style.opacity = '1';
+    idx = 1;
+    timer = setInterval(update, 4000);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+  document.addEventListener('touchstart', start, { once: true, passive: true });
 })();
