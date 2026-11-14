@@ -632,7 +632,7 @@
     resize();
     window.addEventListener('resize', resize);
     
-    const TILE_S = 70, DEPTH = 8, COUNT = 4;
+    const TILE_S = 70, DEPTH = 8, COUNT = 6;
     
     function harmColor(h, s, l) {
       const c = new THREE.Color();
@@ -664,12 +664,14 @@
     
     const tileGeo = makeTileGeo(TILE_S, 10, DEPTH);
     
-    // Конфигурация 4 плиток: Bambu (120°), Blender (30°), Cinema (240°), Maya (180°)
+    // Конфигурация 6 плиток: Bambu (120°), Blender (30°), Cinema (240°), Maya (180°), Bambu (120°), Blender (30°)
     const tileConfigs = [
-      { hue: 120, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/342f465d59350c1b5846e26dc3922642163be4fe/bambu-lab-kclg10oxdv8zx23hxtxzl.svg' },
-      { hue: 30,  svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/342f465d59350c1b5846e26dc3922642163be4fe/blender-logo-j8sqbuxp9w6ikdq2tdt0p.svg' },
-      { hue: 240, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/342f465d59350c1b5846e26dc3922642163be4fe/cinema-4d-k9h97dj9fmvx83hnb3jra.svg' },
-      { hue: 180, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/342f465d59350c1b5846e26dc3922642163be4fe/maya-ewu1lp115nawqxstrdwva.svg' }
+      { hue: 120, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/bambulablogo.svg' },
+      { hue: 30,  svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/blender.svg' },
+      { hue: 240, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/Cinema-4d-Logo--Streamline-Ultimate.svg' },
+      { hue: 180, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/342f465d59350c1b5846e26dc3922642163be4fe/maya-ewu1lp115nawqxstrdwva.svg' },
+      { hue: 120, svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/bambulablogo.svg' },
+      { hue: 30,  svg: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/9645351196029a30fc7c982681402ab1ba666afe/blender.svg' }
     ];
     
     const tiles = [];
@@ -803,7 +805,7 @@
       const PAD_X = TILE_S * 0.7;
       const PAD_Y = TILE_S * 1.2;
       const cols = 2;
-      const rows = 2;
+      const rows = 3;
       const cellW = (sideW - PAD_X * 2) / cols;
       const cellH = (H - PAD_Y * 2) / rows;
       
