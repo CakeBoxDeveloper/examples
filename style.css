@@ -1108,8 +1108,8 @@ body.theme-light .case-item__title { color: var(--text); }
   border-radius: 14px 14px 0 0; flex-shrink: 0;
 }
 body.theme-light .cform__header {
-  background: #e4e4e4;
-  border-bottom: 1px solid var(--chat-border, rgba(0,0,0,0.09));
+  background: #e4e5ec;
+  border-bottom: none;
 }
 .cform__header--green,
 .cform__header--yellow {
@@ -1118,8 +1118,8 @@ body.theme-light .cform__header {
 }
 body.theme-light .cform__header--green,
 body.theme-light .cform__header--yellow {
-  background: #e4e4e4;
-  border-bottom: 1px solid var(--chat-border, rgba(0,0,0,0.09));
+  background: #e4e5ec;
+  border-bottom: none;
 }
 /* Светлая тема: donate */
 body.theme-light .donate__cell {
@@ -1286,6 +1286,19 @@ body.theme-light .cform__input-icon {
   transition: background var(--ease);
 }
 .cform__submit--yellow:hover { background: #2a3a2d; }
+
+/* Светлая тема - кнопки серые */
+body.theme-light .cform__submit--green { background: #d4d5dc !important; color: #666 !important; }
+body.theme-light .cform__submit--green:hover { background: #c4c5cc !important; }
+body.theme-light .cform__submit.btn--primary,
+body.theme-light .cform__submit--green.btn--primary { background: #d4d5dc !important; color: #666 !important; }
+body.theme-light .cform__submit.btn--primary:hover,
+body.theme-light .cform__submit--green.btn--primary:hover { background: #c4c5cc !important; }
+body.theme-light .cform__submit--yellow { background: #d4d5dc !important; color: #666 !important; }
+body.theme-light .cform__submit--yellow:hover { background: #c4c5cc !important; }
+
+/* Иконка кнопки в светлой теме - серая как текст */
+body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.4) !important; }
 .cform__submit.btn--primary,
 .cform__submit--green.btn--primary {
   background: #212e22; color: #a8c4a8;
