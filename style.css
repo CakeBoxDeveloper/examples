@@ -350,7 +350,7 @@ body:not(.theme-light) .hero__chat::before {
     linear-gradient(to left, #000 0, transparent 60px),
     linear-gradient(to bottom, #000 0, transparent 60px);
 }
-  /* ��������� ����� ����� ��� ��������� */
+  /* ��������� ����� ����� ��� ��������� */
   @media (max-width: 860px) {
     .hero__chat-blur-edges {
       mask-image:
@@ -570,9 +570,9 @@ body.theme-light .hero__chat-box {
 
 .hero__chat-placeholder {
   position: absolute; top: 50%; left: 14px; transform: translateY(-50%);
-  pointer-events: none; z-index: 0; font-size: 0.82rem; color: var(--chat-muted);
+  pointer-events: none; z-index: 0; font-size: 0.88rem; color: var(--chat-muted);
   display: flex; align-items: center; white-space: nowrap;
-  overflow: hidden;
+  overflow: hidden; max-width: calc(100% - 28px);
 }
 /* Тёмная тема: зелёный цвет */
 body:not(.theme-light) .hero__chat-placeholder { color: #88aa8e; }
@@ -586,6 +586,7 @@ body:not(.theme-light) .hero__chat-placeholder { color: #88aa8e; }
 }
 .hero__chat-reasoning-text {
   display: inline-block;
+  transition: opacity 0.3s;
 }
 .hero__chat-dots {
   display: inline-flex;
@@ -1102,8 +1103,8 @@ body.theme-light .case-item__title { color: var(--text); }
 .cform__wrap { display: flex; flex-direction: column; }
 .cform__header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 20px; background: var(--chat-footer, #1e261f);
-  border-bottom: 1px solid var(--chat-border, rgba(255,255,255,0.07));
+  padding: 14px 20px; background: var(--bg-card);
+  border-bottom: none;
   border-radius: 14px 14px 0 0; flex-shrink: 0;
 }
 body.theme-light .cform__header {
@@ -1112,8 +1113,8 @@ body.theme-light .cform__header {
 }
 .cform__header--green,
 .cform__header--yellow {
-  background: var(--chat-footer, #1e261f);
-  border-bottom: 1px solid var(--chat-border, rgba(255,255,255,0.07));
+  background: var(--bg-card);
+  border-bottom: none;
 }
 body.theme-light .cform__header--green,
 body.theme-light .cform__header--yellow {
@@ -1172,19 +1173,19 @@ body.theme-light .donate__qr-close:hover {
 }
 .cform__title {
   font-size: clamp(1rem, 2.5vw, 1.2rem); font-weight: 800;
-  letter-spacing: -0.02em; color: var(--accent); line-height: 1.2;
+  letter-spacing: -0.02em; color: #a8c4a8; line-height: 1.2;
 }
-.cform__title--dark { color: var(--accent); }
+.cform__title--dark { color: #a8c4a8; }
 body.theme-light .cform__title,
 body.theme-light .cform__title--dark {
   color: #666 !important;
 }
 
 .contact__emoji { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
-/* Иконки заголовков карточек — цвет совпадает с заголовком (var(--accent)) */
-/* Тёмная тема: зелёная (accent) */
+/* Иконки заголовков карточек — цвет хаки #a8c4a8 */
+/* Тёмная тема: хаки */
 .contact__emoji {
-  filter: invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(105%);
+  filter: invert(76%) sepia(11%) saturate(805%) hue-rotate(69deg) brightness(93%) contrast(89%);
   opacity: 1;
 }
 /* Светлая тема: серая (как var(--text-muted) ≈ #5a6070) */
@@ -1273,27 +1274,27 @@ body.theme-light .cform__input-icon {
   display: flex; align-items: center; justify-content: center;
   gap: 8px; border-radius: 0 0 14px 14px;
 }
-.cform__submit--green { background: var(--accent); }
-.cform__submit--green:hover { background: #3a9458; }
+.cform__submit--green { background: #212e22; color: #a8c4a8; }
+.cform__submit--green:hover { background: #2a3a2d; }
 .cform__submit--yellow {
   display: flex; align-items: center; justify-content: center;
   width: 100%; padding: 15px 28px; font-size: 0.78rem; font-weight: 800;
   letter-spacing: 0.04em; text-transform: uppercase;
-  background: var(--chat-footer); color: var(--chat-text);
+  background: #212e22; color: #a8c4a8;
   border-radius: 0 0 14px 14px; border: none;
-  border-top: 1px solid var(--chat-border); cursor: pointer; flex-shrink: 0;
+  border-top: none; cursor: pointer; flex-shrink: 0;
   transition: background var(--ease);
 }
-.cform__submit--yellow:hover { background: var(--chat-input-bg); }
+.cform__submit--yellow:hover { background: #2a3a2d; }
 .cform__submit.btn--primary,
 .cform__submit--green.btn--primary {
-  background: var(--chat-footer); color: var(--chat-text);
-  border-top: 1px solid var(--chat-border); border-radius: 0 0 14px 14px;
+  background: #212e22; color: #a8c4a8;
+  border-top: none; border-radius: 0 0 14px 14px;
 }
 .cform__submit.btn--primary:hover,
-.cform__submit--green.btn--primary:hover { background: var(--chat-input-bg); }
+.cform__submit--green.btn--primary:hover { background: #2a3a2d; }
 
-.cform__submit-icon { flex-shrink: 0; filter: brightness(0) invert(1); }
+.cform__submit-icon { flex-shrink: 0; filter: invert(76%) sepia(11%) saturate(805%) hue-rotate(69deg) brightness(93%) contrast(89%); }
 body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
 
 /* Donate */
