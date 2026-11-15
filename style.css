@@ -27,9 +27,20 @@
   --border:        rgba(255, 255, 255, 0.07);
   --border-accent: rgba(77, 175, 106, 0.35);
 
-  /* Glass box-shadow — зеленоватая объёмная рамка */
+  /* Glass box-shadow — зеленоватая объёмная рамка (сниженная сатурация для cases) */
   --glass-shadow:
     inset 0 0 0 1.3px color-mix(in srgb, var(--accent) 25%, color-mix(in srgb, #fff 8%, transparent)),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 55%, transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, #fff 40%, transparent),
+    inset -3px -8px 1px -6px color-mix(in srgb, #fff 28%, transparent),
+    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 18%, transparent),
+    inset -1.5px 2.5px 0px -2px color-mix(in srgb, #000 22%, transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 20%, transparent),
+    inset 2px -6.5px 1px -4px color-mix(in srgb, #000 10%, transparent);
+
+  /* Glass box-shadow для cases — сниженная сатурация (убрали зелёный оттенок) */
+  --glass-shadow-cases:
+    inset 0 0 0 1.3px color-mix(in srgb, #fff 8%, transparent),
     inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 55%, transparent),
     inset -2px -2px 0px -2px color-mix(in srgb, #fff 40%, transparent),
     inset -3px -8px 1px -6px color-mix(in srgb, #fff 28%, transparent),
@@ -260,7 +271,7 @@ body.theme-light .section-scroll-btn { color: var(--text); }
 }
 
 .hero__chat-wrap {
-  position: relative; width: 100%; border-radius: 18px; padding: 1px;
+  position: relative; width: 100%; border-radius: 25px; padding: 1px;
   background: transparent;
   box-shadow: 0 24px 60px rgba(0,0,0,0.45);
 }
@@ -277,7 +288,7 @@ body.theme-light .hero__chat-wrap {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: 25px;
   padding: 1.3px;
   background: conic-gradient(
     from var(--gradient-angle),
@@ -304,7 +315,7 @@ body.theme-light .hero__chat-wrap::after {
   width: 100%;
   height: calc(100svh - 160px); max-height: 640px; min-height: 400px;
   background: transparent;
-  border: none; border-radius: 17px;
+  border: none; border-radius: 24px;
   overflow: hidden;
   display: flex; flex-direction: column;
   position: relative;
@@ -331,14 +342,14 @@ body.theme-light .hero__chat {
 body:not(.theme-light) .hero__chat::before {
   content: '';
   position: absolute; inset: 0; z-index: -1;
-  border-radius: 17px; pointer-events: none;
+  border-radius: 24px; pointer-events: none;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
 /* Сильный блюр по краям (маска: left, right, top) */
 .hero__chat-blur-edges {
   position: absolute; inset: 0; z-index: -1;
-  border-radius: 17px; pointer-events: none;
+  border-radius: 24px; pointer-events: none;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   mask-image:
@@ -370,7 +381,7 @@ body:not(.theme-light) .hero__chat::before {
 /* Усиленное размытие снизу (увеличено) */
 .hero__chat-blur-bottom {
   position: absolute; inset: 0; z-index: -1;
-  border-radius: 17px; pointer-events: none;
+  border-radius: 24px; pointer-events: none;
   backdrop-filter: blur(48px);
   -webkit-backdrop-filter: blur(48px);
   mask-image: linear-gradient(to top, #000 0, transparent 256px);
@@ -379,7 +390,7 @@ body:not(.theme-light) .hero__chat::before {
 /* Цветной тинт по краям */
 .hero__chat-tint {
   position: absolute; inset: 0; z-index: -1;
-  border-radius: 17px; pointer-events: none;
+  border-radius: 24px; pointer-events: none;
   background: hsl(var(--hue), 55%, 45%);
   opacity: 0.05;
   mask-image:
@@ -395,7 +406,7 @@ body:not(.theme-light) .hero__chat::before {
 body:not(.theme-light) .hero__chat::after {
   content: '';
   position: absolute; inset: 0; z-index: -1;
-  border-radius: 17px; pointer-events: none;
+  border-radius: 24px; pointer-events: none;
   box-shadow: 
     inset 0 0 30px 0px rgba(77, 175, 106, 0.075),
     inset 0 0 60px 10px rgba(77, 175, 106, 0.0375),
@@ -406,7 +417,7 @@ body:not(.theme-light) .hero__chat::after {
 body.theme-light .hero__chat::after {
   content: '';
   position: absolute; inset: 0; z-index: -1;
-  border-radius: 17px; pointer-events: none;
+  border-radius: 24px; pointer-events: none;
   box-shadow: 
     inset 0 0 30px 0px rgba(255, 255, 255, 0.4),
     inset 0 0 60px 10px rgba(255, 255, 255, 0.2),
@@ -422,7 +433,7 @@ body.theme-light .hero__chat {
 body.theme-light .hero__chat::before {
   content: '';
   position: absolute; inset: 0; z-index: -1;
-  border-radius: 17px; pointer-events: none;
+  border-radius: 24px; pointer-events: none;
   background: linear-gradient(
     to top,
     rgba(220, 225, 232, 0.95) 0%,
@@ -694,7 +705,7 @@ body:not(.theme-light) .hero__chat-icon-btn:hover { color: #a8d8b8; }
   position: absolute;
   inset: 0;
   z-index: 0;
-  display: grid;
+  display: none; /* Временно отключено */
   grid-template-columns: repeat(auto-fill, 48px);
   grid-template-rows: repeat(auto-fill, 48px);
   gap: 0;
@@ -748,9 +759,9 @@ body.theme-light .binary-grid {
   opacity: 0;
   pointer-events: none;
 }
-/* Светлая тема: убираем стеклянные эффекты, простая рамка */
+/* Светлая тема: убираем стеклянные эффекты, рамка 2px */
 body.theme-light .cases-folder__intro {
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 2px solid rgba(0,0,0,0.15);
 }
 .cases-folder__intro-header {
   display: flex;
@@ -907,40 +918,41 @@ body.theme-light .cases-folder__intro-item-text strong {
 
 .cases-folder__tab {
   flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 8px 10px; border: 1px solid var(--border); border-radius: 12px;
-  background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+  padding: 8px 10px; border: 2px solid transparent; border-radius: 12px;
+  background: transparent; color: var(--text-muted); cursor: pointer;
   position: relative; overflow: hidden; white-space: nowrap;
   transition: gap 0.25s ease, border-color 0.18s, color 0.18s, background 0.18s;
 }
-/* Тёмная тема: объёмная стеклянная рамка с зелёным оттенком */
+/* Тёмная тема: толстая рамка */
 body:not(.theme-light) .cases-folder__tab {
-  box-shadow: var(--glass-shadow);
+  border: 2px solid rgba(77, 175, 106, 0.35);
+  background: transparent;
+  color: #88aa8e;
 }
-.cases-folder__tab.is-active {
+body:not(.theme-light) .cases-folder__tab.is-active {
   z-index: 3; gap: 7px;
-  color: var(--text);
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
-  border-color: var(--border-accent);
+  color: #88aa8e;
+  background: rgb(39, 70, 48);
+  border-color: rgb(39, 70, 48);
 }
-.cases-folder__tab:hover:not(.is-active) { background: rgba(255,255,255,0.04); color: var(--text); }
-/* Светлая тема: серые рамки, зелёный акцент при активации */
+body:not(.theme-light) .cases-folder__tab:hover:not(.is-active) { 
+  background: rgba(77, 175, 106, 0.05); 
+  border-color: rgba(77, 175, 106, 0.4);
+}
+/* Светлая тема: серые цвета, более светлый активный таб */
 body.theme-light .cases-folder__tab {
-  border-color: rgba(0,0,0,0.12);
-  background: var(--bg-card);
-  box-shadow: 
-    inset 0 0 0 1.3px color-mix(in srgb, #000 8%, transparent),
-    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 80%, transparent),
-    inset -2px -2px 0px -2px color-mix(in srgb, #000 6%, transparent),
-    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 8%, transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 6%, transparent);
+  border: 2px solid rgba(0,0,0,0.15);
+  background: transparent;
+  color: #666;
 }
 body.theme-light .cases-folder__tab.is-active {
-  background: rgba(77,175,106,0.1);
-  border-color: rgba(77,175,106,0.3);
-  color: var(--text);
+  background: #888;
+  border-color: #888;
+  color: #f2f3f7;
 }
 body.theme-light .cases-folder__tab:hover:not(.is-active) {
   background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.22);
 }
 
 .cases-folder__tab-icon {
@@ -965,24 +977,18 @@ body.theme-light .cases-folder__tab:hover:not(.is-active) {
 /* Panel */
 .cases-folder__panel {
   flex: 1; background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 2px solid transparent;
   border-radius: 12px;
   overflow: clip;
   display: flex; flex-direction: column; position: relative; z-index: 1; min-height: 0;
 }
-/* Тёмная тема: объёмная стеклянная рамка с зелёным оттенком */
+/* Тёмная тема: зелёная рамка 2px */
 body:not(.theme-light) .cases-folder__panel {
-  box-shadow: var(--glass-shadow);
+  border-color: rgba(77, 175, 106, 0.3);
 }
-/* Светлая тема: обычная серая рамка без стеклянного эффекта */
+/* Светлая тема: серая рамка 2px */
 body.theme-light .cases-folder__panel {
-  border: 1px solid rgba(0,0,0,0.12);
-  box-shadow: 
-    inset 0 0 0 1.3px color-mix(in srgb, #000 8%, transparent),
-    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 80%, transparent),
-    inset -2px -2px 0px -2px color-mix(in srgb, #000 6%, transparent),
-    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 8%, transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 6%, transparent);
+  border-color: rgba(0,0,0,0.15);
 }
 /* Убираем обёртку и cases-folder::after */
 .cases-folder__panel-wrap { display: contents; }
@@ -1025,10 +1031,11 @@ body.theme-light .cases-folder__panel {
 }
 .case-item:first-child { border-top: none; }
 .case-item:last-child  { border-bottom: none; }
-.case-item:hover { background: rgba(77,140,255,0.04); }
-.case-item:hover .case-item__title { color: var(--accent); }
-body.theme-light .case-item:hover { background: #ebebeb; }
-body.theme-light .case-item:hover .case-item__title { color: #444; }
+body:not(.theme-light) .case-item:hover { background: rgba(77,140,255,0.04); }
+body:not(.theme-light) .case-item:hover .case-item__title { color: var(--accent); }
+/* Светлая тема: убираем hover */
+body.theme-light .case-item:hover { background: transparent; }
+body.theme-light .case-item:hover .case-item__title { color: var(--text); }
 
 .case-item__meta { display: flex; flex-direction: row; align-items: center; gap: 12px; flex: 1; }
 .case-item__title { font-size: 0.9rem; font-weight: 700; transition: color var(--ease); flex: 0 0 auto; white-space: nowrap; color: #a8c4a8; }
@@ -1799,15 +1806,6 @@ body.theme-light .donate__qr-frame {
 body.theme-light .case-item {
   border-bottom-color: #d8d8d8;
 }
-body.theme-light .cases-folder__panel {
-  box-shadow: var(--glass-shadow);
-}
-body.theme-light .cases-folder__tab {
-  box-shadow: var(--glass-shadow);
-}
-body.theme-light .cases-folder__tab.is-active {
-  box-shadow: var(--glass-shadow);
-}
 
 /* Toast над футером доната */
 .donate-toast {
@@ -2234,4 +2232,31 @@ body.theme-light .cases-folder__intro {
 .cases-folder__intro-btn:hover {
   background: rgba(77, 175, 106, 0.2);
   border-color: rgba(77, 175, 106, 0.7);
+}
+
+/* ═══════════════════════
+   OVERRIDE: Увеличенное скругление hero-чата
+═══════════════════════ */
+.hero .hero__chat-wrap {
+  border-radius: 40px;
+}
+.hero .hero__chat-wrap::after {
+  border-radius: 40px;
+}
+.hero .hero__chat {
+  border-radius: 40px;
+}
+.hero .hero__chat::before,
+.hero .hero__chat::after {
+  border-radius: 40px;
+}
+.hero .hero__chat-blur-edges,
+.hero .hero__chat-blur-bottom,
+.hero .hero__chat-tint {
+  border-radius: 40px;
+}
+
+/* Поднимаем футер чуть выше от нижнего края */
+.hero .hero__chat-footer {
+  padding-bottom: 16px;
 }
