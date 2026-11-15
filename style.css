@@ -2400,3 +2400,118 @@ body.theme-light .intro-btn:hover {
 .hero .hero__chat-footer {
   padding-bottom: 16px;
 }
+
+/* ═══════════════════════
+   BUTTON ANIMATION (Send)
+═══════════════════════ */
+.section-scroll-btn .letter {
+  display: inline-block;
+  opacity: 0;
+  animation: slideDown 0.4s ease forwards calc(var(--i) * 0.015s);
+}
+
+.section-scroll-btn:hover:not(.is-animating) .letter {
+  opacity: 1;
+  animation: wave 0.25s ease forwards calc(var(--i) * 0.01s);
+}
+
+.section-scroll-btn.is-animating .letter {
+  opacity: 1;
+  animation: disapear 0.3s ease forwards calc(var(--i) * 0.015s);
+}
+
+@keyframes wave {
+  30% {
+    opacity: 1;
+    transform: translateY(4px) translateX(0) rotate(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) translateX(0) rotate(0);
+    color: var(--accent);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) translateX(5px) rotate(-90deg);
+    color: var(--accent);
+    filter: blur(5px);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(4px) translateX(0) rotate(0);
+    filter: blur(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) translateX(0) rotate(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+@keyframes disapear {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(5px) translateY(20px);
+    color: var(--accent);
+    filter: blur(5px);
+  }
+}
+
+/* Анимация самолётика (lottie-arrow) */
+.section-scroll-btn .lottie-arrow {
+  transition: transform 0.3s ease;
+}
+
+.section-scroll-btn:hover:not(.is-animating) .lottie-arrow:first-child,
+.section-scroll-btn:hover:not(.is-animating) .lottie-arrow:last-child {
+  transform: rotate(45deg) scale(1.2);
+}
+
+.section-scroll-btn.is-animating .lottie-arrow:first-child {
+  animation: takeOffLeft 0.4s linear forwards;
+}
+
+.section-scroll-btn.is-animating .lottie-arrow:last-child {
+  animation: takeOffRight 0.4s linear forwards;
+}
+
+@keyframes takeOffLeft {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-70px) rotate(-45deg) scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-160px) rotate(-45deg) scale(0);
+  }
+}
+
+@keyframes takeOffRight {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(70px) rotate(45deg) scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(160px) rotate(45deg) scale(0);
+  }
+}
