@@ -705,11 +705,11 @@ body:not(.theme-light) .hero__chat-icon-btn:hover { color: #a8d8b8; }
   position: absolute;
   inset: 0;
   z-index: 0;
-  display: none; /* Временно отключено */
+  display: grid;
   grid-template-columns: repeat(auto-fill, 48px);
   grid-template-rows: repeat(auto-fill, 48px);
   gap: 0;
-  opacity: 0.15;
+  opacity: 0.3;
   pointer-events: none;
   font-family: 'Courier New', monospace;
   font-size: 20px;
@@ -717,8 +717,8 @@ body:not(.theme-light) .hero__chat-icon-btn:hover { color: #a8d8b8; }
   color: var(--accent);
 }
 body.theme-light .binary-grid {
-  opacity: 0.18;
-  color: #6b7280;
+  opacity: 0.35;
+  color: #666;
 }
 .binary-grid span {
   display: flex;
@@ -772,42 +772,34 @@ body.theme-light .cases-folder__intro {
   width: 56px;
   height: 56px;
   flex-shrink: 0;
-}
-/* Тёмная тема: зелёная иконка */
-body:not(.theme-light) .cases-folder__intro-icon {
   color: #88aa8e;
 }
 /* Светлая тема: серая иконка */
 body.theme-light .cases-folder__intro-icon {
-  color: #9ca3af;
+  color: #666;
 }
 .cases-folder__intro-title {
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0;
-}
-/* Тёмная тема: светло-зелёный заголовок */
-body:not(.theme-light) .cases-folder__intro-title {
-  color: #c4d9c6;
+  color: #88aa8e;
 }
 /* Светлая тема: тёмный заголовок */
 body.theme-light .cases-folder__intro-title {
-  color: var(--text);
+  color: #666;
 }
 .cases-folder__intro-desc {
   font-size: 0.88rem;
   line-height: 1.65;
   margin: 0;
-}
-/* Тёмная тема: зелёный текст */
-body:not(.theme-light) .cases-folder__intro-desc {
   color: #88aa8e;
 }
 /* Светлая тема: серый текст */
 body.theme-light .cases-folder__intro-desc {
-  color: #6b7280;
+  color: #666;
 }
+/* Think Tree стиль для списка */
 .cases-folder__intro-list {
   display: flex;
   flex-direction: column;
@@ -817,74 +809,85 @@ body.theme-light .cases-folder__intro-desc {
   list-style: none;
   flex: 1;
   position: relative;
+  padding-left: 20px;
+}
+.cases-folder__intro-list::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(77, 175, 106, 0.35) 0%, rgba(77, 175, 106, 0.1) 100%);
+}
+body.theme-light .cases-folder__intro-list::before {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.05) 100%);
 }
 .cases-folder__intro-item {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 12px 0;
+  padding: 10px 0;
   position: relative;
 }
 .cases-folder__intro-item:first-child {
   padding-top: 0;
 }
-/* Вертикальная линия между элементами - соединяет центры кругов */
-.cases-folder__intro-item:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 17px;
-  height: calc(100% - 10px);
-  width: 2px;
-  border-radius: 2px;
-}
-/* Тёмная тема: зелёная линия */
-body:not(.theme-light) .cases-folder__intro-item:not(:last-child)::before {
-  background: #88aa8e;
-  opacity: 0.35;
-}
-/* Светлая тема: серая линия */
-body.theme-light .cases-folder__intro-item:not(:last-child)::before {
-  background: #9ca3af;
-  opacity: 0.4;
-}
 .cases-folder__intro-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(77, 175, 106, 0.35);
+  background: var(--bg-card);
+  margin-left: -20px;
+  margin-top: 2px;
   position: relative;
   z-index: 1;
-  border: 2px solid var(--bg-card);
 }
-/* Тёмная тема: зелёные точки */
-body:not(.theme-light) .cases-folder__intro-dot {
-  background: #88aa8e;
-}
-/* Светлая тема: серые точки */
 body.theme-light .cases-folder__intro-dot {
-  background: #9ca3af;
+  border-color: rgba(0,0,0,0.2);
+  background: #e4e5ec;
+}
+.cases-folder__intro-dot--view {
+  background: rgba(77, 175, 106, 0.35);
+  border-color: rgba(77, 175, 106, 0.35);
+}
+body.theme-light .cases-folder__intro-dot--view {
+  background: #888;
+  border-color: #888;
+}
+.cases-folder__intro-dot--wip {
+  background: rgba(240, 192, 0, 0.35);
+  border-color: rgba(240, 192, 0, 0.35);
+}
+body.theme-light .cases-folder__intro-dot--wip {
+  background: #f0c000;
+  border-color: #f0c000;
+}
+.cases-folder__intro-dot--nda {
+  background: rgba(255, 82, 82, 0.35);
+  border-color: rgba(255, 82, 82, 0.35);
+}
+body.theme-light .cases-folder__intro-dot--nda {
+  background: #ff5252;
+  border-color: #ff5252;
 }
 .cases-folder__intro-item-text {
   font-size: 0.85rem;
   line-height: 1.6;
   flex: 1;
-}
-/* Тёмная тема: зелёные тона */
-body:not(.theme-light) .cases-folder__intro-item-text {
   color: #88aa8e;
 }
-body:not(.theme-light) .cases-folder__intro-item-text strong {
+body.theme-light .cases-folder__intro-item-text {
+  color: #666;
+}
+.cases-folder__intro-item-text strong {
   color: #a8d8b8;
   font-weight: 600;
 }
-/* Светлая тема: серые тона */
-body.theme-light .cases-folder__intro-item-text {
-  color: #6b7280;
-}
 body.theme-light .cases-folder__intro-item-text strong {
-  color: #374151;
+  color: #333;
   font-weight: 600;
 }
 .cases-folder__intro-btn {
@@ -2181,57 +2184,194 @@ body.theme-light .case-item {
 ═══════════════════════ */
 .cases-folder__intro {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 20;
-  display: flex; align-items: center; justify-content: center;
-  /* сплошной фон, без блюра */
   background: var(--bg-card);
   border: 1px solid var(--border-accent);
   border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 30px;
   opacity: 1;
-  transition: opacity 0.35s ease;
   pointer-events: auto;
-}
-body.theme-light .cases-folder__intro {
-  background: var(--bg-card);
+  transition: opacity 0.3s ease;
 }
 .cases-folder__intro.is-hidden {
   opacity: 0;
   pointer-events: none;
 }
 
-.cases-folder__intro-inner {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 20px;
-  padding: 32px 28px; text-align: center;
-  max-width: 360px;
+.intro-content {
+  max-width: 440px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.cases-folder__intro-icon {
-  width: 64px; height: 64px;
-  opacity: 0.25;
+/* Описание */
+.intro-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+/* Think Tree (список с чекпоинтами) */
+.think-tree {
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 20px;
+}
+
+.think-tree::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--border-accent) 0%, rgba(77, 175, 106, 0.1) 100%);
+}
+
+.think-tree__node {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 0;
+  position: relative;
+}
+
+.think-tree__dot {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border-accent);
+  background: var(--bg-card);
+  margin-left: -20px;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.think-tree__content {
+  flex: 1;
+}
+
+.think-tree__label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.think-tree__desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.6;
+}
+
+/* Checkpoint (заголовок с линиями) */
+.checkpoint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  color: var(--text-dim);
+  user-select: none;
+}
+
+.checkpoint__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-accent), transparent);
+}
+
+.checkpoint__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-card);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.checkpoint__badge svg {
+  flex-shrink: 0;
+}
+
+/* Кнопка внизу на всю ширину */
+.intro-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--r);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+  border: 1px solid var(--border-accent);
+  color: var(--accent);
+  margin-top: auto;
+}
+
+.intro-btn:hover {
+  background: var(--bg-alt);
+  border-color: var(--accent);
+}
+
+.intro-btn svg {
+  flex-shrink: 0;
+}
+
+/* ── СВЕТЛАЯ ТЕМА: всё серое ── */
+body.theme-light .think-tree::before {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.05) 100%);
+}
+
+body.theme-light .think-tree__dot {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: var(--bg-card);
+}
+
+body.theme-light .checkpoint__line {
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.15), transparent);
+}
+
+body.theme-light .checkpoint__badge {
+  border-color: rgba(0, 0, 0, 0.2);
   color: var(--text);
 }
 
-.cases-folder__intro-text {
-  font-size: 0.85rem; color: var(--text-muted);
-  line-height: 1.75; max-width: 300px;
+body.theme-light .intro-btn {
+  border-color: rgba(0, 0, 0, 0.2);
+  color: var(--text);
 }
 
-/* Кнопка в стиле badge (как NDA/WIP/VIEW) */
-.cases-folder__intro-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 6px 16px; border-radius: var(--r);
-  background: rgba(77, 175, 106, 0.1);
-  border: 1px solid rgba(77, 175, 106, 0.45);
-  color: var(--accent);
-  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease;
-}
-.cases-folder__intro-btn:hover {
-  background: rgba(77, 175, 106, 0.2);
-  border-color: rgba(77, 175, 106, 0.7);
+body.theme-light .intro-btn:hover {
+  background: var(--bg-alt);
+  border-color: rgba(0, 0, 0, 0.3);
 }
 
 /* ═══════════════════════
