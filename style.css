@@ -442,8 +442,6 @@ body.theme-light .hero__chat::before {
     transparent 100%
   );
 }
-body.theme-light .hero__chat-blur-edges,
-body.theme-light .hero__chat-blur-bottom,
 body.theme-light .hero__chat-tint {
   display: none;
 }
