@@ -1220,13 +1220,49 @@ body.theme-light .contact__emoji {
 .cform__checks { display: flex; flex-wrap: wrap; gap: 8px; }
 .cform__check {
   display: flex; align-items: center; gap: 8px; padding: 8px 14px;
-  border: 1px solid var(--border); border-radius: var(--r); cursor: pointer;
-  transition: border-color var(--ease), background var(--ease);
-  font-size: 0.82rem; color: var(--text-muted); user-select: none;
+  border: 2px solid var(--border-accent); 
+  border-radius: var(--r); 
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, color 0.18s;
+  font-size: 0.82rem; 
+  color: var(--text-muted); 
+  user-select: none;
+  background: transparent;
 }
-.cform__check:hover { border-color: var(--border-accent); }
+
+/* Тёмная тема */
+body:not(.theme-light) .cform__check {
+  border: 2px solid rgba(77, 175, 106, 0.35);
+  background: transparent;
+  color: #88aa8e;
+}
+body:not(.theme-light) .cform__check:hover:not(:has(input:checked)) { 
+  background: rgba(77, 175, 106, 0.05); 
+  border-color: rgba(77, 175, 106, 0.4);
+}
+body:not(.theme-light) .cform__check:has(input:checked) { 
+  border-color: rgb(39, 70, 48);
+  background: rgb(39, 70, 48);
+  color: #88aa8e;
+}
+
+/* Светлая тема */
+body.theme-light .cform__check {
+  border: 2px solid rgba(0,0,0,0.15);
+  background: transparent;
+  color: #666;
+}
+body.theme-light .cform__check:hover:not(:has(input:checked)) {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.22);
+}
+body.theme-light .cform__check:has(input:checked) {
+  background: #888;
+  border-color: #888;
+  color: #f2f3f7;
+}
+
 .cform__check input { display: none; }
-.cform__check:has(input:checked) { border-color: var(--accent); background: rgba(77,140,255,0.12); color: var(--accent); }
 
 .cform__input,
 .cform__textarea {
@@ -2422,8 +2458,15 @@ body.theme-light .intro-btn:hover {
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  background: var(--accent) !important;
+  background: #212e22 !important;
+  color: #a8c4a8 !important;
   opacity: 1 !important;
+}
+
+/* Светлая тема - кнопки серые */
+body.theme-light .send-btn {
+  background: #d4d5dc !important;
+  color: #666 !important;
 }
 
 .send-btn .send-btn__text {
