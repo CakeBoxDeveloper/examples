@@ -1125,7 +1125,7 @@ window.addEventListener('DOMContentLoaded', () => {
 (function () {
   var el = document.getElementById('reasoningText');
   if (!el) return;
-  var phrases = ['Deploying to production','Compiling sources','Running tests','Building artifacts','Pushing to remote','Installing dependencies','Analyzing bundle','Optimizing assets','Syncing database','Generating types','Linting codebase','Checking updates'];
+  var phrases = ['еплой в продакшн','омпиляция исходников','апуск тестов','Сборка артефактов','уш в репозиторий','становка зависимостей','нализ бандла','птимизация ассетов','Синхронизация ','енерация типов','роверка кода','оиск обновлений'];
   var idx = 0, timer = null;
   function update() {
     el.style.opacity = '0';

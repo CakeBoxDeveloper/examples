@@ -709,13 +709,7 @@ body.theme-light .binary-grid {
   opacity: 0.35;
   color: #666;
 }
-.binary-grid span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  animation: binaryPulse 2.6s ease-in-out infinite;
-}
+.binary-grid span { display: flex; align-items: center; justify-content: center; opacity: 0; animation: binaryPulse 2.6s ease-in-out infinite; will-change: auto; }
 @keyframes binaryPulse {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
