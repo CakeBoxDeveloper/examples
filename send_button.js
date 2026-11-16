@@ -34,7 +34,7 @@
       
       setTimeout(() => {
         this.classList.remove('is-sending');
-      }, 2500);
+      }, 2100);
     });
   });
 

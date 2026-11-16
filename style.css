@@ -2410,136 +2410,222 @@ body.theme-light .intro-btn:hover {
    SEND BUTTON ANIMATION
 ═══════════════════════ */
 .send-btn {
-  position: relative !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 10px !important;
-  min-height: 48px !important;
-  opacity: 1 !important;
+  --primary: var(--text);
+  cursor: pointer;
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  min-height: 48px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   background: var(--accent) !important;
-  overflow: visible !important;
-}
-
-.send-btn__state {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.send-btn__state--sent {
-  display: none;
-  opacity: 0;
-}
-
-.send-btn__icon {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-}
-
-.send-btn__icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-.send-btn__text {
-  display: flex;
-  margin: 0;
-  white-space: nowrap;
-}
-
-/* Буквы */
-.send-letter {
-  display: inline-block;
-  opacity: 1;
-}
-
-/* При клике: буквы первого состояния исчезают */
-.send-btn.is-sending .send-btn__state--default .send-letter {
-  animation: letterOut 0.3s ease forwards;
-  animation-delay: calc(var(--i) * 0.02s);
-}
-
-/* При клике: самолётик улетает */
-.send-btn.is-sending .send-btn__state--default .send-btn__icon {
-  animation: planeOut 0.5s ease forwards;
-}
-
-/* Скрываем первое состояние, показываем второе */
-.send-btn.is-sending .send-btn__state--default {
-  visibility: hidden !important;
-}
-
-.send-btn.is-sending .send-btn__state--sent {
-  display: flex !important;
   opacity: 1 !important;
+}
+
+.send-btn .send-btn__text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.send-btn .send-btn__icon {
   position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  transform: scale(1.25);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Буквы второго состояния появляются */
-.send-btn.is-sending .send-btn__state--sent .send-letter {
+.send-btn .send-btn__icon svg {
+  overflow: visible;
+  filter: none;
+}
+
+/* Letters */
+.send-btn .send-btn__text span {
+  display: block;
   opacity: 0;
-  animation: letterIn 0.4s ease forwards;
-  animation-delay: calc(0.3s + var(--i) * 0.05s);
+  animation: slideDown 0.4s ease forwards calc(var(--i) * 0.015s);
 }
 
-/* Галочка появляется */
-.send-btn.is-sending .send-btn__state--sent .send-btn__icon {
-  opacity: 0;
-  animation: checkIn 0.5s ease forwards 0.5s;
+.send-btn.is-sending .send-btn__text span {
+  opacity: 1;
+  animation: disapear 0.3s ease forwards calc(var(--i) * 0.015s);
 }
 
-/* Анимации */
-@keyframes letterOut {
-  to {
-    opacity: 0;
-    transform: translateY(10px);
-    filter: blur(3px);
-  }
-}
-
-@keyframes letterIn {
+@keyframes disapear {
   from {
-    opacity: 0;
-    transform: translateY(-10px);
-    filter: blur(3px);
+    opacity: 1;
   }
   to {
+    opacity: 0;
+    transform: translateX(5px) translateY(20px);
+    filter: blur(5px);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) translateX(5px) rotate(-90deg);
+    filter: blur(5px);
+  }
+  30% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(4px) translateX(0) rotate(0);
+    filter: blur(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) translateX(0) rotate(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+/* Plane */
+.send-btn .send-btn__state--default .send-btn__icon svg {
+  animation: land 0.3s ease forwards;
+}
+
+.send-btn.is-sending .send-btn__state--default svg {
+  animation: takeOff 0.4s linear forwards;
+}
+
+.send-btn.is-sending .send-btn__state--default .send-btn__icon {
+  transform: rotate(0) scale(1.25);
+}
+
+@keyframes takeOff {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(70px) rotate(45deg) scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(160px) rotate(45deg) scale(0);
+  }
+}
+
+@keyframes land {
+  0% {
+    transform: translateX(-60px) translateY(30px) rotate(-50deg) scale(2);
+    opacity: 0;
+    filter: blur(3px);
+  }
+  100% {
+    transform: translateX(0) translateY(0) rotate(0);
+    opacity: 1;
     filter: blur(0);
   }
 }
 
-@keyframes planeOut {
+/* Contrail */
+.send-btn .send-btn__state--default .send-btn__icon:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  width: 0;
+  left: -5px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5));
+}
+
+.send-btn.is-sending .send-btn__state--default .send-btn__icon:before {
+  animation: contrail 0.4s linear forwards;
+}
+
+@keyframes contrail {
   0% {
+    width: 0;
     opacity: 1;
-    transform: translateX(0) rotate(0) scale(1);
   }
-  50% {
-    opacity: 1;
-    transform: translateX(60px) rotate(45deg) scale(1.5);
+  8% {
+    width: 15px;
+  }
+  60% {
+    opacity: 0.7;
+    width: 80px;
   }
   100% {
     opacity: 0;
-    transform: translateX(100px) rotate(45deg) scale(0.5);
+    width: 160px;
   }
 }
 
-@keyframes checkIn {
+/* States */
+.send-btn .send-btn__state {
+  padding-left: 29px;
+  z-index: 3;
+  display: flex;
+  position: relative;
+}
+
+.send-btn .send-btn__state--default span:nth-child(4) {
+  margin-right: 0;
+}
+
+.send-btn .send-btn__state--sent {
+  display: none;
+}
+
+.send-btn .send-btn__state--sent svg {
+  transform: scale(1.25);
+  margin-right: 8px;
+}
+
+.send-btn.is-sending .send-btn__state--default {
+  position: absolute;
+}
+
+.send-btn.is-sending .send-btn__state--sent {
+  display: flex;
+}
+
+.send-btn.is-sending .send-btn__state--sent span {
+  opacity: 0;
+  animation: slideDown 0.4s ease forwards calc(var(--i) * 0.1s);
+}
+
+.send-btn.is-sending .send-btn__state--sent .send-btn__icon svg {
+  opacity: 0;
+  animation: aparecer 0.6s ease forwards 0.4s;
+}
+
+@keyframes aparecer {
   0% {
     opacity: 0;
-    transform: scale(0) rotate(-45deg);
+    transform: scale(4) rotate(-40deg);
+    filter: blur(4px);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(0.6);
+    filter: blur(1px);
   }
   50% {
     opacity: 1;
-    transform: scale(1.2) rotate(0);
+    transform: scale(1.2);
+    filter: blur(0);
   }
   100% {
     opacity: 1;
-    transform: scale(1) rotate(0);
+    transform: scale(1);
   }
 }
+
