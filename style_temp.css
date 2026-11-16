@@ -1,0 +1,2641 @@
+/* ============================================================
+   PORTFOLIO — clean, mobile-first
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'AnaloguePro';
+  src: url('https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/AnaloguePro-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ═══════════════════════
+   VARIABLES
+═══════════════════════ */
+:root {
+  /* Colors */
+  --bg:          #080f09;
+  --bg-alt:      #0c1a0e;
+  --bg-card:     #101f12;
+  --accent:      #4daf6a;
+  --accent-glow: rgba(77, 175, 106, 0.2);
+  --text:        #ffffff;
+  --text-muted:  #88aa8e;
+  --text-dim:    #4a6850;
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-accent: rgba(77, 175, 106, 0.35);
+
+  /* Glass box-shadow — зеленоватая объёмная рамка (сниженная сатурация для cases) */
+  --glass-shadow:
+    inset 0 0 0 1.3px color-mix(in srgb, var(--accent) 25%, color-mix(in srgb, #fff 8%, transparent)),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 55%, transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, #fff 40%, transparent),
+    inset -3px -8px 1px -6px color-mix(in srgb, #fff 28%, transparent),
+    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 18%, transparent),
+    inset -1.5px 2.5px 0px -2px color-mix(in srgb, #000 22%, transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 20%, transparent),
+    inset 2px -6.5px 1px -4px color-mix(in srgb, #000 10%, transparent);
+
+  /* Glass box-shadow для cases — сниженная сатурация (убрали зелёный оттенок) */
+  --glass-shadow-cases:
+    inset 0 0 0 1.3px color-mix(in srgb, #fff 8%, transparent),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 55%, transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, #fff 40%, transparent),
+    inset -3px -8px 1px -6px color-mix(in srgb, #fff 28%, transparent),
+    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 18%, transparent),
+    inset -1.5px 2.5px 0px -2px color-mix(in srgb, #000 22%, transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 20%, transparent),
+    inset 2px -6.5px 1px -4px color-mix(in srgb, #000 10%, transparent);
+
+  /* Chat colors */
+  --chat-bg:         #111714;
+  --chat-footer:     #151c16;
+  --chat-border:     rgba(255,255,255,0.07);
+  --chat-text:       #c4ccc5;
+  --chat-muted:      #637065;
+  --chat-accent:     #c07a40;
+  --chat-input-bg:   #1a221b;
+  --chat-icon-color: #3a4a3c;
+
+  /* Layout */
+  --r:    6.5px;
+  --font: 'Inter', system-ui, sans-serif;
+  --ease: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --pg:   20px;
+
+  /* Block width — единая ширина для hero, cases, contact */
+  --block-w: calc((100vw - 80px) / 3);
+  --folder-h: calc(100svh - 160px);
+}
+
+/* ── Светлая тема ── */
+body.theme-light {
+  --bg:          #f2f3f7;
+  --bg-alt:      #eaebf0;
+  --bg-card:     #e4e5ec;
+  --text:        #1a1c26;
+  --text-muted:  #5a6070;
+  --text-dim:    #9098aa;
+  --border:        rgba(0, 0, 0, 0.09);
+  --border-accent: rgba(77, 175, 106, 0.4);
+
+  --chat-bg:         #f0f1f5;
+  --chat-footer:     #e4e5ec;
+  --chat-border:     rgba(0,0,0,0.09);
+  --chat-text:       #1a1a1a;
+  --chat-muted:      #666666;
+  --chat-input-bg:   #d8d9e0;
+  --chat-icon-color: #b0b0b0;
+
+  --glass-shadow:
+    inset 0 0 0 1.3px color-mix(in srgb, #000 8%, transparent),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 80%, transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, #000 6%, transparent),
+    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 8%, transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 6%, transparent);
+}
+
+/* ═══════════════════════
+   LOADER
+═══════════════════════ */
+.loader {
+  position: fixed; inset: 0; z-index: 9000;
+  background: #060c07;
+  display: flex; align-items: flex-start; justify-content: center;
+  pointer-events: all;
+  transition: opacity 0.25s ease;
+}
+.loader.loader--day {
+  background: #f2f3f7;
+}
+.loader.loader--day .loader__lottie {
+  filter: brightness(0) opacity(0.55);
+}
+.loader__lottie {
+  position: absolute; /* позиционируем через JS */
+  width: 110px; height: 110px;
+  flex-shrink: 0;
+  filter: invert(45%) sepia(15%) saturate(300%) hue-rotate(90deg) brightness(85%);
+  /* transform-origin по центру — рост из центра */
+  transform-origin: center center;
+  transition: width 0.18s cubic-bezier(0.4,0,0.2,1),
+              height 0.18s cubic-bezier(0.4,0,0.2,1),
+              top 0.18s cubic-bezier(0.4,0,0.2,1),
+              left 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.loader.is-hiding { opacity: 0; pointer-events: none; }
+.loader.is-hidden { display: none; }
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: clip; }
+
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after { transition: none !important; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 1.8s ease, color 1.8s ease;
+}
+img    { display: block; max-width: 100%; user-select: none; }
+a      { color: inherit; text-decoration: none; }
+ul     { list-style: none; }
+button { font: inherit; color: inherit; cursor: pointer; border: none; background: none; }
+::selection { background: var(--accent); color: #fff; }
+
+.noise {
+  position: fixed; inset: 0; z-index: 999; pointer-events: none; opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════
+   BUTTONS
+═══════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 8px 14px; border-radius: var(--r);
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+.btn--primary { background: var(--accent); color: #fff; padding: 14px 28px; font-size: 0.78rem; }
+.btn--primary:hover { background: #3a9458; }
+.btn--nda  { border: 1px solid var(--border-accent);  color: var(--accent);  background: rgba(77,175,106,0.05); }
+.btn--nda:hover  { background: rgba(77,175,106,0.15);  border-color: var(--border-accent); }
+.btn--wip  { border: 1px solid var(--border-accent);  color: var(--accent);  background: rgba(77,175,106,0.05); }
+.btn--wip:hover  { background: rgba(77,175,106,0.15);  border-color: var(--border-accent); }
+.btn--view { border: 1px solid var(--border-accent); color: var(--accent); background: rgba(77,175,106,0.05); }
+.btn--view:hover { background: rgba(77,175,106,0.15); border-color: var(--border-accent); }
+/* Светлая тема: серые статусы */
+body.theme-light .btn--nda  { border-color: rgba(0,0,0,0.15); color: #666; background: rgba(0,0,0,0.04); }
+body.theme-light .btn--nda:hover  { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.25); }
+body.theme-light .btn--wip  { border-color: rgba(0,0,0,0.15); color: #666; background: rgba(0,0,0,0.04); }
+body.theme-light .btn--wip:hover  { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.25); }
+body.theme-light .btn--view { border-color: rgba(0,0,0,0.15); color: #666; background: rgba(0,0,0,0.04); }
+body.theme-light .btn--view:hover { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.25); }
+
+.btn__shimmer {
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+  animation: shimmer 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+.btn__shimmer--hidden { display: none; }
+@keyframes shimmer { 0% { left: -60%; } 100% { left: 160%; } }
+
+/* ── Lottie arrow ── */
+.lottie-arrow {
+  width: 32px; height: 32px; flex-shrink: 0;
+  filter: invert(65%) sepia(40%) saturate(600%) hue-rotate(95deg) brightness(120%);
+}
+.hero .lottie-arrow { filter: invert(65%) sepia(40%) saturate(600%) hue-rotate(95deg) brightness(120%); }
+body.theme-light .lottie-arrow { filter: invert(50%) sepia(0%) saturate(0%) brightness(60%); }
+.section-scroll-btn { color: var(--accent); }
+body.theme-light .section-scroll-btn { color: var(--text); }
+
+/* ── Canvases ── */
+.wire-canvas  { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; display: none; }
+.matrix-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.hero__vignette { display: none; }
+
+/* ═══════════════════════
+   HERO
+═══════════════════════ */
+.hero {
+  height: 100svh;
+  display: flex; align-items: center; justify-content: center;
+  padding-inline: var(--pg);
+  overflow-x: clip; overflow-y: visible;
+  position: relative;
+  padding-top: 48px; padding-bottom: 48px;
+}
+/* Fade-out внизу hero — скрывает нижний край матрицы */
+.hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent 0%, #08090f 50%, #08090f 100%);
+  pointer-events: none; z-index: 1;
+}
+body.theme-light .hero::after {
+  background: linear-gradient(to bottom, transparent 0%, #f2f3f7 50%, #f2f3f7 100%);
+  z-index: 4;
+}
+body.theme-light .hero .section-scroll-btn {
+  z-index: 6;
+}
+body.theme-light .hero::after {
+  background: linear-gradient(to bottom, transparent 0%, transparent 40%, #f2f3f7 100%);
+}
+
+.hero__inner {
+  display: flex; flex-direction: row;
+  align-items: center; justify-content: center;
+  gap: 32px; width: 100%; max-width: 100%;
+  position: relative; z-index: 2;
+}
+
+.hero__center {
+  width: var(--block-w);
+  min-width: 240px; max-width: 480px;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 14px; text-align: center;
+  flex: 0 0 auto;
+}
+
+/* ── Section scroll button ── */
+.section-scroll-btn {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; padding: 20px var(--pg);
+  border: none; font: inherit; color: var(--accent);
+  font-size: 0.88rem; font-weight: 900; letter-spacing: 0.09em; text-transform: uppercase;
+  cursor: pointer; transition: opacity var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  background: transparent; width: 100%;
+}
+body.theme-light .section-scroll-btn { color: var(--text); }
+.section-scroll-btn:hover { opacity: 0.75; }
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.hero__chat-wrap {
+  position: relative; width: 100%; border-radius: 25px; padding: 1px;
+  background: transparent;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+}
+body.theme-light .hero__chat-wrap {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+/* Пассивная рамка в светлой теме через outline — не ломает backdrop */
+body.theme-light .hero__chat-wrap {
+  outline: 1px solid rgba(0, 0, 0, 0.13);
+  outline-offset: -1px;
+}
+/* Анимированная рамка — только 1.3px контур, без засветки внутри */
+.hero__chat-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 25px;
+  padding: 2.6px;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    transparent,
+    #4daf6a 16%, #a8d8b8 32%, #4daf6a 48%, transparent 64%
+  );
+  animation: gradient-angle 6s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 3;
+}
+body.theme-light .hero__chat-wrap::after {
+  background: conic-gradient(
+    from var(--gradient-angle),
+    transparent, #aaaaaa 16%, #dddddd 32%, #aaaaaa 48%, transparent 64%
+  );
+}
+@keyframes gradient-angle { to { --gradient-angle: 360deg; } }
+
+.hero__chat {
+  width: 100%;
+  height: calc(100svh - 160px); max-height: 640px; min-height: 400px;
+  background: transparent;
+  border: none; border-radius: 24px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+  box-shadow: 
+    inset 0 0 0 1.3px color-mix(in srgb, var(--accent) 5%, transparent);
+}
+/* Светлая тема: упрощённая рамка */
+body.theme-light .hero__chat {
+  box-shadow: 
+    inset 0 0 0 1.3px color-mix(in srgb, #000 5%, transparent);
+}
+
+/* Тёмная тема: прозрачный центр + цветной блюр по краям */
+/* Базовый лёгкий блюр по всей поверхности */
+body:not(.theme-light) .hero__chat::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 24px; pointer-events: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+/* Сильный блюр по краям (маска: left, right, top) */
+.hero__chat-blur-edges {
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 24px; pointer-events: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  mask-image:
+    linear-gradient(to right, #000 0, transparent 120px),
+    linear-gradient(to left, #000 0, transparent 120px),
+    linear-gradient(to bottom, #000 0, transparent 120px);
+  -webkit-mask-image:
+    linear-gradient(to right, #000 0, transparent 120px),
+    linear-gradient(to left, #000 0, transparent 120px),
+    linear-gradient(to bottom, #000 0, transparent 120px);
+}
+  /* ��������� ����� ����� ��� ��������� */
+  /* /* /* @media (max-width: 860px) {
+    .hero__chat-blur-edges {
+      mask-image:
+        linear-gradient(to right, #000 0, transparent 20px),
+        linear-gradient(to left, #000 0, transparent 20px),
+        linear-gradient(to bottom, #000 0, transparent 20px);
+      -webkit-mask-image:
+        linear-gradient(to right, #000 0, transparent 20px),
+        linear-gradient(to left, #000 0, transparent 20px),
+        linear-gradient(to bottom, #000 0, transparent 20px);
+    }
+    .hero__chat-blur-bottom {
+      mask-image: linear-gradient(to top, #000 0, transparent 80px);
+      -webkit-mask-image: linear-gradient(to top, #000 0, transparent 80px);
+    }
+  } */
+/* Усиленное размытие снизу (увеличено) */
+.hero__chat-blur-bottom {
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 24px; pointer-events: none;
+  backdrop-filter: blur(48px);
+  -webkit-backdrop-filter: blur(48px);
+  mask-image: linear-gradient(to top, #000 0, transparent 256px);
+  -webkit-mask-image: linear-gradient(to top, #000 0, transparent 256px);
+} */ 
+/* Цветной тинт по краям */
+.hero__chat-tint {
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 24px; pointer-events: none;
+  background: hsl(var(--hue), 55%, 45%);
+  opacity: 0.05;
+  mask-image:
+    linear-gradient(to right, #000 0, transparent 30px),
+    linear-gradient(to left, #000 0, transparent 30px),
+    linear-gradient(to bottom, #000 0, transparent 30px);
+  -webkit-mask-image:
+    linear-gradient(to right, #000 0, transparent 30px),
+    linear-gradient(to left, #000 0, transparent 30px),
+    linear-gradient(to bottom, #000 0, transparent 30px);
+}
+/* Цветное внутреннее свечение (зелёное) — по контуру фигуры */
+body:not(.theme-light) .hero__chat::after {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 24px; pointer-events: none;
+  box-shadow: 
+    inset 0 0 30px 0px rgba(77, 175, 106, 0.075),
+    inset 0 0 60px 10px rgba(77, 175, 106, 0.0375),
+    inset 0 -120px 180px -40px rgba(77, 175, 106, 0.06),
+    inset 0 -60px 100px 0px rgba(77, 175, 106, 0.045);
+}
+/* Светлая тема: белое свечение */
+body.theme-light .hero__chat::after {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 24px; pointer-events: none;
+  box-shadow: 
+    inset 0 0 30px 0px rgba(255, 255, 255, 0.4),
+    inset 0 0 60px 10px rgba(255, 255, 255, 0.2),
+    inset 0 -120px 180px -40px rgba(255, 255, 255, 0.32),
+    inset 0 -60px 100px 0px rgba(255, 255, 255, 0.24);
+}
+/* Светлая тема — прозрачный центр + видимый градиент снизу */
+body.theme-light .hero__chat {
+  background: transparent;
+  position: relative;
+}
+/* Градиент-подложка от низа к центру */
+body.theme-light .hero__chat::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 24px; pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(220, 225, 232, 0.95) 0%,
+    rgba(230, 235, 242, 0.7) 20%,
+    rgba(240, 245, 250, 0.3) 50%,
+    transparent 100%
+  );
+}
+body.theme-light .hero__chat-tint {
+  display: none;
+}
+body.theme-light .hero__chat-greeting {
+  background: #d8d9e0;
+  border-color: rgba(0,0,0,0.09);
+}
+body.theme-light .hero__chat-tag {
+  background: #d0d1d9;
+  border-color: rgba(0,0,0,0.1);
+}
+
+/* Chat body */
+.hero__chat-body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; padding: 20px 20px 60px; min-height: 0; text-align: center;
+  position: relative;
+}
+/* Скрываем градиент футера (временно) */
+.hero__chat-body::after {
+  display: none;
+}
+
+/* Волнистая граница футера */
+.hero__chat-wave {
+  display: block;
+  width: 100%; height: 56px;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  overflow: visible;
+}
+body.theme-light .hero__chat-wave {
+  display: none;
+}
+
+.hero__chat-icon {
+  width: 220px; height: 220px; flex-shrink: 0; margin-bottom: 4px;
+}
+/* Тёмная тема: зелёный как падающие буквы */
+body:not(.theme-light) .hero__chat-icon {
+  filter: invert(55%) sepia(60%) saturate(600%) hue-rotate(100deg) brightness(115%);
+}
+body.theme-light .hero__chat-icon { 
+  filter: brightness(0) invert(20%) sepia(0%) saturate(0%);
+}
+
+.hero__chat-greeting {
+  border: 1px solid var(--chat-border); border-radius: 10px;
+  padding: 12px 14px; background: var(--chat-input-bg);
+  font-size: 0.75rem; line-height: 1.6; color: var(--chat-text);
+  text-align: center; width: fit-content; max-width: 100%;
+}
+.hero__chat-greeting p { margin: 0; }
+/* Светлая тема: видимая обводка + backdrop */
+body.theme-light .hero__chat-greeting {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+}
+/* Тёмная тема: зелёный текст на полупрозрачной подложке */
+body:not(.theme-light) .hero__chat-greeting {
+  background: rgba(77, 175, 106, 0.08);
+  border-color: rgba(77, 175, 106, 0.2);
+  color: #a8d8b8;
+}
+
+/* Tags */
+.hero__chat-tags {
+  display: flex; flex-direction: row; flex-wrap: wrap;
+  gap: 5px; width: 100%; overflow-x: visible;
+  scrollbar-width: none; justify-content: center;
+}
+.hero__chat-tags::-webkit-scrollbar { display: none; }
+.hero__chat-tag {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 9px; border-radius: 8px;
+  border: 1px solid var(--chat-border); background: var(--chat-input-bg);
+  color: var(--chat-muted); font-size: 0.68rem; font-weight: 500;
+  cursor: default; white-space: nowrap; flex-shrink: 0;
+  transition: border-color 0.18s, color 0.18s;
+}
+.hero__chat-tag:hover { border-color: var(--accent); color: var(--accent); }
+body.theme-light .hero__chat-tag:hover { border-color: #555; color: #333; }
+.hero__chat-tag svg { flex-shrink: 0; opacity: 0.6; transition: opacity 0.18s; }
+.hero__chat-tag:hover svg { opacity: 1; }
+/* Светлая тема: видимая обводка + backdrop */
+body.theme-light .hero__chat-tag {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+}
+/* Тёмная тема: зелёный текст на полупрозрачной подложке */
+body:not(.theme-light) .hero__chat-tag {
+  background: rgba(77, 175, 106, 0.08);
+  border-color: rgba(77, 175, 106, 0.2);
+  color: #a8d8b8;
+}
+
+/* Chat footer */
+.hero__chat-footer {
+  padding: 0 12px 12px; background: transparent; flex-shrink: 0;
+}
+.hero__chat-box {
+  background: var(--chat-input-bg); border: none; border-radius: 0;
+  overflow: hidden; display: flex; flex-direction: column;
+  margin: 0 -12px -12px;
+}
+/* Тёмная тема: прозрачный футер */
+body:not(.theme-light) .hero__chat-box {
+  background: transparent;
+}
+/* Светлая тема: прозрачный футер без границ */
+body.theme-light .hero__chat-box {
+  background: transparent;
+  border: none;
+}
+
+/* Input row */
+.hero__chat-input-row {
+  position: relative; display: flex; align-items: baseline;
+  padding: 12px 14px 6px;
+}
+.hero__chat-input-row .hero__chat-input { padding: 0; flex: 1; }
+
+.hero__chat-input {
+  position: relative; z-index: 1;
+  background: transparent !important; border: none;
+  font: inherit; font-size: 0.82rem; color: transparent;
+  caret-color: var(--chat-text); outline: none; cursor: default; width: 100%;
+}
+.hero__chat-input::placeholder { color: var(--chat-muted); }
+
+.hero__chat-placeholder {
+  position: absolute; top: 50%; left: 14px; transform: translateY(-50%);
+  pointer-events: none; z-index: 0; font-size: 0.88rem; color: var(--chat-muted);
+  display: flex; align-items: center; white-space: nowrap;
+  overflow: hidden; max-width: calc(100% - 28px);
+}
+/* Тёмная тема: зелёный цвет */
+body:not(.theme-light) .hero__chat-placeholder { color: #88aa8e; }
+
+/* Reasoning анимация */
+.hero__chat-reasoning {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.hero__chat-reasoning-text {
+  display: inline-block;
+  transition: opacity 0.3s;
+}
+.hero__chat-dots {
+  display: inline-flex;
+  gap: 1px;
+}
+.hero__chat-dots span {
+  animation: dotBlink 1.4s infinite;
+  opacity: 0;
+}
+.hero__chat-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+.hero__chat-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.hero__chat-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotBlink {
+  0%, 20% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.hero__chat-cursor {
+  display: inline-block; width: 1.5px; height: 0.85em;
+  background: var(--chat-muted); margin-left: 1px; vertical-align: middle;
+  animation: blink 1.1s step-end infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Toolbar */
+.hero__chat-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 8px 8px; gap: 6px;
+}
+.hero__chat-toolbar-left  { display: flex; align-items: center; gap: 6px; }
+.hero__chat-toolbar-right { display: flex; align-items: center; gap: 5px; }
+
+.hero__chat-plus {
+  width: 24px; height: 24px; border-radius: 6px; color: var(--chat-muted);
+  display: flex; align-items: center; justify-content: center; transition: color 0.18s;
+}
+.hero__chat-plus:hover { color: var(--chat-text); }
+/* Тёмная тема: зелёный цвет */
+body:not(.theme-light) .hero__chat-plus { color: #88aa8e; }
+body:not(.theme-light) .hero__chat-plus:hover { color: #a8d8b8; }
+
+.hero__chat-mode {
+  display: flex; align-items: center; background: var(--chat-bg);
+  border: 1px solid var(--chat-border); border-radius: 8px; padding: 2px; gap: 1px;
+}
+.hero__chat-mode-btn {
+  padding: 3px 9px; border-radius: 6px; font-size: 0.68rem; font-weight: 500;
+  color: var(--chat-muted); transition: background 0.18s, color 0.18s; white-space: nowrap;
+}
+.hero__chat-mode-btn--active { background: var(--chat-input-bg); color: var(--chat-text); }
+/* Светлая тема: прозрачный режим без резкой границы */
+body.theme-light .hero__chat-mode {
+  background: transparent;
+  border: none;
+}
+body.theme-light .hero__chat-mode-btn--active {
+  background: transparent;
+}
+/* Тёмная тема: зелёные цвета + зелёный фон */
+body:not(.theme-light) .hero__chat-mode { 
+  background: rgba(77, 175, 106, 0.08);
+  border-color: rgba(77, 175, 106, 0.15);
+}
+body:not(.theme-light) .hero__chat-mode-btn { color: #88aa8e; }
+body:not(.theme-light) .hero__chat-mode-btn--active { 
+  background: rgba(77, 175, 106, 0.15); 
+  color: #a8d8b8; 
+}
+
+.hero__chat-model-name { font-size: 0.72rem; font-weight: 600; color: var(--chat-text); }
+.hero__chat-sep        { color: var(--chat-border); font-size: 0.72rem; }
+.hero__chat-quality    { font-size: 0.72rem; color: var(--chat-muted); }
+/* Тёмная тема: зелёные надписи */
+body:not(.theme-light) .hero__chat-model-name { color: #a8d8b8; }
+body:not(.theme-light) .hero__chat-quality { color: #88aa8e; }
+
+.hero__chat-icon-btn {
+  width: 24px; height: 24px; border-radius: 5px; color: var(--chat-muted);
+  display: flex; align-items: center; justify-content: center; transition: color 0.18s;
+}
+.hero__chat-icon-btn:hover { color: var(--chat-text); }
+/* Тёмная тема: зелёный цвет */
+body:not(.theme-light) .hero__chat-icon-btn { color: #88aa8e; }
+body:not(.theme-light) .hero__chat-icon-btn:hover { color: #a8d8b8; }
+
+/* ═══════════════════════
+   CASES SECTION
+═══════════════════════ */
+.cases {
+  height: 100svh; padding: 0; background: var(--bg-alt);
+  border-top: 1px solid var(--border); position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* Binary grid background */
+.binary-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 48px);
+  grid-template-rows: repeat(auto-fill, 48px);
+  gap: 0;
+  opacity: 0.3;
+  pointer-events: none;
+  font-family: 'Courier New', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+body.theme-light .binary-grid {
+  opacity: 0.35;
+  color: #666;
+}
+.binary-grid span { display: flex; align-items: center; justify-content: center; opacity: 0; animation: binaryPulse 2.6s ease-in-out infinite; will-change: auto; }
+@keyframes binaryPulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* Badges */
+.disclaimer__badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 1px 5px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.02em; flex-shrink: 0; white-space: nowrap; vertical-align: baseline;
+}
+.disclaimer__badge--view { background: rgba(77,140,255,0.15); color: #4d8cff; border: 1px solid rgba(77,140,255,0.35); }
+.disclaimer__badge--wip  { background: rgba(240,192,0,0.12);  color: #f0c000; border: 1px solid rgba(240,192,0,0.3); }
+.disclaimer__badge--nda  { background: rgba(255,82,82,0.12);  color: #ff5252; border: 1px solid rgba(255,82,82,0.3); }
+
+/* Intro overlay */
+.cases-folder__intro {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 40px 32px 32px;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+.cases-folder__intro.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Светлая тема: убираем стеклянные эффекты, рамка 2px */
+body.theme-light .cases-folder__intro {
+  border: 2px solid rgba(0,0,0,0.15);
+}
+.cases-folder__intro-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cases-folder__intro-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  color: #88aa8e;
+}
+/* Светлая тема: серая иконка */
+body.theme-light .cases-folder__intro-icon {
+  color: #666;
+}
+.cases-folder__intro-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: #88aa8e;
+}
+/* Светлая тема: тёмный заголовок */
+body.theme-light .cases-folder__intro-title {
+  color: #666;
+}
+.cases-folder__intro-desc {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  margin: 0;
+  color: #88aa8e;
+}
+/* Светлая тема: серый текст */
+body.theme-light .cases-folder__intro-desc {
+  color: #666;
+}
+/* Think Tree стиль для списка */
+.cases-folder__intro-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex: 1;
+  position: relative;
+  padding-left: 20px;
+}
+.cases-folder__intro-list::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(to bottom, rgba(77, 175, 106, 0.35) 0%, rgba(77, 175, 106, 0.1) 100%);
+}
+body.theme-light .cases-folder__intro-list::before {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.05) 100%);
+}
+.cases-folder__intro-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 0;
+  position: relative;
+}
+.cases-folder__intro-item:first-child {
+  padding-top: 0;
+}
+.cases-folder__intro-dot {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(77, 175, 106, 0.35);
+  background: var(--bg-card);
+  margin-left: -20px;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+body.theme-light .cases-folder__intro-dot {
+  border-color: rgba(0,0,0,0.2);
+  background: #e4e5ec;
+}
+.cases-folder__intro-dot--view {
+  background: rgba(77, 175, 106, 0.35);
+  border-color: rgba(77, 175, 106, 0.35);
+}
+body.theme-light .cases-folder__intro-dot--view {
+  background: #888;
+  border-color: #888;
+}
+.cases-folder__intro-dot--wip {
+  background: rgba(240, 192, 0, 0.35);
+  border-color: rgba(240, 192, 0, 0.35);
+}
+body.theme-light .cases-folder__intro-dot--wip {
+  background: #f0c000;
+  border-color: #f0c000;
+}
+.cases-folder__intro-dot--nda {
+  background: rgba(255, 82, 82, 0.35);
+  border-color: rgba(255, 82, 82, 0.35);
+}
+body.theme-light .cases-folder__intro-dot--nda {
+  background: #ff5252;
+  border-color: #ff5252;
+}
+.cases-folder__intro-item-text {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  flex: 1;
+  color: #88aa8e;
+}
+body.theme-light .cases-folder__intro-item-text {
+  color: #666;
+}
+.cases-folder__intro-item-text strong {
+  color: #a8d8b8;
+  font-weight: 600;
+}
+body.theme-light .cases-folder__intro-item-text strong {
+  color: #333;
+  font-weight: 600;
+}
+.cases-folder__intro-btn {
+  width: 100%;
+  padding: 14px 28px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s ease;
+  margin-top: auto;
+}
+.cases-folder__intro-btn:hover {
+  background: #3a9458;
+}
+
+/* ── Folder tabs ── */
+.cases-folder {
+  display: flex; flex-direction: column;
+  width: var(--block-w); min-width: 240px; max-width: 480px;
+  height: var(--folder-h); min-height: 360px; max-height: 640px;
+  position: relative;
+}
+
+.cases-folder__tabs { display: flex; gap: 6px; flex-shrink: 0; margin-bottom: 8px; }
+
+.cases-folder__tab {
+  flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 10px; border: 2px solid transparent; border-radius: 12px;
+  background: transparent; color: var(--text-muted); cursor: pointer;
+  position: relative; overflow: hidden; white-space: nowrap;
+  transition: gap 0.25s ease, border-color 0.18s, color 0.18s, background 0.18s;
+}
+/* Тёмная тема: толстая рамка */
+body:not(.theme-light) .cases-folder__tab {
+  border: 2px solid rgba(77, 175, 106, 0.35);
+  background: transparent;
+  color: #88aa8e;
+}
+body:not(.theme-light) .cases-folder__tab.is-active {
+  z-index: 3; gap: 7px;
+  color: #88aa8e;
+  background: rgb(39, 70, 48);
+  border-color: rgb(39, 70, 48);
+}
+body:not(.theme-light) .cases-folder__tab:hover:not(.is-active) { 
+  background: rgba(77, 175, 106, 0.05); 
+  border-color: rgba(77, 175, 106, 0.4);
+}
+/* Светлая тема: серые цвета, более светлый активный таб */
+body.theme-light .cases-folder__tab {
+  border: 2px solid rgba(0,0,0,0.15);
+  background: transparent;
+  color: #666;
+}
+body.theme-light .cases-folder__tab.is-active {
+  background: #888;
+  border-color: #888;
+  color: #f2f3f7;
+}
+body.theme-light .cases-folder__tab:hover:not(.is-active) {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.22);
+}
+
+.cases-folder__tab-icon {
+  width: 17px; height: 17px; flex-shrink: 0;
+  /* для inline SVG */
+  display: flex; align-items: center; justify-content: center;
+}
+.cases-folder__tab-icon svg { width: 17px; height: 17px; stroke: currentColor; fill: none; flex-shrink: 0; }
+
+.cases-folder__tab-label {
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em;
+  overflow: hidden; white-space: nowrap;
+}
+/* Десктоп — всегда показываем название */
+.cases-folder__tab-label { max-width: 160px; opacity: 1; transition: max-width 0.25s ease, opacity 0.2s ease; }
+/* Мобиле — только у активной */
+/* /* /* @media (max-width: 860px) {
+  .cases-folder__tab-label { max-width: 0; opacity: 0; }
+  .cases-folder__tab.is-active .cases-folder__tab-label { max-width: 140px; opacity: 1; }
+} */  */
+
+/* Panel */
+.cases-folder__panel {
+  flex: 1; background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: clip;
+  display: flex; flex-direction: column; position: relative; z-index: 1; min-height: 0;
+}
+/* Тёмная тема: зелёная рамка 2px */
+body:not(.theme-light) .cases-folder__panel {
+  border-color: rgba(77, 175, 106, 0.3);
+}
+/* Светлая тема: серая рамка 2px */
+body.theme-light .cases-folder__panel {
+  border-color: rgba(0,0,0,0.15);
+}
+/* Убираем обёртку и cases-folder::after */
+.cases-folder__panel-wrap { display: contents; }
+.cases-folder::after { display: none; }
+.cases__fade-top { z-index: 3; }
+.cases__fade-bot { z-index: 3; }
+
+/* Pages */
+.cases-folder__page { display: none; flex-direction: column; flex: 1; min-height: 0; }
+.cases-folder__page.is-active { display: flex; }
+
+/* Info page */
+.cases-folder__info {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; padding: 32px 24px; text-align: center; flex: 1;
+}
+.cases-folder__info-img { width: 100px; height: 100px; object-fit: contain; }
+.cases-folder__info-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; max-width: 360px; }
+
+/* List page header */
+.cases-folder__page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: #161a2a;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.cases-folder__page-title { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em; }
+.cases-folder__page-icon  { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
+
+/* Cases list */
+.cases__list {
+  display: flex; flex-direction: column; flex: 1;
+  overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; min-height: 0;
+}
+.cases__list::-webkit-scrollbar { display: none; }
+
+.case-item {
+  display: flex; align-items: center;
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background var(--ease);
+}
+.case-item:first-child { border-top: none; }
+.case-item:last-child  { border-bottom: none; }
+body:not(.theme-light) .case-item:hover { background: rgba(77,140,255,0.04); }
+body:not(.theme-light) .case-item:hover .case-item__title { color: var(--accent); }
+/* Светлая тема: убираем hover */
+body.theme-light .case-item:hover { background: transparent; }
+body.theme-light .case-item:hover .case-item__title { color: var(--text); }
+
+.case-item__meta { display: flex; flex-direction: row; align-items: center; gap: 12px; flex: 1; }
+.case-item__title { font-size: 0.9rem; font-weight: 700; transition: color var(--ease); flex: 0 0 auto; white-space: nowrap; color: #a8c4a8; }
+.case-item__cat   { display: none; }
+.case-item__btn   { flex-shrink: 0; font-size: 0.65rem; padding: 5px 12px; margin-left: auto; }
+body.theme-light .case-item__title { color: var(--text); }
+
+/* FADE OVERLAYS */
+.cases__fade-top,
+.cases__fade-bot {
+  position: absolute; left: 0; right: 0; height: 56px;
+  pointer-events: none; z-index: 1; transition: opacity 0.25s ease;
+}
+.cases__fade-top { 
+  top: 0;  
+  background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%); 
+  opacity: 1;
+  margin-top: 1px;
+  border-radius: 12px 12px 0 0;
+}
+.cases__fade-bot { 
+  bottom: 0; 
+  background: linear-gradient(to top, var(--bg-card) 0%, transparent 100%); 
+  opacity: 1;
+  margin-bottom: 1px;
+  border-radius: 0 0 12px 12px;
+}
+
+/* ═══════════════════════
+   CONTACT
+═══════════════════════ */
+.contact {
+  min-height: 100svh; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 10; background: var(--bg);
+  padding-block: 48px; overflow: visible;
+}
+.contact__inner { width: 100%; padding-block: 32px; position: relative; z-index: 3; overflow: visible; }
+.contact__fg    { display: none; }
+
+.orbit-canvas {
+  position: absolute; inset: 0; width: 100% !important; height: 100% !important;
+  pointer-events: none; z-index: 0;
+}
+
+/* Contact card stack */
+.cstack {
+  position: relative;
+  width: var(--block-w); min-width: 240px; max-width: 480px;
+  margin-inline: auto; height: 510px;
+}
+.cstack__card {
+  position: absolute; top: 0; left: 0; width: 100%; height: 510px;
+  border-radius: 14px; will-change: transform, opacity;
+  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease, box-shadow 0.45s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5); cursor: pointer; transform-origin: top center;
+  overflow: hidden; /* скругление применяется ко всему содержимому */
+}
+.cstack__card .cform__wrap { height: 100%; display: flex; flex-direction: column; }
+.cstack__card .cform,
+.cstack__card .cform--donate { flex: 1; overflow-y: auto; scrollbar-width: none; }
+.cstack__card .cform::-webkit-scrollbar,
+.cstack__card .cform--donate::-webkit-scrollbar { display: none; }
+/* donate внутри cstack — не скроллим, слайдер сам управляет */
+.cstack__card .cform--donate { overflow-y: visible; }
+
+.cstack__card[data-pos="center"] { z-index: 10; transform: translateX(0) scale(1); opacity: 1; cursor: default; box-shadow: 0 16px 48px rgba(0,0,0,0.6); }
+.cstack__card[data-pos="left"]   { z-index: 5;  transform: translateX(-120px) translateY(44px) scale(0.827); transform-origin: top center; opacity: 1; cursor: pointer; }
+.cstack__card[data-pos="right"]  { z-index: 5;  transform: translateX(120px)  translateY(44px) scale(0.827); transform-origin: top center; opacity: 1; cursor: pointer; }
+
+/* Form */
+.cform__wrap { display: flex; flex-direction: column; }
+.cform__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: var(--bg-card);
+  border-bottom: none;
+  border-radius: 14px 14px 0 0; flex-shrink: 0;
+}
+body.theme-light .cform__header {
+  background: #e4e5ec;
+  border-bottom: none;
+}
+.cform__header--green,
+.cform__header--yellow {
+  background: var(--bg-card);
+  border-bottom: none;
+}
+body.theme-light .cform__header--green,
+body.theme-light .cform__header--yellow {
+  background: #e4e5ec;
+  border-bottom: none;
+}
+/* Светлая тема: donate */
+body.theme-light .donate__cell {
+  background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1);
+}
+body.theme-light .donate__copy {
+  border-color: rgba(0,0,0,0.18);
+  color: #888 !important;
+  background: #e8e8e8 !important;
+}
+body.theme-light .donate__copy img {
+  filter: brightness(0) opacity(0.45) !important;
+}
+body.theme-light .donate__copy svg {
+  opacity: 0.5 !important;
+}
+body.theme-light .donate__copy:hover {
+  background: #d8d8d8 !important;
+  border-color: rgba(0,0,0,0.3) !important;
+  color: #555 !important;
+}
+body.theme-light .donate__copy:hover img {
+  filter: brightness(0) opacity(0.6) !important;
+}
+body.theme-light .donate__copy:hover svg {
+  opacity: 0.75 !important;
+}
+/* Светлая тема: copied — инверсия: фон = цвет рамки (#888), кнопка = цвет фона карточки */
+body.theme-light .donate__copy.copied {
+  background: #888 !important;
+  border-color: var(--chat-footer) !important;
+  color: var(--chat-footer) !important;
+}
+body.theme-light .donate__copy.copied img {
+  filter: brightness(0) invert(1) opacity(0.9) !important;
+}
+body.theme-light .donate__copy.copied svg {
+  opacity: 1 !important;
+  color: var(--chat-footer) !important;
+}
+/* QR-box в светлой теме */
+body.theme-light .donate__qr-box {
+  background: #fff; border-color: rgba(0,0,0,0.15);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+}
+body.theme-light .donate__qr-close {
+  background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12);
+}
+body.theme-light .donate__qr-close:hover {
+  background: rgba(0,0,0,0.1); color: var(--text);
+}
+.cform__title {
+  font-size: clamp(1rem, 2.5vw, 1.2rem); font-weight: 800;
+  letter-spacing: -0.02em; color: #a8c4a8; line-height: 1.2;
+}
+.cform__title--dark { color: #a8c4a8; }
+body.theme-light .cform__title,
+body.theme-light .cform__title--dark {
+  color: #666 !important;
+}
+
+.contact__emoji { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
+/* Иконки заголовков карточек — цвет хаки #a8c4a8 */
+/* Тёмная тема: хаки */
+.contact__emoji {
+  filter: invert(76%) sepia(11%) saturate(805%) hue-rotate(69deg) brightness(93%) contrast(89%);
+  opacity: 1;
+}
+/* Светлая тема: серая (как var(--text-muted) ≈ #5a6070) */
+body.theme-light .contact__emoji {
+  filter: brightness(0) opacity(0.5);
+  opacity: 1;
+}
+
+.cform {
+  display: flex; flex-direction: column; gap: 16px;
+  background: var(--bg-card); border: none;
+  border-top: none; border-radius: 0; padding: 20px; position: relative;
+}
+/* Если есть кнопка — убираем нижний padding (кнопка сама несёт отступ) */
+.cform:has(.cform__btn-wrap) {
+  padding-bottom: 0;
+}
+.cform__group { display: flex; flex-direction: column; gap: 8px; border: none; padding: 0; margin: 0; }
+.cform__legend,
+.cform__label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); }
+
+.cform__checks { display: flex; flex-wrap: wrap; gap: 8px; }
+.cform__check {
+  display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+  border: 2px solid var(--border-accent); 
+  border-radius: var(--r); 
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, color 0.18s;
+  font-size: 0.82rem; 
+  color: var(--text-muted); 
+  user-select: none;
+  background: transparent;
+}
+
+/* Тёмная тема */
+body:not(.theme-light) .cform__check {
+  border: 2px solid rgba(77, 175, 106, 0.35);
+  background: transparent;
+  color: #88aa8e;
+}
+body:not(.theme-light) .cform__check:hover:not(:has(input:checked)) { 
+  background: rgba(77, 175, 106, 0.05); 
+  border-color: rgba(77, 175, 106, 0.4);
+}
+body:not(.theme-light) .cform__check:has(input:checked) { 
+  border-color: rgb(39, 70, 48);
+  background: rgb(39, 70, 48);
+  color: #88aa8e;
+}
+
+/* Светлая тема */
+body.theme-light .cform__check {
+  border: 2px solid rgba(0,0,0,0.15);
+  background: transparent;
+  color: #666;
+}
+body.theme-light .cform__check:hover:not(:has(input:checked)) {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.22);
+}
+body.theme-light .cform__check:has(input:checked) {
+  background: #888;
+  border-color: #888;
+  color: #f2f3f7;
+}
+
+.cform__check input { display: none; }
+
+.cform__input,
+.cform__textarea {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--text-muted); font: inherit; font-size: 0.88rem;
+  padding: 11px 14px; outline: none; resize: vertical;
+  transition: border-color var(--ease); width: 100%;
+}
+.cform__input::placeholder,
+.cform__textarea::placeholder { color: var(--text-dim); }
+.cform__input:focus,
+.cform__textarea:focus { border-color: var(--border-accent); color: var(--text); }
+body.theme-light .cform__input,
+body.theme-light .cform__textarea { color: #333; }
+body.theme-light .cform__input::placeholder,
+body.theme-light .cform__textarea::placeholder { color: #777; }
+
+.cform__row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.cform__group--row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cform__input--half { grid-column: 1; }
+.cform__messenger-btns { grid-column: 2; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.cform__messenger-btns .cform__check { display: flex; align-items: center; justify-content: center; }
+
+/* Иконка внутри кнопки-чекбокса */
+.cform__check-icon {
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+body.theme-light .cform__check-icon {
+  filter: brightness(0) opacity(0.45);
+}
+
+/* Input с иконкой справа */
+.cform__input-wrap {
+  position: relative; display: flex; align-items: center;
+  grid-column: 1;
+}
+.cform__input-wrap .cform__input {
+  padding-right: 34px;
+}
+.cform__input-icon {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; opacity: 0.45;
+  filter: brightness(0) invert(1);
+}
+body.theme-light .cform__input-icon {
+  filter: brightness(0) opacity(0.35);
+}
+
+.cform__submit {
+  align-self: flex-start; width: 100%; padding: 15px 28px; font-size: 0.78rem;
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; border-radius: 0 0 14px 14px;
+}
+.cform__submit--green { background: #212e22; color: #a8c4a8; }
+.cform__submit--green:hover { background: #2a3a2d; }
+.cform__submit--yellow {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 15px 28px; font-size: 0.78rem; font-weight: 800;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  background: #212e22; color: #a8c4a8;
+  border-radius: 0 0 14px 14px; border: none;
+  border-top: none; cursor: pointer; flex-shrink: 0;
+  transition: background var(--ease);
+}
+.cform__submit--yellow:hover { background: #2a3a2d; }
+
+/* Светлая тема - кнопки серые */
+body.theme-light .cform__submit--green { background: #d4d5dc !important; color: #666 !important; }
+body.theme-light .cform__submit--green:hover { background: #c4c5cc !important; }
+body.theme-light .cform__submit.btn--primary,
+body.theme-light .cform__submit--green.btn--primary { background: #d4d5dc !important; color: #666 !important; }
+body.theme-light .cform__submit.btn--primary:hover,
+body.theme-light .cform__submit--green.btn--primary:hover { background: #c4c5cc !important; }
+body.theme-light .cform__submit--yellow { background: #d4d5dc !important; color: #666 !important; }
+body.theme-light .cform__submit--yellow:hover { background: #c4c5cc !important; }
+
+/* Иконка кнопки в светлой теме - серая как текст */
+body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.4) !important; }
+.cform__submit.btn--primary,
+.cform__submit--green.btn--primary {
+  background: #212e22; color: #a8c4a8;
+  border-top: none; border-radius: 0 0 14px 14px;
+}
+.cform__submit.btn--primary:hover,
+.cform__submit--green.btn--primary:hover { background: #2a3a2d; }
+
+.cform__submit-icon { flex-shrink: 0; filter: invert(76%) sepia(11%) saturate(805%) hue-rotate(69deg) brightness(93%) contrast(89%); }
+body.theme-light .cform__submit-icon { filter: brightness(0) opacity(0.75); }
+
+/* Donate */
+.cform--donate { border-radius: 0; border-top: none; border-bottom: none; display: flex; flex-direction: column; padding: 0 !important; gap: 0; }
+.donate__desc  { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0; padding: 16px 16px 10px; }
+
+/* Сетка 2 колонки */
+.donate__grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+.donate__cell {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 9px 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--r);
+}
+.donate__cell--wide { grid-column: 1 / -1; }
+.donate__coin {
+  font-size: 0.78rem; font-weight: 700; color: #a8c4a8; white-space: nowrap;
+}
+body.theme-light .donate__coin { color: var(--text); }
+.donate__net {
+  font-size: 0.65rem; font-weight: 500; color: var(--text-muted);
+  margin-left: 3px;
+}
+.donate__actions { display: flex; gap: 5px; flex-shrink: 0; }
+.donate__copy {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 5px;
+  border: 1px solid var(--border-accent); color: var(--accent); background: transparent; cursor: pointer;
+  transition: border-color 0.28s ease, color 0.28s ease, background 0.28s ease;
+}
+/* SVG-иконка копирования — зелёная через currentColor */
+.donate__copy svg { opacity: 0.75; transition: opacity 0.18s; }
+/* IMG-иконка QR — зелёная через filter */
+.donate__copy img {
+  display: block; opacity: 0.75; transition: opacity 0.18s, filter 0.28s ease;
+  filter: invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(100%);
+}
+.donate__copy:hover { border-color: var(--border-accent); background: var(--accent-dim); }
+.donate__copy:hover img,
+.donate__copy:hover svg { opacity: 1; }
+
+/* Тёмная тема: copied — инверсия: фон = цвет акцента, рамка = фон карточки */
+.donate__copy.copied {
+  background: rgba(77,175,106,0.25) !important;
+  border-color: var(--chat-input-bg) !important;
+  color: var(--accent) !important;
+}
+.donate__copy.copied svg { opacity: 1; }
+.donate__copy.copied img {
+  filter: invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(100%);
+  opacity: 1;
+}
+
+/* QR инлайн */
+.donate__qr-overlay { display: none; }
+.donate__qr-box {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+.donate__qr-canvas { border-radius: 8px; }
+.donate__qr-addr {
+  font-size: 0.72rem; color: var(--text-muted);
+  font-family: monospace; text-align: center;
+  word-break: break-all; max-width: 180px;
+}
+.donate__qr-close {
+  align-self: stretch;
+  padding: 8px 24px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background var(--ease);
+}
+.donate__qr-close:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
+/* ═══════════════════════
+   THEME TOGGLE
+═══════════════════════ */
+.theme-toggle {
+  position: fixed; top: 16px; right: 16px; z-index: 9999;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+}
+.theme-toggle:hover { color: var(--text); border-color: var(--border-accent); }
+
+/* ═══════════════════════
+   DL-BUTTON — оригинал 1в1
+═══════════════════════ */
+.dl-button {
+  --duration: 4000;
+  --success: #16bf78;
+  --grey-light: #99a3ba;
+  --grey: #6c7486;
+  --grey-dark: #3f4656;
+  --light: #cdd9ed;
+  --shadow: rgba(18, 22, 33, 0.6);
+  --shadow-dark: rgba(18, 22, 33, 0.85);
+  display: block;
+  text-decoration: none;
+  perspective: 500px;
+}
+.dl-button > div {
+  position: relative;
+  background: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  padding: 16px 24px;
+  box-shadow: 0 4px 12px var(--shadow);
+}
+.dl-button > div .icon {
+  --color: var(--grey);
+  margin-right: 12px;
+  position: relative;
+  transform: translateZ(8px);
+}
+.dl-button > div .icon div {
+  overflow: hidden;
+  position: relative;
+  width: 20px;
+  height: 22px;
+}
+.dl-button > div .icon div:before,
+.dl-button > div .icon div:after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  top: 2px;
+  transition: opacity 0.3s ease;
+}
+.dl-button > div .icon div:before {
+  left: 6px;
+  background-image: radial-gradient(circle at 0 100%, var(--color) 2px, #fff 0px);
+}
+.dl-button > div .icon div:after {
+  right: 6px;
+  background-image: radial-gradient(circle at 100% 100%, var(--color) 2px, #fff 0px);
+}
+.dl-button > div .icon div svg {
+  width: 20px;
+  height: 18px;
+  display: block;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+.dl-button > div .icon div svg.arrow {
+  color: #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  transform: translateY(-1px);
+}
+.dl-button > div .icon div svg.shape {
+  color: var(--color);
+  transition: color 0.4s ease;
+}
+.dl-button > div .icon span {
+  --s: 1;
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  bottom: 2px;
+  background: var(--color);
+  height: 6px;
+  border-radius: 50%;
+  display: block;
+  transform: translateY(0) scale(var(--s));
+}
+.dl-button > div .label {
+  --color: var(--grey-dark);
+  line-height: 22px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color);
+  position: relative;
+  transition: color 0.4s ease;
+  transform: translateZ(8px);
+}
+.dl-button > div .label > div {
+  display: flex;
+  transition: opacity 0.25s ease;
+}
+.dl-button > div .label > div:not(.show) {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+.dl-button > div .label > div.hide { opacity: 0; }
+.dl-button > div .label > div .counter {
+  overflow: hidden;
+  display: flex;
+  height: 18px;
+  line-height: 18px;
+  margin: 2px 0;
+  position: relative;
+  transition: opacity 0.3s ease;
+}
+.dl-button > div .label > div .counter:before,
+.dl-button > div .label > div .counter:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 1;
+}
+.dl-button > div .label > div .counter:before {
+  top: 0;
+  background: linear-gradient(to bottom, white 0%, rgba(255,255,255,0) 100%);
+}
+.dl-button > div .label > div .counter:after {
+  bottom: 0;
+  background: linear-gradient(to top, white 0%, rgba(255,255,255,0) 100%);
+}
+.dl-button > div .label > div .counter span { display: inline-block; margin: 0 4px 0 2px; }
+.dl-button > div .label > div .counter ul {
+  --y: 0;
+  margin: 0; padding: 0; list-style: none;
+  width: 10px; height: 18px;
+  backface-visibility: hidden;
+  transform: translateY(var(--y)) translateZ(0);
+}
+.dl-button > div .label > div .counter ul:nth-child(1) { transition: transform calc(var(--duration) * 0.2ms) ease-in-out; }
+.dl-button > div .label > div .counter ul:nth-child(2) { transition: transform calc(var(--duration) * 0.8ms) ease-in-out; }
+.dl-button > div .label > div .counter ul:nth-child(3) { transition: transform calc(var(--duration) * 0.8ms) ease-in-out; }
+.dl-button > div .label > div .counter ul li { width: 10px; height: 18px; }
+.dl-button > div .label > div .counter.hide { opacity: 0; }
+.dl-button > div .progress {
+  --s: 0;
+  position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  transform-origin: 50% 100%;
+  transform: scaleY(var(--s));
+  transition: transform 0.4s ease;
+}
+.dl-button > div .progress:before,
+.dl-button > div .progress:after {
+  --s: 1;
+  content: "";
+  background: var(--success);
+  position: absolute; left: 0; top: 0; bottom: 0; right: 0;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--s));
+}
+.dl-button > div .progress:before { opacity: 0.35; }
+.dl-button > div .progress:after {
+  --s: 0;
+  transition: transform calc(var(--duration) * 0.9ms) ease-in-out;
+}
+.dl-button.active > div { animation: dlbtn-anim calc(var(--duration) * 1ms) linear forwards; }
+.dl-button.active > div .icon div:before,
+.dl-button.active > div .icon div:after { opacity: 0; transition-delay: 0.4s; }
+.dl-button.active > div .icon svg.arrow { animation: dlbtn-arrow calc(var(--duration) * 0.18ms) linear 4 calc(var(--duration) * 0.2ms); }
+.dl-button.active > div .icon span     { animation: dlbtn-span  calc(var(--duration) * 0.18ms) linear 4 calc(var(--duration) * 0.2ms); }
+.dl-button.active > div .label > div .counter ul:nth-child(1) { --y: -18px;  transition-delay: calc(var(--duration) * 0.72ms); }
+.dl-button.active > div .label > div .counter ul:nth-child(2) { --y: -180px; transition-delay: calc(var(--duration) * 0.09ms); animation: dlbtn-motion calc(var(--duration) * 0.5ms) linear forwards calc(var(--duration) * 0.19ms); }
+.dl-button.active > div .label > div .counter ul:nth-child(3) { --y: -540px; transition-delay: calc(var(--duration) * 0.075ms); animation: dlbtn-motion calc(var(--duration) * 0.8ms) linear forwards calc(var(--duration) * 0.075ms); }
+.dl-button.active > div .progress { --s: 1; transition-delay: 0.4s; }
+.dl-button.active > div .progress:after { --s: 1; transition-delay: 0.4s; }
+.dl-button.done > div .icon { --color: var(--success); }
+.dl-button.done .label { --color: var(--success); }
+.dl-button.done .label .counter { width: 0; }
+@keyframes dlbtn-arrow {
+  38% { transform: translateY(100%); opacity: 1; }
+  39% { transform: translateY(100%); opacity: 0; }
+  40% { transform: translateY(-100%); opacity: 0; }
+  41% { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(-1px); opacity: 1; }
+}
+@keyframes dlbtn-span {
+  25%, 55% { transform: translateY(2px) scale(var(--s)); }
+  80%, 100% { transform: translateY(0) scale(var(--s)); }
+}
+@keyframes dlbtn-motion { 20%, 70% { filter: blur(0.4px); } }
+@keyframes dlbtn-anim {
+  0%   { transform: translateX(0) translateZ(0) scale(1) rotateY(0deg); }
+  10%  { transform: translateX(0) translateZ(0) scale(0.96) rotateY(0deg); box-shadow: 0 4px 8px var(--shadow-dark); }
+  20%  { transform: translateX(-16px) translateZ(32px) scale(1) rotateY(-16deg); box-shadow: 4px 12px 20px var(--shadow-dark); }
+  85%  { transform: translateX(16px) translateZ(32px) scale(1) rotateY(16deg); box-shadow: -4px 12px 20px var(--shadow-dark); }
+  95%  { transform: translateX(0) translateZ(0) scale(1.12) rotateY(0deg); box-shadow: 0 8px 24px var(--shadow-dark); }
+  100% { transform: translateX(0) translateZ(0) scale(1) rotateY(0deg); }
+}
+
+/* ── Адаптация кнопки под тему проекта ── */
+/* Кнопка auto-width, центрируется margin:auto, равные отступы */
+.cform__btn-wrap { display: block; padding: 16px 0; }
+.cform__btn-wrap .dl-button { display: table; margin: 0 auto; }
+/* Фон под тему (не белый) — см. ниже для outline/shadow */
+/* Иконка и текст: в тёмной = accent, в светлой = text-muted */
+body:not(.theme-light) .dl-button > div .icon { --color: var(--accent); }
+body:not(.theme-light) .dl-button > div .label { --color: var(--accent); }
+body.theme-light .dl-button > div .icon { --color: var(--text-muted); }
+body.theme-light .dl-button > div .label { --color: var(--text-muted); }
+/* Пиксели-заглушки иконки под bg-card */
+.dl-button > div .icon div:before { background-image: radial-gradient(circle at 0 100%, var(--color) 2px, var(--bg-card) 0px) !important; }
+.dl-button > div .icon div:after  { background-image: radial-gradient(circle at 100% 100%, var(--color) 2px, var(--bg-card) 0px) !important; }
+.dl-button > div .icon div svg.arrow { color: var(--bg-card) !important; }
+/* Градиенты счётчика под bg-card */
+.dl-button > div .label > div .counter:before { background: linear-gradient(to bottom, var(--bg-card) 0%, transparent 100%) !important; }
+.dl-button > div .label > div .counter:after  { background: linear-gradient(to top,   var(--bg-card) 0%, transparent 100%) !important; }
+/* Фаза active — только счётчик, span «Отправлено» скрыт */
+.dl-button .state > span {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  vertical-align: middle;
+  white-space: nowrap;
+  /* плавно появляется после счётчика */
+  transition: max-width 0.5s cubic-bezier(0.4,0,0.2,1) 0.15s,
+              opacity 0.4s ease 0.15s;
+}
+.dl-button.done .state > span {
+  max-width: 150px;
+  opacity: 1;
+}
+.dl-button.active .state > span {
+  max-width: 0 !important;
+  opacity: 0 !important;
+  transition: none;
+}
+/* Фаза done — counter плавно схлопывается */
+.dl-button.done .label .counter {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.4s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.3s ease;
+}
+
+/* Lottie внутри dl-button иконки */
+.dl-lottie-wrap {
+  width: 22px; height: 22px;
+  overflow: visible;
+}
+/* Цвет Lottie = цвет label (accent или text-muted) — через filter */
+body:not(.theme-light) .dl-lottie-wrap {
+  filter: invert(55%) sepia(60%) saturate(500%) hue-rotate(100deg) brightness(105%);
+}
+body.theme-light .dl-lottie-wrap {
+  filter: brightness(0) opacity(0.5);
+}
+
+/* Пассив — обводка, без тени; плавный переход */
+.dl-button > div {
+  background: var(--bg-card) !important;
+  outline: 1.5px solid var(--accent);
+  outline-offset: -1.5px;
+  box-shadow: none !important;
+  transition: outline-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+/* Актив/done — убираем обводку, добавляем shadow */
+.dl-button.active > div,
+.dl-button.done > div {
+  outline-color: transparent !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.55) !important;
+}
+
+/* feedbackForm — форма растягивается, textarea заполняет всё */
+#feedbackForm { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.cform__group--grow { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.cform__textarea--grow { flex: 1; resize: none; min-height: 60px; scrollbar-width: none; }
+.cform__textarea--grow::-webkit-scrollbar { display: none; }
+
+/* Фикс: cform__wrap у feedback — сплошной фон без дыр */
+[data-card="feedback"] .cform__wrap {
+  background: var(--bg-card);
+}
+[data-card="feedback"] .cform__btn-wrap {
+  background: var(--bg-card);
+  padding: 0 20px 20px;
+}
+
+/* Donate inline QR — слайдер */
+.donate__slider {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  overflow: hidden;
+}
+/* Список занимает 100%, при QR съезжает влево на 50% (уходит за край) */
+.donate__slide--list {
+  flex: 0 0 100%;
+  min-width: 100%;
+  overflow: visible;
+  padding: 0 0 12px;
+  box-sizing: border-box;
+  transition: margin-left 0.38s cubic-bezier(0.4,0,0.2,1),
+              filter 0.38s ease,
+              opacity 0.38s ease,
+              padding 0s;
+}
+/* В нормальном состоянии добавляем горизонтальные отступы */
+.donate__slider:not(.qr-open) .donate__slide--list {
+  padding: 0 16px 12px;
+}
+/* QR-слайд */
+.donate__slide--qr {
+  flex: 0 0 0%;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  padding: 0;
+  /* тянется по высоте списка */
+  align-self: stretch;
+  transition: flex-basis 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+/* Открытое состояние */
+.donate__slider.qr-open .donate__slide--qr {
+  flex-basis: 50%;
+  padding: 4px 12px 8px 6px;
+}
+
+/* QR-рамка — только тикер, без кода */
+.donate__qr-frame {
+  border: 1px solid var(--border-accent);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+.donate__qr-canvas-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* qrcodejs генерирует и canvas и img — скрываем canvas, оставляем только img */
+.donate__qr-canvas-inline canvas { display: none !important; }
+.donate__qr-canvas-inline img {
+  border-radius: 4px;
+}
+/* Список при открытом QR — сдвиг впритык, клики остаются активными для закрытия */
+.donate__slide--list { position: relative; }
+.donate__slider.qr-open .donate__slide--list {
+  margin-left: -50%;
+  opacity: 0.6;
+  cursor: pointer;
+  pointer-events: auto;
+  filter: blur(2px) brightness(0.75);
+}
+.donate__qr-addr {
+  font-size: 0.75rem; font-weight: 700;
+  color: var(--accent); letter-spacing: 0.06em;
+  text-align: center;
+  width: 100%; padding: 0; margin: 0;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+body.theme-light .donate__qr-addr { color: var(--text-muted); }
+
+/* Светлая тема: рамка QR-кода — серая */
+body.theme-light .donate__qr-frame {
+  border-color: #d0d0d0;
+}
+
+/* Светлая тема: разделители строк кейсов — серые */
+body.theme-light .case-item {
+  border-bottom-color: #d8d8d8;
+}
+
+/* Toast над футером доната */
+.donate-toast {
+  display: block; text-align: center;
+  padding: 0; margin: 0;
+  background: var(--accent); color: #fff; border-radius: 8px;
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em;
+  opacity: 0; height: 0; overflow: hidden; line-height: 0;
+  transition: opacity 0.25s ease, height 0.25s ease, line-height 0.25s ease;
+  pointer-events: none;
+}
+.donate-toast.show { opacity: 1; height: 28px; line-height: 28px; padding: 0 16px; margin: 0 20px 4px; }
+
+/* Футер доната — кликабельный только когда QR открыт */
+.cform__submit--yellow { cursor: default; }
+.cform__submit--yellow.is-back {
+  cursor: pointer;
+}
+.cform__submit--yellow.is-back:hover { background: var(--chat-input-bg); }
+.copy-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #fff;
+  padding: 8px 18px; border-radius: 20px;
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.03em;
+  pointer-events: none; z-index: 9999;
+  opacity: 0; transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+.copy-toast.show { opacity: 1; }
+
+/* ═══════════════════════
+   MOBILE  ≤ 860px
+═══════════════════════ */
+/* /* @media (max-width: 860px) {
+  * { -webkit-tap-highlight-color: transparent; }
+
+  :root { --block-w: calc(100vw - 32px); }
+
+  .hero {
+    height: auto; min-height: 100svh; padding: 60px 0 80px;
+  }
+  .hero__inner {
+    flex-direction: column; gap: 0; padding-inline: 0;
+    align-items: center; justify-content: center;
+  }
+  .hero__center {
+    width: var(--block-w); max-width: var(--block-w);
+    min-width: 0; padding-inline: 0; flex: none;
+  }
+  .hero__chat {
+    height: calc(100svh - 180px); min-height: 360px; max-height: none;
+  }
+  /* Тулбар — убираем scaleX, был кривой на мобиле */
+  .hero__chat-box {
+    transform: none;
+  }
+  /* Теги — одна строка, скролл, шрифт мельче */
+  .hero__chat-tags {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  .hero__chat-tag {
+    font-size: 0.6rem;
+    padding: 5px 7px;
+    gap: 4px;
+  }
+  .hero__chat-tag svg {
+    width: 11px; height: 11px;
+  }
+  /* Блок кейсов — убираем glass-shadow, простая обводка */
+  .cases-folder {
+    width: var(--block-w); max-width: var(--block-w);
+    height: calc(100svh - 160px); max-height: none;
+  }
+  /* Неактивные вкладки — сжимаются до иконки, активная — занимает всё место */
+  .cases-folder__tab {
+    gap: 0; flex: 0 0 36px;
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+  .cases-folder__tab.is-active {
+    gap: 6px; flex: 1 1 0;
+    border-color: var(--border-accent);
+    box-shadow: none;
+  }
+  body.theme-light .cases-folder__tab {
+    border-color: rgba(0,0,0,0.15);
+  }
+  body.theme-light .cases-folder__tab.is-active {
+    border-color: rgba(0,0,0,0.25);
+  }
+
+  /* Строки кейсов — название 80%, плашка 20% */
+  .case-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 14px;
+  }
+  .case-item__meta {
+    min-width: 0;
+    overflow: hidden;
+  }
+  /* Название без сокращения */
+  .case-item__title {
+    font-size: 0.85rem;
+    white-space: normal;
+    overflow: visible;
+    display: block;
+  }
+  .case-item__btn {
+    font-size: 0.6rem;
+    padding: 4px 7px;
+    margin-left: 0;
+    white-space: nowrap;
+  }
+  .contact { overflow: hidden; padding-block: 60px; }
+  .contact__inner {
+    padding-block: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* На мобиле заявки — folder-tabs как кейсы */
+  .cstack { display: none; }
+  .cform__row { grid-template-columns: 1fr; }
+  .cform__group--row { grid-template-columns: 1fr; }
+  .cform__input--half  { grid-column: 1; }
+  .cform__messenger-btns { grid-column: 1; }
+
+  /* Убираем заголовки карточек — они дублируют табы */
+  .contact-folder__page .cform__header { display: none; }
+
+  /* Активная вкладка — нет нижней границы (эффект одного слоя) */
+  .contact-folder__tab.is-active {
+    box-shadow: inset 1px 0 0 var(--border-accent), inset -1px 0 0 var(--border-accent), inset 0 1px 0 var(--border-accent);
+    margin-bottom: -1px;
+    padding-bottom: 14px;
+  }
+
+  /* Кнопки отправки — скругление совпадает с карточкой (14px) */
+  .contact-folder__page .cform__submit,
+  .contact-folder__page .cform__submit--green.btn--primary,
+  .contact-folder__page .cform__submit--yellow {
+    border-radius: 0 0 14px 14px;
+  }
+
+  /* Донат на мобиле — скрываем QR-кнопку, только копировать */
+  .donate__copy[aria-label="QR-код"] { display: none; }
+  /* Плашка валюты — кликабельная (визуальный сигнал) */
+  .donate__cell { cursor: pointer; }
+  /* Донат — скролл внутри карточки */
+  .contact-folder__page .cform--donate {
+    overflow-y: auto;
+    flex: 1;
+  }
+} */ 
+
+/* ═══════════════════════
+   MOBILE CONTACT FOLDER
+═══════════════════════ */
+.contact-folder { display: none; }
+
+/* /* @media (max-width: 860px) {
+  .contact-folder {
+    display: flex; flex-direction: column;
+    width: var(--block-w); max-width: var(--block-w);
+    height: calc(100svh - 160px); max-height: none; min-height: 400px;
+    /* Убираем backdrop-filter который размывает фон за пределами */
+  }
+  /* Все фоны внутри contact-folder — прозрачные (кроме табов) */
+  .contact-folder__panel,
+  .contact-folder__page .cform__wrap,
+  .contact-folder__page .cform,
+  .contact-folder__page .cform--donate,
+  .contact-folder__page .cform__header,
+  .contact-folder__page .cform__btn-wrap,
+  .contact-folder__page .cform__submit,
+  .contact-folder__page .cform__submit--yellow,
+  .contact-folder__page .cform__submit--green.btn--primary,
+  .contact-folder__page .donate__cell,
+  .contact-folder__page .donate__grid,
+  .contact-folder__page .donate__slide--list,
+  .contact-folder__page .donate__desc {
+    background: transparent !important;
+  }
+  /* Кнопки валют — подложка accent с прозрачностью */
+  .contact-folder__page .donate__cell {
+    background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+    border-color: rgba(255,255,255,0.1) !important;
+  }
+  /* Инпуты и textarea — подкрашиваем цветом accent с прозрачностью 75% */
+  .contact-folder__page .cform__input,
+  .contact-folder__page .cform__textarea {
+    background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+    border-color: rgba(255,255,255,0.12) !important;
+  }
+  body.theme-light .contact-folder__page .cform__input,
+  body.theme-light .contact-folder__page .cform__textarea {
+    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+    border-color: rgba(0,0,0,0.15) !important;
+  }
+  /* Светлая тема: кнопки валют — подложка accent с прозрачностью */
+  body.theme-light .contact-folder__page .donate__cell {
+    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+    border-color: rgba(0,0,0,0.1) !important;
+  }
+  body.theme-light .contact-folder__page .cform__submit,
+  body.theme-light .contact-folder__page .cform__submit--yellow,
+  body.theme-light .contact-folder__page .cform__submit--green.btn--primary {
+    background: color-mix(in srgb, var(--accent) 18%, transparent) !important;
+    border-radius: 4px !important;
+  }
+  /* Убираем все внутренние горизонтальные границы */
+  .contact-folder__page .cform__group,
+  .contact-folder__page .cform__header {
+    border-bottom: none !important;
+    border-top: none !important;
+  }
+  .contact-folder__page .cform__submit,
+  .contact-folder__page .cform__submit--yellow,
+  .contact-folder__page .cform__submit--green.btn--primary {
+    border-top: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 0 14px 14px;
+  }
+  /* ── Табы — отдельные пилюли над панелью ── */
+  .contact-folder__tabs {
+    display: flex; gap: 6px; flex-shrink: 0;
+    margin-bottom: 8px; align-items: center;
+  }
+  /* Табы — простая обводка вместо glass-shadow */
+  .contact-folder__tab {
+    flex: 0 0 36px; display: flex; align-items: center; justify-content: center; gap: 0;
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--text-muted); cursor: pointer;
+    position: relative; overflow: hidden; white-space: nowrap;
+    transition: flex 0.25s ease, gap 0.25s ease, border-color 0.18s, color 0.18s, background 0.18s;
+  }
+  .contact-folder__tab.is-active {
+    flex: 1 1 0; gap: 6px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    border-color: var(--border-accent);
+    overflow: hidden;
+  }
+  body.theme-light .contact-folder__tab {
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    border-color: rgba(0,0,0,0.15);
+  }
+  body.theme-light .contact-folder__tab.is-active {
+    background: color-mix(in srgb, var(--accent) 22%, transparent);
+    border-color: var(--border-accent);
+  }
+  .contact-folder__tab-icon {
+    width: 18px; height: 18px; flex-shrink: 0; object-fit: contain;
+    filter: invert(65%) sepia(20%) saturate(400%) hue-rotate(90deg) brightness(80%);
+  }
+  .contact-folder__tab.is-active .contact-folder__tab-icon {
+    filter: invert(72%) sepia(40%) saturate(500%) hue-rotate(90deg) brightness(100%);
+  }
+  .contact-folder__tab-label { color: #8aab8a; }
+  .contact-folder__tab.is-active .contact-folder__tab-label { color: #a8c4a8; }
+  body.theme-light .contact-folder__tab-icon { filter: brightness(0) opacity(0.35); }
+  body.theme-light .contact-folder__tab.is-active .contact-folder__tab-icon { filter: brightness(0) opacity(0.65); }
+  body.theme-light .contact-folder__tab-label { color: var(--text-muted); }
+  body.theme-light .contact-folder__tab.is-active .contact-folder__tab-label { color: var(--text); }
+  .contact-folder__tab-label {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em;
+    overflow: hidden; max-width: 0; opacity: 0;
+    transition: max-width 0.25s ease, opacity 0.2s ease;
+  }
+  .contact-folder__tab.is-active .contact-folder__tab-label { max-width: 160px; opacity: 1; }
+
+  /* Чекбоксы категорий и мессенджеров — подложка accent */
+  .contact-folder__page .cform__check {
+    background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+  }
+  .contact-folder__page .cform__check:has(input:checked) {
+    background: color-mix(in srgb, var(--accent) 18%, transparent) !important;
+  }
+  body.theme-light .contact-folder__page .cform__check {
+    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+  }
+  body.theme-light .contact-folder__page .cform__check:has(input:checked) {
+    background: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+  }
+    background: color-mix(in srgb, var(--accent) 6%, transparent) !important;
+  }
+  .contact-folder__page .cform__check:has(input:checked) {
+    background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+  }
+  body.theme-light .contact-folder__page .cform__check {
+    background: color-mix(in srgb, var(--accent) 8%, transparent) !important;
+  }
+  body.theme-light .contact-folder__page .cform__check:has(input:checked) {
+    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+  }
+
+  /* ── Панель — простая обводка вместо glass-shadow ── */
+  .contact-folder__panel {
+    flex: 1; border: 1px solid var(--border);
+    border-radius: 4px; overflow: hidden;
+    display: flex; flex-direction: column; min-height: 0;
+    position: relative; z-index: 1;
+  }
+  body.theme-light .contact-folder__panel {
+    border-color: rgba(0,0,0,0.15);
+  }
+  .contact-folder__page { display: none; flex-direction: column; flex: 1; min-height: 0; }
+  .contact-folder__page.is-active { display: flex; }
+
+  /* cform__wrap должен занимать всю высоту страницы */
+  .contact-folder__page .cform__wrap {
+    flex: 1; display: flex; flex-direction: column; min-height: 0;
+  }
+  .contact-folder__page .cform {
+    flex: 1; overflow-y: auto; min-height: 0;
+  }
+  .contact-folder__page .cform__btn-wrap,
+  .contact-folder__page .cform__submit {
+    flex-shrink: 0;
+    border-radius: 0 0 14px 14px;
+  }
+
+  /* Убираем border-radius у cform__header внутри folder */
+  .contact-folder__page .cform__header {
+    border-radius: 0;
+  }
+
+  /* Светлая тема — серые табы и панель */
+  body.theme-light .contact-folder__tab {
+    background: #e4e4e4;
+  }
+  body.theme-light .contact-folder__tab.is-active {
+    background: #e4e4e4;
+  }
+  body.theme-light .contact-folder__panel {
+    background: #e4e4e4;
+    border-color: #d0d0d0;
+  }
+} */ 
+
+/* ── Убираем header-плашку из кейсов (имя теперь на вкладке) ── */
+.cases-folder__page-header { display: none; }
+
+/* Сдвигаем fade-top выше без заголовка */
+.cases__fade-top { top: 0; }
+
+/* ═══════════════════════
+   CASES FOLDER — INTRO OVERLAY
+═══════════════════════ */
+.cases-folder__intro {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 30px;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+.cases-folder__intro.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-content {
+  max-width: 440px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Описание */
+.intro-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+/* Think Tree (список с чекпоинтами) */
+.think-tree {
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 20px;
+}
+
+.think-tree::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--border-accent) 0%, rgba(77, 175, 106, 0.1) 100%);
+}
+
+.think-tree__node {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 0;
+  position: relative;
+}
+
+.think-tree__dot {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border-accent);
+  background: var(--bg-card);
+  margin-left: -20px;
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.think-tree__content {
+  flex: 1;
+}
+
+.think-tree__label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.think-tree__desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.6;
+}
+
+/* Checkpoint (заголовок с линиями) */
+.checkpoint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  color: var(--text-dim);
+  user-select: none;
+}
+
+.checkpoint__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-accent), transparent);
+}
+
+.checkpoint__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-accent);
+  background: var(--bg-card);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.checkpoint__badge svg {
+  flex-shrink: 0;
+}
+
+/* Кнопка внизу на всю ширину */
+.intro-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--r);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent;
+  border: 1px solid var(--border-accent);
+  color: var(--accent);
+  margin-top: auto;
+}
+
+.intro-btn:hover {
+  background: var(--bg-alt);
+  border-color: var(--accent);
+}
+
+.intro-btn svg {
+  flex-shrink: 0;
+}
+
+/* ── СВЕТЛАЯ ТЕМА: всё серое ── */
+body.theme-light .think-tree::before {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.05) 100%);
+}
+
+body.theme-light .think-tree__dot {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: var(--bg-card);
+}
+
+body.theme-light .checkpoint__line {
+  background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.15), transparent);
+}
+
+body.theme-light .checkpoint__badge {
+  border-color: rgba(0, 0, 0, 0.2);
+  color: var(--text);
+}
+
+body.theme-light .intro-btn {
+  border-color: rgba(0, 0, 0, 0.2);
+  color: var(--text);
+}
+
+body.theme-light .intro-btn:hover {
+  background: var(--bg-alt);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+/* ═══════════════════════
+   OVERRIDE: Увеличенное скругление hero-чата
+═══════════════════════ */
+.hero .hero__chat-wrap {
+  border-radius: 40px;
+}
+.hero .hero__chat-wrap::after {
+  border-radius: 40px;
+}
+.hero .hero__chat {
+  border-radius: 40px;
+}
+.hero .hero__chat::before,
+.hero .hero__chat::after {
+  border-radius: 40px;
+}
+.hero .hero__chat-blur-edges,
+.hero .hero__chat-blur-bottom,
+.hero .hero__chat-tint {
+  border-radius: 40px;
+}
+
+/* Поднимаем футер чуть выше от нижнего края */
+.hero .hero__chat-footer {
+  padding-bottom: 16px;
+}
+
+/* ═══════════════════════
+   BUTTON ANIMATION (Send)
+═══════════════════════ */
+/* УДАЛЕНО - эти стили больше не нужны для section-scroll-btn */
+
+/* ═══════════════════════
+   SEND BUTTON ANIMATION
+═══════════════════════ */
+.send-btn {
+  --primary: var(--text);
+  cursor: pointer;
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  min-height: 48px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: #212e22 !important;
+  color: #a8c4a8 !important;
+  opacity: 1 !important;
+}
+
+/* Светлая тема - кнопки серые */
+body.theme-light .send-btn {
+  background: #d4d5dc !important;
+  color: #666 !important;
+}
+
+.send-btn .send-btn__text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.send-btn .send-btn__icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  transform: scale(1.25);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-btn .send-btn__icon svg {
+  overflow: visible;
+  filter: none;
+}
+
+/* Letters */
+.send-btn .send-btn__text span {
+  display: block;
+  opacity: 0;
+  animation: slideDown 0.4s ease forwards calc(var(--i) * 0.015s);
+}
+
+.send-btn.is-sending .send-btn__text span {
+  opacity: 1;
+  animation: disapear 0.3s ease forwards calc(var(--i) * 0.015s);
+}
+
+@keyframes disapear {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(5px) translateY(20px);
+    filter: blur(5px);
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) translateX(5px) rotate(-90deg);
+    filter: blur(5px);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(4px) translateX(0) rotate(0);
+    filter: blur(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px) translateX(0) rotate(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+/* Plane */
+.send-btn .send-btn__state--default .send-btn__icon svg {
+  animation: land 0.3s ease forwards;
+}
+
+.send-btn.is-sending .send-btn__state--default svg {
+  animation: takeOff 0.4s linear forwards;
+}
+
+.send-btn.is-sending .send-btn__state--default .send-btn__icon {
+  transform: rotate(0) scale(1.25);
+}
+
+@keyframes takeOff {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(70px) rotate(45deg) scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(160px) rotate(45deg) scale(0);
+  }
+}
+
+@keyframes land {
+  0% {
+    transform: translateX(-60px) translateY(30px) rotate(-50deg) scale(2);
+    opacity: 0;
+    filter: blur(3px);
+  }
+  100% {
+    transform: translateX(0) translateY(0) rotate(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Contrail */
+.send-btn .send-btn__state--default .send-btn__icon:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  width: 0;
+  left: -5px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5));
+}
+
+.send-btn.is-sending .send-btn__state--default .send-btn__icon:before {
+  animation: contrail 0.4s linear forwards;
+}
+
+@keyframes contrail {
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+  8% {
+    width: 15px;
+  }
+  60% {
+    opacity: 0.7;
+    width: 80px;
+  }
+  100% {
+    opacity: 0;
+    width: 160px;
+  }
+}
+
+/* States */
+.send-btn .send-btn__state {
+  padding-left: 29px;
+  z-index: 3;
+  display: flex;
+  position: relative;
+}
+
+.send-btn .send-btn__state--default span:nth-child(4) {
+  margin-right: 0;
+}
+
+.send-btn .send-btn__state--sent {
+  display: none;
+}
+
+.send-btn .send-btn__state--sent svg {
+  transform: scale(1.25);
+  margin-right: 8px;
+}
+
+.send-btn.is-sending .send-btn__state--default {
+  position: absolute;
+}
+
+.send-btn.is-sending .send-btn__state--sent {
+  display: flex;
+}
+
+.send-btn.is-sending .send-btn__state--sent span {
+  opacity: 0;
+  animation: slideDown 0.4s ease forwards calc(var(--i) * 0.1s);
+}
+
+.send-btn.is-sending .send-btn__state--sent .send-btn__icon svg {
+  opacity: 0;
+  animation: aparecer 0.6s ease forwards 0.4s;
+}
+
+@keyframes aparecer {
+  0% {
+    opacity: 0;
+    transform: scale(4) rotate(-40deg);
+    filter: blur(4px);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(0.6);
+    filter: blur(1px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+

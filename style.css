@@ -353,7 +353,7 @@ body:not(.theme-light) .hero__chat::before {
     linear-gradient(to bottom, #000 0, transparent 120px);
 }
   /* ��������� ����� ����� ��� ��������� */
-  @media (max-width: 860px) {
+/*   /* @media (max-width: 860px) {
     .hero__chat-blur-edges {
       mask-image:
         linear-gradient(to right, #000 0, transparent 20px),
@@ -368,7 +368,7 @@ body:not(.theme-light) .hero__chat::before {
       mask-image: linear-gradient(to top, #000 0, transparent 80px);
       -webkit-mask-image: linear-gradient(to top, #000 0, transparent 80px);
     }
-  }
+  } */ */
 /* Усиленное размытие снизу (увеличено) */
 .hero__chat-blur-bottom {
   position: absolute; inset: 0; z-index: -1;
@@ -955,10 +955,10 @@ body.theme-light .cases-folder__tab:hover:not(.is-active) {
 /* Десктоп — всегда показываем название */
 .cases-folder__tab-label { max-width: 160px; opacity: 1; transition: max-width 0.25s ease, opacity 0.2s ease; }
 /* Мобиле — только у активной */
-@media (max-width: 860px) {
+/* /* @media (max-width: 860px) {
   .cases-folder__tab-label { max-width: 0; opacity: 0; }
   .cases-folder__tab.is-active .cases-folder__tab-label { max-width: 140px; opacity: 1; }
-}
+} */ */
 
 /* Panel */
 .cases-folder__panel {
@@ -1861,7 +1861,7 @@ body.theme-light .case-item {
 /* ═══════════════════════
    MOBILE  ≤ 860px
 ═══════════════════════ */
-@media (max-width: 860px) {
+/* @media (max-width: 860px) {
   * { -webkit-tap-highlight-color: transparent; }
 
   :root { --block-w: calc(100vw - 32px); }
@@ -1986,14 +1986,14 @@ body.theme-light .case-item {
     overflow-y: auto;
     flex: 1;
   }
-}
+} */
 
 /* ═══════════════════════
    MOBILE CONTACT FOLDER
 ═══════════════════════ */
 .contact-folder { display: none; }
 
-@media (max-width: 860px) {
+/* @media (max-width: 860px) {
   .contact-folder {
     display: flex; flex-direction: column;
     width: var(--block-w); max-width: var(--block-w);
@@ -2121,7 +2121,7 @@ body.theme-light .case-item {
     background: color-mix(in srgb, var(--accent) 22%, transparent) !important;
   }
     background: color-mix(in srgb, var(--accent) 6%, transparent) !important;
-  }
+  } */
   .contact-folder__page .cform__check:has(input:checked) {
     background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
   }
