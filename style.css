@@ -2404,114 +2404,142 @@ body.theme-light .intro-btn:hover {
 /* ═══════════════════════
    BUTTON ANIMATION (Send)
 ═══════════════════════ */
-.section-scroll-btn .letter {
-  display: inline-block;
+/* УДАЛЕНО - эти стили больше не нужны для section-scroll-btn */
+
+/* ═══════════════════════
+   SEND BUTTON ANIMATION
+═══════════════════════ */
+.send-btn {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  min-height: 48px !important;
+  opacity: 1 !important;
+  background: var(--accent) !important;
+  overflow: visible !important;
+}
+
+.send-btn__state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.send-btn__state--sent {
+  display: none;
   opacity: 0;
-  animation: slideDown 0.4s ease forwards calc(var(--i) * 0.015s);
 }
 
-.section-scroll-btn:hover:not(.is-animating) .letter {
+.send-btn__icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.send-btn__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.send-btn__text {
+  display: flex;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Буквы */
+.send-letter {
+  display: inline-block;
   opacity: 1;
-  animation: wave 0.25s ease forwards calc(var(--i) * 0.01s);
 }
 
-.section-scroll-btn.is-animating .letter {
-  opacity: 1;
-  animation: disapear 0.3s ease forwards calc(var(--i) * 0.015s);
+/* При клике: буквы первого состояния исчезают */
+.send-btn.is-sending .send-btn__state--default .send-letter {
+  animation: letterOut 0.3s ease forwards;
+  animation-delay: calc(var(--i) * 0.02s);
 }
 
-@keyframes wave {
-  30% {
-    opacity: 1;
-    transform: translateY(4px) translateX(0) rotate(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-3px) translateX(0) rotate(0);
-    color: var(--accent);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) translateX(0) rotate(0);
-  }
+/* При клике: самолётик улетает */
+.send-btn.is-sending .send-btn__state--default .send-btn__icon {
+  animation: planeOut 0.5s ease forwards;
 }
 
-@keyframes slideDown {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px) translateX(5px) rotate(-90deg);
-    color: var(--accent);
-    filter: blur(5px);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(4px) translateX(0) rotate(0);
-    filter: blur(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-3px) translateX(0) rotate(0);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) translateX(0) rotate(0);
-  }
+/* Скрываем первое состояние, показываем второе */
+.send-btn.is-sending .send-btn__state--default {
+  visibility: hidden !important;
 }
 
-@keyframes disapear {
-  from {
-    opacity: 1;
-  }
+.send-btn.is-sending .send-btn__state--sent {
+  display: flex !important;
+  opacity: 1 !important;
+  position: absolute;
+}
+
+/* Буквы второго состояния появляются */
+.send-btn.is-sending .send-btn__state--sent .send-letter {
+  opacity: 0;
+  animation: letterIn 0.4s ease forwards;
+  animation-delay: calc(0.3s + var(--i) * 0.05s);
+}
+
+/* Галочка появляется */
+.send-btn.is-sending .send-btn__state--sent .send-btn__icon {
+  opacity: 0;
+  animation: checkIn 0.5s ease forwards 0.5s;
+}
+
+/* Анимации */
+@keyframes letterOut {
   to {
     opacity: 0;
-    transform: translateX(5px) translateY(20px);
-    color: var(--accent);
-    filter: blur(5px);
+    transform: translateY(10px);
+    filter: blur(3px);
   }
 }
 
-/* Анимация самолётика (lottie-arrow) */
-.section-scroll-btn .lottie-arrow {
-  transition: transform 0.3s ease;
+@keyframes letterIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
-.section-scroll-btn:hover:not(.is-animating) .lottie-arrow:first-child,
-.section-scroll-btn:hover:not(.is-animating) .lottie-arrow:last-child {
-  transform: rotate(45deg) scale(1.2);
-}
-
-.section-scroll-btn.is-animating .lottie-arrow:first-child {
-  animation: takeOffLeft 0.4s linear forwards;
-}
-
-.section-scroll-btn.is-animating .lottie-arrow:last-child {
-  animation: takeOffRight 0.4s linear forwards;
-}
-
-@keyframes takeOffLeft {
+@keyframes planeOut {
   0% {
     opacity: 1;
+    transform: translateX(0) rotate(0) scale(1);
   }
-  60% {
+  50% {
     opacity: 1;
-    transform: translateX(-70px) rotate(-45deg) scale(2);
+    transform: translateX(60px) rotate(45deg) scale(1.5);
   }
   100% {
     opacity: 0;
-    transform: translateX(-160px) rotate(-45deg) scale(0);
+    transform: translateX(100px) rotate(45deg) scale(0.5);
   }
 }
 
-@keyframes takeOffRight {
+@keyframes checkIn {
   0% {
-    opacity: 1;
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
   }
-  60% {
+  50% {
     opacity: 1;
-    transform: translateX(70px) rotate(45deg) scale(2);
+    transform: scale(1.2) rotate(0);
   }
   100% {
-    opacity: 0;
-    transform: translateX(160px) rotate(45deg) scale(0);
+    opacity: 1;
+    transform: scale(1) rotate(0);
   }
 }
