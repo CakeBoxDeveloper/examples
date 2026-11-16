@@ -1121,31 +1121,4 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 })();
 
-/* Mobile-friendly REASONING animation */
-(function () {
-  var el = document.getElementById('reasoningText');
-  if (!el) return;
-  var phrases = ['еплой в продакшн','омпиляция исходников','апуск тестов','Сборка артефактов','уш в репозиторий','становка зависимостей','нализ бандла','птимизация ассетов','Синхронизация ','енерация типов','роверка кода','оиск обновлений'];
-  var idx = 0, timer = null;
-  function update() {
-    el.style.opacity = '0';
-    setTimeout(function() {
-      el.textContent = phrases[idx];
-      idx = (idx + 1) % phrases.length;
-      el.style.opacity = '1';
-    }, 300);
-  }
-  function start() {
-    if (timer) return;
-    el.textContent = phrases[0];
-    el.style.opacity = '1';
-    idx = 1;
-    timer = setInterval(update, 4000);
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    start();
-  }
-  document.addEventListener('touchstart', start, { once: true, passive: true });
-})();
+
