@@ -202,7 +202,7 @@ body.theme-light .section-scroll-btn { color: var(--text); }
 
 /* ── Canvases ── */
 .wire-canvas  { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; display: none; }
-.matrix-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.matrix-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 .hero__vignette { display: none; }
 
 /* ═══════════════════════
@@ -222,18 +222,18 @@ body.theme-light .section-scroll-btn { color: var(--text); }
   position: absolute; bottom: 0; left: 0; right: 0;
   height: 120px;
   background: linear-gradient(to bottom, transparent 0%, #08090f 50%, #08090f 100%);
-  pointer-events: none; z-index: 1;
+  pointer-events: none; z-index: 2;
 }
 body.theme-light .hero::after {
   background: linear-gradient(to bottom, transparent 0%, transparent 40%, #f2f3f7 100%);
-  z-index: 1;
+  z-index: 2;
 }
 
 .hero__inner {
   display: flex; flex-direction: row;
   align-items: center; justify-content: center;
   gap: 32px; width: 100%; max-width: 100%;
-  position: relative; z-index: 2;
+  position: relative; z-index: 3;
 }
 
 .hero__center {
@@ -247,7 +247,7 @@ body.theme-light .hero::after {
 
 /* ── Section scroll button ── */
 .section-scroll-btn {
-  position: absolute; bottom: 0; left: 0; right: 0; z-index: 5;
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 4;
   display: flex; align-items: center; justify-content: center;
   gap: 12px; padding: 20px var(--pg);
   border: none; font: inherit; color: var(--accent);
@@ -255,6 +255,11 @@ body.theme-light .hero::after {
   cursor: pointer; transition: opacity var(--ease);
   -webkit-tap-highlight-color: transparent;
   background: transparent; width: 100%;
+  pointer-events: none;
+}
+.section-scroll-btn span,
+.section-scroll-btn .lottie-arrow {
+  pointer-events: auto;
 }
 body.theme-light .section-scroll-btn { color: var(--text); }
 .section-scroll-btn:hover { opacity: 0.75; }
@@ -347,22 +352,6 @@ body:not(.theme-light) .hero__chat::before {
     linear-gradient(to bottom, #000 0, transparent 120px);
 }
   /* ��������� ����� ����� ��� ��������� */
-@media (max-width: 860px) {
-    .hero__chat-blur-edges {
-      mask-image:
-        linear-gradient(to right, #000 0, transparent 20px),
-        linear-gradient(to left, #000 0, transparent 20px),
-        linear-gradient(to bottom, #000 0, transparent 20px);
-      -webkit-mask-image:
-        linear-gradient(to right, #000 0, transparent 20px),
-        linear-gradient(to left, #000 0, transparent 20px),
-        linear-gradient(to bottom, #000 0, transparent 20px);
-    }
-    .hero__chat-blur-bottom {
-      mask-image: linear-gradient(to top, #000 0, transparent 80px);
-      -webkit-mask-image: linear-gradient(to top, #000 0, transparent 80px);
-    }
-  }
 /* Усиленное размытие снизу (увеличено) */
 .hero__chat-blur-bottom {
   position: absolute; inset: 0; z-index: -1;
@@ -371,6 +360,31 @@ body:not(.theme-light) .hero__chat::before {
   -webkit-backdrop-filter: blur(48px);
   mask-image: linear-gradient(to top, #000 0, transparent 256px);
   -webkit-mask-image: linear-gradient(to top, #000 0, transparent 256px);
+}
+@media (max-width: 860px) {
+  /* Упрощаем backdrop-filter для производительности */
+  body:not(.theme-light) .hero__chat::before {
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+  }
+  .hero__chat-blur-edges {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    mask-image:
+      linear-gradient(to right, #000 0, transparent 20px),
+      linear-gradient(to left, #000 0, transparent 20px),
+      linear-gradient(to bottom, #000 0, transparent 20px);
+    -webkit-mask-image:
+      linear-gradient(to right, #000 0, transparent 20px),
+      linear-gradient(to left, #000 0, transparent 20px),
+      linear-gradient(to bottom, #000 0, transparent 20px);
+  }
+  .hero__chat-blur-bottom {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    mask-image: linear-gradient(to top, #000 0, transparent 80px);
+    -webkit-mask-image: linear-gradient(to top, #000 0, transparent 80px);
+  }
 }
 /* Цветной тинт по краям */
 .hero__chat-tint {
@@ -531,6 +545,7 @@ body:not(.theme-light) .hero__chat-tag {
 /* Chat footer */
 .hero__chat-footer {
   padding: 0 12px 12px; background: transparent; flex-shrink: 0;
+  position: relative; z-index: 10;
 }
 .hero__chat-box {
   background: var(--chat-input-bg); border: none; border-radius: 0;
@@ -632,10 +647,13 @@ body:not(.theme-light) .hero__chat-plus:hover { color: #a8d8b8; }
 .hero__chat-mode {
   display: flex; align-items: center; background: var(--chat-bg);
   border: 1px solid var(--chat-border); border-radius: 8px; padding: 2px; gap: 1px;
+  position: relative; z-index: 11;
 }
 .hero__chat-mode-btn {
   padding: 3px 9px; border-radius: 6px; font-size: 0.68rem; font-weight: 500;
   color: var(--chat-muted); transition: background 0.18s, color 0.18s; white-space: nowrap;
+  position: relative; z-index: 12; cursor: pointer; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .hero__chat-mode-btn--active { background: var(--chat-input-bg); color: var(--chat-text); }
 /* Светлая тема: аккуратная плашка с выделением активной кнопки */
