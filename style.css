@@ -225,14 +225,8 @@ body.theme-light .section-scroll-btn { color: var(--text); }
   pointer-events: none; z-index: 1;
 }
 body.theme-light .hero::after {
-  background: linear-gradient(to bottom, transparent 0%, #f2f3f7 50%, #f2f3f7 100%);
-  z-index: 4;
-}
-body.theme-light .hero .section-scroll-btn {
-  z-index: 6;
-}
-body.theme-light .hero::after {
   background: linear-gradient(to bottom, transparent 0%, transparent 40%, #f2f3f7 100%);
+  z-index: 1;
 }
 
 .hero__inner {
@@ -644,13 +638,18 @@ body:not(.theme-light) .hero__chat-plus:hover { color: #a8d8b8; }
   color: var(--chat-muted); transition: background 0.18s, color 0.18s; white-space: nowrap;
 }
 .hero__chat-mode-btn--active { background: var(--chat-input-bg); color: var(--chat-text); }
-/* Светлая тема: прозрачный режим без резкой границы */
+/* Светлая тема: аккуратная плашка с выделением активной кнопки */
 body.theme-light .hero__chat-mode {
-  background: transparent;
-  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.09);
+}
+body.theme-light .hero__chat-mode-btn {
+  color: #636b7b;
 }
 body.theme-light .hero__chat-mode-btn--active {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.1);
+  color: #1a1c26;
+  font-weight: 600;
 }
 /* Тёмная тема: зелёные цвета + зелёный фон */
 body:not(.theme-light) .hero__chat-mode { 
@@ -1883,6 +1882,12 @@ body.theme-light .case-item {
   /* Тулбар — убираем scaleX, был кривой на мобиле */
   .hero__chat-box {
     transform: none;
+  }
+  .hero__chat-mode-btn {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    touch-action: manipulation;
   }
   /* Теги — одна строка, скролл, шрифт мельче */
   .hero__chat-tags {

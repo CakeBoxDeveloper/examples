@@ -231,6 +231,7 @@
   }
 
   recolorAll();
+  document.addEventListener('themeChanged', recolorAll);
 
   /* ── Resize ── */
   window.addEventListener('resize', function() {

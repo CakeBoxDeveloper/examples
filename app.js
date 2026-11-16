@@ -505,6 +505,8 @@ window.addEventListener('DOMContentLoaded', () => {
       dayBtn.classList.toggle('hero__chat-mode-btn--active',   theme === 'light');
       nightBtn.classList.toggle('hero__chat-mode-btn--active', theme !== 'light');
     }
+    // Уведомляем canvas и другие компоненты о смене темы
+    document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
   }
 
   // Тема по времени — без localStorage, только сессия
@@ -522,8 +524,18 @@ window.addEventListener('DOMContentLoaded', () => {
   // Кнопки День/Ночь в чате
   var dayBtn   = document.getElementById('chatModeDay');
   var nightBtn = document.getElementById('chatModeNight');
-  if (dayBtn)   dayBtn.addEventListener('click',   function () { apply('light'); });
-  if (nightBtn) nightBtn.addEventListener('click', function () { apply('dark');  });
+  function bindModeBtn(btn, theme) {
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      apply(theme);
+    });
+    btn.addEventListener('touchend', function (e) {
+      e.preventDefault();
+      apply(theme);
+    });
+  }
+  bindModeBtn(dayBtn, 'light');
+  bindModeBtn(nightBtn, 'dark');
 })();
 
 
@@ -536,7 +548,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const cv   = document.getElementById('matrixCanvas');
   if (!root || !cv) return;
   const ctx  = cv.getContext('2d');
-  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Символы как в rain.py
   const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*+-=/<>|ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ'.split('');
@@ -589,6 +600,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function size() {
     const r = root.getBoundingClientRect();
     w = r.width; h = r.height;
+    if (!w || !h) return;
     dpr = Math.min(devicePixelRatio || 1, 2);
     cv.width  = Math.round(w * dpr);
     cv.height = Math.round(h * dpr);
@@ -597,8 +609,8 @@ window.addEventListener('DOMContentLoaded', () => {
     ctx.textBaseline = 'top';
     cols  = Math.ceil(w / COL_GAP);
     drops = Array.from({ length: cols }, (_, i) => makeCol(i * COL_GAP));
-    // Заливаем фон
-    ctx.fillStyle = '#08090f';
+    // Заливаем фон в цвет активной темы
+    ctx.fillStyle = getTheme() === 'light' ? '#f0f1f5' : '#08090f';
     ctx.fillRect(0, 0, w, h);
   }
 
@@ -661,17 +673,47 @@ window.addEventListener('DOMContentLoaded', () => {
     if (live) raf = requestAnimationFrame(frame);
   }
 
-  const start = () => { if (!live && !calm) { live = true; raf = requestAnimationFrame(frame); } };
-  const stop  = () => { /* не останавливаем — мигание при скролле */ };
+  const start = () => {
+    if (!live) {
+      live = true;
+      raf = requestAnimationFrame(frame);
+    }
+  };
 
   size();
-  if (calm) { for (let i = 0; i < 30; i++) draw(); }
-  else start(); // всегда работает, не зависит от viewport
+  start(); // Всегда запускаем анимацию матрицы
+
+  // Пересчитываем размер после полной готовности страницы и скрытия лоадера
+  document.addEventListener('DOMContentLoaded', size);
+  window.addEventListener('load', size);
+  document.addEventListener('loaderDone', () => {
+    size();
+    start();
+  });
+
+  // При смене темы — мгновенно перезаливаем фон под новую палитру
+  document.addEventListener('themeChanged', () => {
+    if (!w || !h) return;
+    ctx.fillStyle = getTheme() === 'light' ? '#f0f1f5' : '#08090f';
+    ctx.fillRect(0, 0, w, h);
+  });
 
   let t;
   addEventListener('resize', () => {
     clearTimeout(t);
-    t = setTimeout(() => { size(); }, 180);
+    t = setTimeout(() => {
+      const r = root.getBoundingClientRect();
+      // На мобильных при появлении/скрытии адресной строки меняется высота — не сбрасываем капли
+      if (Math.round(r.width) === Math.round(w) && Math.abs(r.height - h) < 160) {
+        h = r.height;
+        cv.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.font         = 'bold ' + CELL + 'px ui-monospace, Menlo, monospace';
+        ctx.textBaseline = 'top';
+        return;
+      }
+      size();
+    }, 180);
   });
 })();
 
@@ -1010,18 +1052,18 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!reasoningTextEl) return;
 
   var phrases = [
-    'Deploying to production',
-    'Compiling sources',
-    'Running tests',
-    'Building artifacts',
-    'Pushing to remote',
-    'Installing dependencies',
-    'Analyzing bundle',
-    'Optimizing assets',
-    'Syncing database',
-    'Generating types',
-    'Linting codebase',
-    'Checking updates'
+    'Деплой в продакшн',
+    'Компиляция исходников',
+    'Запуск тестов',
+    'Сборка артефактов',
+    'Пуш в репозиторий',
+    'Установка зависимостей',
+    'Анализ бандла',
+    'Оптимизация ассетов',
+    'Синхронизация БД',
+    'Генерация типов',
+    'Проверка кода',
+    'Поиск обновлений'
   ];
 
   var currentIndex = 0;
