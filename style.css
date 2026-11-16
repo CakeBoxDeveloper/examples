@@ -1926,7 +1926,7 @@ body.theme-light .case-item {
     border-color: rgba(0,0,0,0.15);
   }
   body.theme-light .cases-folder__tab.is-active {
-    border-color: var(--border-accent);
+    border-color: rgba(0,0,0,0.25);
   }
 
   /* Строки кейсов — название 80%, плашка 20% */
@@ -1941,28 +1941,12 @@ body.theme-light .case-item {
     min-width: 0;
     overflow: hidden;
   }
-  /* Бегущая строка для длинного названия */
+  /* Название без сокращения */
   .case-item__title {
     font-size: 0.85rem;
-    flex: none;
-    white-space: nowrap;
-    overflow: hidden;
+    white-space: normal;
+    overflow: visible;
     display: block;
-    /* маска — фейдаут на краях */
-    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%);
-    mask-image: linear-gradient(to right, black 70%, transparent 100%);
-  }
-  /* Если текст не помещается — запускаем marquee */
-  .case-item__title.is-marquee {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-    animation: marquee-scroll 8s linear infinite;
-  }
-  @keyframes marquee-scroll {
-    0%   { transform: translateX(0); }
-    40%  { transform: translateX(var(--marquee-offset, -30%)); }
-    60%  { transform: translateX(var(--marquee-offset, -30%)); }
-    100% { transform: translateX(0); }
   }
   .case-item__btn {
     font-size: 0.6rem;
