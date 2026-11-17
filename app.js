@@ -541,12 +541,21 @@ window.addEventListener('DOMContentLoaded', () => {
   // Символы как в rain.py
   const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*+-=/<>|ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ'.split('');
 
-  // Мобильные настройки — меньше нагрузки
-  const isMobile = window.innerWidth <= 860;
-  const CELL    = isMobile ? 40 : 26;         // размер ячейки px
-  const COL_GAP = CELL * 2;   // шаг колонок — каждая вторая, не накладываются
-  const FPS     = isMobile ? 10 : 20;         // на мобильных вдвое медленнее
-  const STEP    = 1000 / FPS;
+  let w = 0, h = 0, dpr = 1, cols = 0, drops = [];
+  let raf = 0, live = false, last = 0;
+  
+  // Динамические параметры — пересчитываются при resize
+  let CELL, COL_GAP, FPS, STEP;
+
+  function updateParams() {
+    const isMobile = window.innerWidth <= 860;
+    CELL    = isMobile ? 40 : 26;
+    COL_GAP = CELL * 2;
+    FPS     = isMobile ? 10 : 20;
+    STEP    = 1000 / FPS;
+  }
+
+  updateParams(); // первоначальная инициализация
 
   // Цвета зависят от темы
   function getTheme() {
@@ -569,9 +578,6 @@ window.addEventListener('DOMContentLoaded', () => {
       dim:    'rgba(0,120,40,0.35)',
     };
   }
-
-  let w = 0, h = 0, dpr = 1, cols = 0, drops = [];
-  let raf = 0, live = false, last = 0;
 
   const pick = () => CHARS[(Math.random() * CHARS.length) | 0];
   const rows = () => Math.ceil(h / CELL);
@@ -673,7 +679,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let t;
   addEventListener('resize', () => {
     clearTimeout(t);
-    t = setTimeout(() => { size(); }, 180);
+    t = setTimeout(() => { updateParams(); size(); }, 180);
   });
 })();
 
