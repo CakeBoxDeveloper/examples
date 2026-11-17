@@ -541,9 +541,11 @@ window.addEventListener('DOMContentLoaded', () => {
   // Символы как в rain.py
   const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*+-=/<>|ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ'.split('');
 
-  const CELL    = 26;         // размер ячейки px
+  // Мобильные настройки — меньше нагрузки
+  const isMobile = window.innerWidth <= 860;
+  const CELL    = isMobile ? 40 : 26;         // размер ячейки px
   const COL_GAP = CELL * 2;   // шаг колонок — каждая вторая, не накладываются
-  const FPS     = 20;         // ~как sleep(0.05) в rain.py
+  const FPS     = isMobile ? 10 : 20;         // на мобильных вдвое медленнее
   const STEP    = 1000 / FPS;
 
   // Цвета зависят от темы
