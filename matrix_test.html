@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Matrix Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #08090f;
+      transition: background 0.3s;
+    }
+    
+    body.theme-light {
+      background: #f2f3f7;
+    }
+    
+    #matrixCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    #themeBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      padding: 12px 24px;
+      background: rgba(77, 175, 106, 0.2);
+      border: 2px solid rgba(77, 175, 106, 0.5);
+      border-radius: 8px;
+      color: #4daf6a;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    #themeBtn:hover {
+      background: rgba(77, 175, 106, 0.3);
+      border-color: #4daf6a;
+    }
+    
+    body.theme-light #themeBtn {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.2);
+      color: #333;
+    }
+    
+    #info {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 10;
+    }
+    
+    body.theme-light #info {
+      color: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrixCanvas"></canvas>
+  <button id="themeBtn">Сменить тему</button>
+  <div id="info">
+    Canvas: <span id="canvasSize">—</span><br>
+    Cols: <span id="colsCount">—</span><br>
+    Rows: <span id="rowsCount">—</span><br>
+    FPS: <span id="fpsCount">—</span>
+  </div>
+
+  <script>
+    /* ═══════════════════════════════════════
+       MATRIX CODE RAIN — ISOLATED TEST
+    ═══════════════════════════════════════ */
+    (function () {
+      const cv   = document.getElementById('matrixCanvas');
+      if (!cv) return;
+      
+      const ctx  = cv.getContext('2d');
+      const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Символы
+      const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*+-=/<>|ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ'.split('');
+
+      const CELL    = 26;
+      const COL_GAP = CELL * 2;
+      const FPS     = 20;
+      const STEP    = 1000 / FPS;
+
+      // Цвета зависят от темы
+      function getTheme() {
+        return document.body.classList.contains('theme-light') ? 'light' : 'dark';
+      }
+
+      function palette() {
+        if (getTheme() === 'light') return {
+          bg:     'rgba(240,241,245,0.25)',
+          white:  'rgba(60,60,70,1.0)',
+          bright: 'rgba(90,95,110,0.85)',
+          mid:    'rgba(130,135,150,0.6)',
+          dim:    'rgba(170,175,185,0.35)',
+        };
+        return {
+          bg:     'rgba(8,9,15,0.2)',
+          white:  'rgba(230,255,240,1.0)',
+          bright: 'rgba(0,255,100,0.9)',
+          mid:    'rgba(0,200,70,0.65)',
+          dim:    'rgba(0,120,40,0.35)',
+        };
+      }
+
+      let w = 0, h = 0, dpr = 1, cols = 0, drops = [];
+      let raf = 0, live = false, last = 0;
+      let frameCount = 0, lastFpsTime = 0, currentFps = 0;
+
+      const pick = () => CHARS[(Math.random() * CHARS.length) | 0];
+      const rows = () => Math.ceil(h / CELL);
+
+      function makeCol(x) {
+        const r = rows();
+        return {
+          x,
+          head:   -(Math.random() * r | 0),
+          length: 6 + (Math.random() * Math.max(1, r / 2) | 0),
+          speed:  Math.random() < 0.75 ? 1 : 2,
+          chars:  Array.from({ length: r + 4 }, pick),
+          tick:   0,
+        };
+      }
+
+      function size() {
+        w = window.innerWidth;
+        h = window.innerHeight;
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        cv.width  = Math.round(w * dpr);
+        cv.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.font         = 'bold ' + CELL + 'px ui-monospace, Menlo, monospace';
+        ctx.textBaseline = 'top';
+        cols  = Math.ceil(w / COL_GAP);
+        drops = Array.from({ length: cols }, (_, i) => makeCol(i * COL_GAP));
+        
+        // Обновляем инфо
+        document.getElementById('canvasSize').textContent = `${cv.width}×${cv.height}`;
+        document.getElementById('colsCount').textContent = cols;
+        document.getElementById('rowsCount').textContent = rows();
+        
+        // Заливаем фон
+        const p = palette();
+        ctx.fillStyle = getTheme() === 'light' ? '#f2f3f7' : '#08090f';
+        ctx.fillRect(0, 0, w, h);
+        
+        console.log('Matrix initialized:', { w, h, dpr, cols, rows: rows() });
+      }
+
+      function stepCol(d) {
+        d.tick++;
+        if (d.tick < d.speed) return;
+        d.tick = 0;
+        d.head++;
+        if (Math.random() < 0.12) {
+          const ri = Math.random() * d.chars.length | 0;
+          d.chars[ri] = pick();
+        }
+        const r = rows();
+        if (d.head - d.length > r) {
+          d.head   = -(Math.random() * r / 2 | 0);
+          d.length = 6 + (Math.random() * Math.max(1, r / 2) | 0);
+          d.speed  = Math.random() < 0.75 ? 1 : 2;
+          d.chars  = Array.from({ length: r + 4 }, pick);
+        }
+      }
+
+      function drawCol(d) {
+        const r = rows();
+        const p = palette();
+        for (let row = 0; row < r; row++) {
+          const dist = d.head - row;
+          const y    = row * CELL;
+          const ch   = d.chars[row] || ' ';
+
+          if (dist === 0) {
+            ctx.fillStyle = p.white;
+            ctx.fillText(ch, d.x, y);
+          } else if (dist > 0 && dist <= 2) {
+            ctx.fillStyle = p.bright;
+            ctx.fillText(ch, d.x, y);
+          } else if (dist > 0 && dist <= d.length / 2) {
+            ctx.fillStyle = p.mid;
+            ctx.fillText(ch, d.x, y);
+          } else if (dist > 0 && dist <= d.length) {
+            ctx.fillStyle = p.dim;
+            ctx.fillText(ch, d.x, y);
+          }
+        }
+      }
+
+      function draw() {
+        const p = palette();
+        ctx.fillStyle = p.bg;
+        ctx.fillRect(0, 0, w, h);
+        for (const d of drops) {
+          stepCol(d);
+          drawCol(d);
+        }
+      }
+
+      function frame(now) {
+        if (now - last >= STEP) {
+          last = now;
+          draw();
+          
+          // FPS counter
+          frameCount++;
+          if (now - lastFpsTime >= 1000) {
+            currentFps = frameCount;
+            document.getElementById('fpsCount').textContent = currentFps;
+            frameCount = 0;
+            lastFpsTime = now;
+          }
+        }
+        if (live) raf = requestAnimationFrame(frame);
+      }
+
+      const start = () => {
+        if (!live && !calm) {
+          console.log('Matrix animation started');
+          live = true;
+          raf = requestAnimationFrame(frame);
+        }
+      };
+
+      size();
+      if (calm) {
+        console.log('Reduced motion preference detected, drawing static frame');
+        for (let i = 0; i < 30; i++) draw();
+      } else {
+        start();
+      }
+
+      let t;
+      addEventListener('resize', () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          console.log('Resize detected, recalculating...');
+          size();
+        }, 180);
+      });
+
+      // Кнопка смены темы
+      const btn = document.getElementById('themeBtn');
+      btn.addEventListener('click', () => {
+        document.body.classList.toggle('theme-light');
+        console.log('Theme switched to:', getTheme());
+        // Перерисовываем при смене темы
+        size();
+      });
+    })();
+  </script>
+</body>
+</html>
