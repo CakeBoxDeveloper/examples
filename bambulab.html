@@ -436,9 +436,17 @@
       const holoCtx = holoCvs.getContext('2d');
       const patCvs = document.createElement('canvas'); patCvs.width = 1024; patCvs.height = 1365;
       const patCtx = patCvs.getContext('2d');
+      
+      // Новый слой: размытая маска логотипа
+      const maskCvs = document.createElement('canvas'); maskCvs.width = 1024; maskCvs.height = 1365;
+      const maskCtx = maskCvs.getContext('2d');
 
       const tex = new THREE.CanvasTexture(cvs); tex.anisotropy = 16;
       const holoTex = new THREE.CanvasTexture(holoCvs); holoTex.anisotropy = 16;
+      
+      // Создаём текстуру маски заранее (пустую)
+      const maskTexture = new THREE.CanvasTexture(maskCvs);
+      maskTexture.anisotropy = 16;
 
       const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/342f465d59350c1b5846e26dc3922642163be4fe/bambulablogo.svg';
       const img = new Image(); img.crossOrigin = 'Anonymous'; img.src = svgUrl;
@@ -478,8 +486,25 @@
         const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
         for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) { const offX=(r%2!==0)?gX/2:0; patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH); }
         patCtx.restore();
-        ctx.fillStyle=getHarmonicColor(hueShiftDeg,0.35,0.15); ctx.fillRect(0,0,w,h);
-        ctx.save(); ctx.globalAlpha=0.08; ctx.drawImage(patCvs,0,0); ctx.restore();
+        
+        // 1. Фон карточки
+        const cardBgColor = getHarmonicColor(hueShiftDeg,0.35,0.15);
+        ctx.fillStyle = cardBgColor;
+        ctx.fillRect(0,0,w,h);
+        
+        // 2. Паттерн
+        ctx.save(); 
+        ctx.globalAlpha=0.08; 
+        ctx.drawImage(patCvs,0,0); 
+        ctx.restore();
+        
+        // 3. МАСКА - хардкод цвет как на карточке
+        maskCtx.clearRect(0, 0, w, h);
+        maskCtx.fillStyle = 'rgb(16, 31, 18)'; // хардкод тёмно-зелёный
+        const maskSize = 420 * 1.3; // 130% от размера лого
+        maskCtx.fillRect((w - maskSize) / 2, (h - maskSize) / 2, maskSize, maskSize);
+        maskTexture.needsUpdate = true;
+        
         ctx.save();
         const cr=30; ctx.beginPath();
         ctx.moveTo(cr,0);ctx.lineTo(w-cr,0);ctx.quadraticCurveTo(w,0,w,cr);
@@ -550,9 +575,23 @@
       const holoGeo=new THREE.PlaneGeometry(cW+0.03,cH+0.03);
       const holoMat=new THREE.MeshBasicMaterial({map:holoTex,transparent:true,blending:THREE.NormalBlending,depthWrite:false});
       const holoMesh=new THREE.Mesh(holoGeo,holoMat); holoMesh.position.z=depth/2+0.016; card.add(holoMesh);
+      
+      // Добавляем маску как отдельный 3D plane между карточкой и лого
+      const maskPlaneGeo = new THREE.PlaneGeometry(cW * 0.5, cH * 0.5);
+      const maskPlaneMat = baseMat.clone(); // клонируем материал тела карточки
+      maskPlaneMat.map = maskTexture; // добавляем текстуру с SVG силуэтом
+      maskPlaneMat.needsUpdate = true;
+      const maskPlane = new THREE.Mesh(maskPlaneGeo, maskPlaneMat);
+      maskPlane.position.set(0, 0.12, depth/2 + 0.02);
+      card.add(maskPlane);
 
       img.onload=function(){
-        svgLoaded=true; drawBase();
+        svgLoaded=true; 
+        
+        // Получаем ТОЧНЫЙ цвет из baseMat для маски
+        window.maskColor = baseMat.color.getStyle(); // сохраняем в window
+        
+        drawBase();
         const loader=new THREE.SVGLoader();
         loader.load(svgUrl,(data)=>{
           const logoGroup=new THREE.Group();
