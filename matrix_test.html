@@ -226,27 +226,55 @@
           if (now - lastFpsTime >= 1000) {
             currentFps = frameCount;
             document.getElementById('fpsCount').textContent = currentFps;
+            console.log('FPS:', currentFps);
             frameCount = 0;
             lastFpsTime = now;
           }
         }
-        if (live) raf = requestAnimationFrame(frame);
+        if (live) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          console.error('❌ RAF stopped: live = false');
+        }
       }
 
       const start = () => {
         if (!live && !calm) {
-          console.log('Matrix animation started');
+          console.log('🚀 Matrix animation starting...');
           live = true;
+          last = performance.now();
           raf = requestAnimationFrame(frame);
+          console.log('RAF ID:', raf);
+        } else {
+          console.log('⚠️ Start blocked: live =', live, ', calm =', calm);
         }
       };
 
       size();
+      
+      // Логируем все важные параметры
+      console.log('=== MATRIX DEBUG ===');
+      console.log('calm (reduced motion):', calm);
+      console.log('Canvas context:', ctx ? 'OK' : 'FAIL');
+      console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
+      console.log('DPR:', devicePixelRatio);
+      
       if (calm) {
-        console.log('Reduced motion preference detected, drawing static frame');
+        console.log('⚠️ Reduced motion detected - static frame only');
+        document.getElementById('info').innerHTML += '<br><strong style="color:red;">STATIC MODE</strong>';
         for (let i = 0; i < 30; i++) draw();
       } else {
+        console.log('✅ Starting animation...');
         start();
+        
+        // Проверка через 2 секунды
+        setTimeout(() => {
+          console.log('Animation check: live =', live, ', raf =', raf, ', frameCount =', frameCount);
+          if (frameCount === 0) {
+            console.error('❌ RAF NOT WORKING! Frames not rendered.');
+            document.getElementById('info').innerHTML += '<br><strong style="color:red;">RAF FAILED</strong>';
+          }
+        }, 2000);
       }
 
       let t;
