@@ -1,1439 +1,656 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Час для себе — Студія масажу · Миколаїв</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <!-- TTNooks from GitHub -->
-  <style>
-    @font-face {
-      font-family: 'TTNooks';
-      src: url('https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/main/TTNooks-Black.ttf') format('truetype');
-      font-weight: 900; font-display: swap;
-    }
-    @font-face {
-      font-family: 'TTNooks';
-      src: url('https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/main/TTNooks-Bold.ttf') format('truetype');
-      font-weight: 700; font-display: swap;
-    }
-    @font-face {
-      font-family: 'TTNooks';
-      src: url('https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/main/TTNooks-Light.ttf') format('truetype');
-      font-weight: 300; font-display: swap;
-    }
-    @font-face {
-      font-family: 'TTNooks';
-      src: url('https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/main/TTNooks-Regular.ttf') format('truetype');
-      font-weight: 400; font-display: swap;
-    }
-    @font-face {
-      font-family: 'TTNooksScript';
-      src: url('https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/main/TTNooksScript-Bold.ttf') format('truetype');
-      font-weight: 700; font-display: swap;
-    }
-  </style>
-  <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/main/Icon.svg" />
-  <link rel="stylesheet" href="style.css?v=21" />
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <title>Эдельвейс | Разработка | Дизайн</title>
+  <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/31a84ffdfe125dd9756dadd19d72da85ce18bd6a/EdelFav.svg" />
+  <!-- Скролл в топ до рендера — убирает восстановление позиции браузером -->
+  <script>history.scrollRestoration='manual';window.scrollTo(0,0);</script>
+  <link rel="stylesheet" href="style.css?v=63" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="app.js?v=5" defer></script>
+  <script src="orbit3d.js" defer></script>
+  <script src="reasoning_fix.js?v=2" defer></script>
+  <script src="send_button.js" defer></script>
 </head>
 <body>
 
-<!-- SVG filters for horizontal-only blur on cert flip -->
-<svg width="0" height="0" style="position:absolute;overflow:hidden;" aria-hidden="true">
-  <defs>
-    <filter id="hblur-6"  x="-30%" width="160%" y="0%" height="100%"><feGaussianBlur stdDeviation="18 0" /></filter>
-    <filter id="hblur-14" x="-60%" width="220%" y="0%" height="100%"><feGaussianBlur stdDeviation="40 0" /></filter>
-  </defs>
-</svg>
+  <div class="noise" aria-hidden="true"></div>
 
-<div class="noise" aria-hidden="true"></div>
+  <!-- SVG-фильтр для liquid glass эффекта на десктопе -->
+  <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+    <defs>
+      <filter id="frosted" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feColorMatrix type="saturate" values="1.4" in="blur" result="sat"/>
+        <feComponentTransfer in="sat" result="bright">
+          <feFuncR type="linear" slope="1.05"/>
+          <feFuncG type="linear" slope="1.05"/>
+          <feFuncB type="linear" slope="1.05"/>
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode in="bright"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
 
-<!-- Confetti Explosion -->
-<div id="confettiStage" class="confetti-stage" aria-hidden="true"></div>
-<style id="confettiKeyframes"></style>
-
-<!-- LOADER -->
-<div class="loader" id="siteLoader" aria-hidden="true">
-  <div class="loader__hero">
-    <div class="loader__model-wrap">
-      <img
-        src="https://github.com/CakeBoxDeveloper/timetome/blob/main/ClockLoader.webp?raw=true"
-        alt=""
-        class="loader__img"
-        style="width:100%;height:100%;object-fit:contain;display:block;"
-      />
-    </div>
-    <div class="loader__title">ЧАС ДЛЯ СЕБЕ</div>
-  </div>
-  <div class="loader__progress-wrap" aria-hidden="true">
-    <div class="loader__progress-track">
-      <div class="loader__progress-bar" id="loaderBar"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     HERO
-══════════════════════════════════════ -->
-<section class="hero" id="hero">
-
-  <!-- Review cards LEFT -->
-  <div class="hero-reviews hero-reviews--left" aria-hidden="true">
-    <div class="hero-reviews__col hero-reviews__col--a">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#60a5fa">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Віка</span></div>
-        <p class="hero-review-card__text">Без слів! Тисячу разів дякую за золоті руки та професіоналізм… Тепер знаю куди йти коли тіло просить допомоги.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#f472b6">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Оля</span></div>
-        <p class="hero-review-card__text">Я просто в захваті! Навіть не очікувала такого результату після першого сеансу… Рекомендую всім хто шукає справжнього майстра.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#34d399">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Максим</span></div>
-        <p class="hero-review-card__text">Це треба відчути! Слів немає, тільки кайф і повне розслаблення… Вже записався на наступний місяць наперед.</p>
-      </a>
-    </div>
-    <div class="hero-reviews__col hero-reviews__col--b">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#06b6d4">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Ліза</span></div>
-        <p class="hero-review-card__text">Диво, а не масаж! Прийшла сгорбленою, вийшла з прямою спиною… Відчуття неймовірне, ніби крила виросли за спиною.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#fb923c">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Ірина</span></div>
-        <p class="hero-review-card__text">Я не можу повірити! М'язи нарешті відпустило після місяців болю… Тепер розумію що таке справжній масаж професіонала.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#a78bfa">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Дмитро</span></div>
-        <p class="hero-review-card__text">Руки золоті! Прийшов зі спазмом, пішов як новий. Рекомендую всім… Ціна повністю виправдовує якість роботи.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#38bdf8">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Катя</span></div>
-        <p class="hero-review-card__text">Це щось неймовірне! Таке відчуття ніби заново народилась, серйозно… Буду ходити тепер регулярно на підтримку.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#e0f2fe">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Світла</span></div>
-        <p class="hero-review-card__text">Просто казка! Після першого сеансу забула що таке напруження… Атмосфера релаксу і турботи на всіх 100%.</p>
-      </a>
-    </div>
-    <div class="hero-reviews__col hero-reviews__col--c">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#f97316">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Вікторія</span></div>
-        <p class="hero-review-card__text">Нарешті виспалась! Після антистресу сплю як немовля вже тиждень… Це просто магія якась, а не масаж звичайний.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#22d3ee">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Олег</span></div>
-        <p class="hero-review-card__text">Стоун — це вогонь! Камені прогріли так, що я забув про спину… Відчуття тепла і розслаблення ще довго залишається.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#86efac">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Таня</span></div>
-        <p class="hero-review-card__text">Відчуття космос! Прийшла з мігренню, пішла зовсім іншою людиною… Тепер знаю свій секретний спосіб позбутись головного болю.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#fbbf24">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Роман</span></div>
-        <p class="hero-review-card__text">Топ майстер! Голки зняли тригер за один сеанс, неймовірно… Спочатку боявся, але тепер розумію що це реально працює.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#d946ef">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Оксана</span></div>
-        <p class="hero-review-card__text">Тепер тільки сюди! Три роки шукала такого майстра… Нарешті знайшла своє місце де тіло відпочиває по-справжньому.</p>
-      </a>
-    </div>
-    <div class="hero-reviews__col hero-reviews__col--d">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#818cf8">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Миколай</span></div>
-        <p class="hero-review-card__text">Результат на всі 100%! Я вражений ефектом вже після другого разу… Колеги на роботі помітили що я перестав сутулитись.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#fbbf24">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Катя</span></div>
-        <p class="hero-review-card__text">Стоун-масаж — це як подорож у космос, тільки без ракети… Гарячі камені творять справжні дива з напруженими м'язами.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#a78bfa">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Саша</span></div>
-        <p class="hero-review-card__text">Баночки рятують! Після сидячої роботи спина знову жива… Думав що це страшно, але насправді це дуже приємно.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#fb923c">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Ірина</span></div>
-        <p class="hero-review-card__text">Масаж голови — це щось! Мігрень як рукою зняло… Тепер приходжу регулярно для профілактики та насолоди.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#4ade80">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Олексій</span></div>
-        <p class="hero-review-card__text">Перкусія — мій улюблений вид масажу! М'язи дякують… Після тренувань відновлення проходить у двічі швидше тепер.</p>
-      </a>
-    </div>
+  <!-- ══════════════════════════════════════
+       LOADER
+  ═══════════════════════════════════════ -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__lottie" id="loaderLottie"></div>
   </div>
 
-  <!-- Review cards RIGHT -->
-  <div class="hero-reviews hero-reviews--right" aria-hidden="true">
-    <div class="hero-reviews__col hero-reviews__col--a">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#38bdf8">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Леся</span></div>
-        <p class="hero-review-card__text">Це справжнє диво! Відчуваю себе як у казці після масажу… Кожен сеанс — це маленька подорож у світ спокою.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#f43f5e">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Наталя</span></div>
-        <p class="hero-review-card__text">Повернусь знову! Найкращий масаж у моєму житті, без перебільшень… Вже порадила всім подругам і сестрі обов'язково.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#facc15">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Сергій</span></div>
-        <p class="hero-review-card__text">Боже, як добре! Спина не боліла вже тиждень після одного сеансу… Тепер розумію що значить справжня робота з тілом.</p>
-      </a>
-    </div>
-    <div class="hero-reviews__col hero-reviews__col--b">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#2dd4bf">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Поліна</span></div>
-        <p class="hero-review-card__text">Мрія, а не майстер! Завжди знає що саме потрібно твоєму тілу… Відчуває кожен затиск і працює точно по проблемі.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#4ade80">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Аліна</span></div>
-        <p class="hero-review-card__text">Краще не буває! Dry needling — це магія, болю як не бувало… Спочатку страшно, але результат перевершує всі очікування.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#818cf8">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Андрій</span></div>
-        <p class="hero-review-card__text">Від душі дякую! Стоун-масаж — це взагалі окремий всесвіт… Тепло каменів проникає глибоко і лікує не тільки тіло.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#e879f9">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Юля</span></div>
-        <p class="hero-review-card__text">Я розтанула! Ароматерапія + масаж = рай на землі, не інакше… Запахи і дотики створюють неймовірну гармонію відчуттів.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#7dd3fc">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Денис</span></div>
-        <p class="hero-review-card__text">Неймовірно! Після перкусії м'язи відновились вдвічі швидше… Це must-have для кожного хто активно займається спортом.</p>
-      </a>
-    </div>
-    <div class="hero-reviews__col hero-reviews__col--c">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#fb7185">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Марина</span></div>
-        <p class="hero-review-card__text">Хочу сюди щотижня! Перший раз за рік відчула що тіло відпустило… Це не просто масаж, це справжня перезагрузка організму.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#67e8f9">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Ігор</span></div>
-        <p class="hero-review-card__text">Перкусія — ВАУ! М'язи після тренування відновились за добу… Тренер помітив що я став витривалішим на змаганнях.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#a3e635">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Лєна</span></div>
-        <p class="hero-review-card__text">Рекомендую всім! Особливо червоне світло — шкіра просто сяє… Комплексний підхід дає результат який видно одразу.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#c084fc">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Вася</span></div>
-        <p class="hero-review-card__text">Це не масаж — це терапія душі! Пішов скептиком, повернувся фанатом… Тепер приходжу не тільки коли болить, а для задоволення.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#fda4af">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Надя</span></div>
-        <p class="hero-review-card__text">Золоті руки та золоте серце! Завжди уважна і турботлива… Відчуваєш себе особливим гостем, а не просто клієнтом.</p>
-      </a>
-    </div>
-    <div class="hero-reviews__col hero-reviews__col--d">
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#22d3ee">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Євген</span></div>
-        <p class="hero-review-card__text">Топчик! Масаж вирішив проблему, яку не могли вилікувати два роки… Лікарі тільки таблетки призначали, а тут руками все виправили.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#ef4444">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Костя</span></div>
-        <p class="hero-review-card__text">Я в захваті! Stretch-масаж — це те що треба для спортсменів… Гнучкість покращилась, а м'язи стали еластичнішими відчутно.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#10b981">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Оксана</span></div>
-        <p class="hero-review-card__text">Гарячі камені — моє все! Відпочинок і розслаблення… Це як SPA процедура вищого рівня за адекватною ціною.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#f472b6">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Богдан</span></div>
-        <p class="hero-review-card__text">Дарсонваль — круто працює! Волосся стало густішим… Не вірив у це, але факт є факт, результат видно.</p>
-      </a>
-      <a class="hero-review-card" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" style="--av:#06b6d4">
-        <div class="hero-review-card__top"><span class="hero-review-card__avatar"></span><span class="hero-review-card__name">Софія</span></div>
-        <p class="hero-review-card__text">Aroma Relax — це рай! Ефірні масла і світло — ідеально… Це найкраще що я можу зробити для себе після важкого тижня.</p>
-      </a>
-    </div>
-  </div>
+  <!-- ══════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <canvas id="wireCanvas" class="wire-canvas" aria-hidden="true"></canvas>
+    <canvas id="matrixCanvas" class="matrix-canvas" aria-hidden="true"></canvas>
+    <div class="hero__vignette" aria-hidden="true"></div>
+    <div class="hero__inner">
 
-  <!-- Flip Card (заменяет 3D модель) -->
-  <div class="hero__flip-card" id="heroFlipCard">
-    <div class="hero__flip-inner">
-      <!-- Front side (WebM анимация з iOS fallback) -->
-      <div class="hero__flip-front">
-        <video 
-          class="hero__flip-video" 
-          id="heroFlipVideo"
-          autoplay 
-          loop 
-          muted 
-          playsinline
-          preload="auto"
-          poster="https://github.com/CakeBoxDeveloper/timetome/raw/main/SmilePoster.jpg">
-          <!-- MP4 first for iOS/Instagram compatibility -->
-          <source src="https://github.com/CakeBoxDeveloper/timetome/raw/main/IosFallback.mp4" type="video/mp4">
-          <source src="https://github.com/CakeBoxDeveloper/timetome/raw/main/SmileWebm.webm" type="video/webm">
-        </video>
+      <!-- COL LO -->
+      <!--
+      COL LO + COL LI (закомментировано)
+      <div class="hero__col hero__col--lo">
+        <article class="card card--beige card--wip-border">
+          <div class="card__header card__header--yellow">Panacea</div>
+          <div class="card__img-wrap">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/acdb4a50ed9862af719e764b04472ec7fbfaa33f/PanCardSVG.svg" alt="" />
+          </div>
+          <div class="card__wip">
+            <span class="card__wip-label card__wip-label--yellow">В разработке <span class="card__wip-ping card__wip-ping--dark"></span></span>
+          </div>
+          <span class="wire-dot" data-wire-color="#f0c000" aria-hidden="true"></span>
+        </article>
       </div>
-      
-      <!-- Back side (Контакты) -->
-      <div class="hero__flip-back">
-        <div class="hero__flip-contacts">
-          <div class="flip-back-slogan">
-            Зупинись і знайди <span class="flip-back-slogan-accent">час для себе</span>
+
+      COL LI: 2 карточки
+      <div class="hero__col hero__col--li">
+        <article class="card card--ttm">
+          <div class="card__header">Час для себе</div>
+          <div class="card__img-wrap card__img-wrap--pink">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/TTM%20Logo%20Isolate.svg" alt="TTM" />
           </div>
-          
-          <!-- Карта -->
-          <div class="flip-back-map">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2735.5!2d31.9950!3d46.9750!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40c5c8f0!2z0LLRg9C7LiDQl9Cw0YXQuNGB0L3QuNC60ZbQstCh0LXQsdC1LCAxNSwg0JzQuNC60L7Qu9Cw0ZfQsg!5e0!3m2!1suk!2sua!4v1234567890"
-              allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-              title="Час для себе на карті">
-            </iframe>
+          <button class="card__cta">Смотреть проект</button>
+          <span class="wire-dot" data-wire-color="#4daf6a" aria-hidden="true"></span>
+        </article>
+        <article class="card card--nda">
+          <div class="card__header card__header--nda">Prism Terminal</div>
+          <div class="card__img-wrap card__img-wrap--prism">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/PrismLogo2.svg" alt="Prism Terminal" />
           </div>
-          
-          <!-- Кнопка адреса -->
-          <a href="https://maps.google.com/?q=вул.+Захисників+Миколаєва,+15,+Миколаїв" class="flip-back-address" target="_blank" rel="noopener">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-              <circle cx="12" cy="9" r="2.5"/>
-            </svg>
-            <span>вул. Захисників Миколаєва, 15</span>
-          </a>
-          
-          <!-- Контакты -->
-          <div class="flip-back-contacts">
-            <a href="tel:+380996335197" class="flip-back-link">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                <path fill="currentColor" transform="translate(2 2) scale(.83)" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-              <span>+380 99 633-51-97</span>
-            </a>
-            
-            <a href="https://t.me/pro_telo_niko" target="_blank" rel="noopener" class="flip-back-link">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                <path fill="currentColor" d="M16.906 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-              </svg>
-              <span>Наш Telegram</span>
-            </a>
-            
-            <a href="https://www.instagram.com/pro_telo_niko" target="_blank" rel="noopener" class="flip-back-link">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                <rect fill="none" stroke="currentColor" stroke-width="2" x="2" y="2" width="20" height="20" rx="6"/>
-                <circle fill="none" stroke="currentColor" stroke-width="2" cx="12" cy="12" r="4.8"/>
-                <circle fill="currentColor" cx="17.4" cy="6.6" r="1.3"/>
-              </svg>
-              <span>Наш Instagram</span>
-            </a>
+          <div class="card__nda-label">НЕ МОГУ ПОКАЗАТЬ</div>
+          <span class="wire-dot" data-wire-color="#ff5252" aria-hidden="true"></span>
+        </article>
+      </div>
+      -->
+
+      <!-- CENTER -->
+      <div class="hero__center">
+        <div class="hero__chat-wrap">
+        <div class="hero__chat" id="wireTarget">
+          <!-- Эффекты прозрачной карточки с цветным блюром -->
+          <div class="hero__chat-blur-edges" aria-hidden="true"></div>
+          <div class="hero__chat-blur-bottom" aria-hidden="true"></div>
+          <div class="hero__chat-tint" aria-hidden="true"></div>
+
+          <!-- Тело: логотип + приветствие -->
+          <div class="hero__chat-body">
+            <div class="hero__chat-icon" id="heroLottie" aria-hidden="true"></div>
+            <div class="hero__chat-greeting">
+              <p>Эдельвейс растёт только на высоте 2500+ метров, в местах где выживают единицы. Символ упорства и уникальности.</p>
+            </div>
+            <!-- Направления -->
+            <div class="hero__chat-tags">
+              <div class="hero__chat-tag">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>Web</span>
+              </div>
+              <div class="hero__chat-tag">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <span>3D печать</span>
+              </div>
+              <div class="hero__chat-tag">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Разное</span>
+              </div>
+              <div class="hero__chat-tag">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Дизайн</span>
+              </div>
+            </div>
           </div>
+
+          <!-- Футер: инпут + нижняя строка -->
+          <div class="hero__chat-footer">
+
+            <div class="hero__chat-box">
+
+              <!-- Строка ввода -->
+              <div class="hero__chat-input-row">
+                <input
+                  class="hero__chat-input"
+                  type="text"
+                  readonly
+                  aria-label="Поле ввода чата"
+                />
+                <div class="hero__chat-placeholder" aria-hidden="true">
+                  <span class="hero__chat-reasoning">
+                    <span class="hero__chat-reasoning-text" id="reasoningText">Деплой в продакшн</span><span class="hero__chat-dots"><span>.</span><span>.</span><span>.</span></span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Тулбар -->
+              <div class="hero__chat-toolbar">
+
+                <!-- Левая часть: + День Ночь -->
+                <div class="hero__chat-toolbar-left">
+                  <button class="hero__chat-plus" aria-label="Добавить">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <div class="hero__chat-mode">
+                    <button class="hero__chat-mode-btn hero__chat-mode-btn--active" id="chatModeDay" aria-label="Светлая тема">День</button>
+                    <button class="hero__chat-mode-btn" id="chatModeNight" aria-label="Тёмная тема">Ночь</button>
+                  </div>
+                </div>
+
+                <!-- Правая часть: Edelweiss · Medium · mic · chevron · waves -->
+                <div class="hero__chat-toolbar-right">
+                  <span class="hero__chat-model-name">Edelweiss</span>
+                  <span class="hero__chat-sep">·</span>
+                  <span class="hero__chat-quality">Medium</span>
+                  <button class="hero__chat-icon-btn" aria-label="Голос">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                  </button>
+                  <button class="hero__chat-icon-btn hero__chat-chevron-btn" aria-label="Настройки">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <button class="hero__chat-icon-btn" aria-label="Уровень">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="12" x2="4" y2="12"/><line x1="6" y1="8" x2="6" y2="16"/><line x1="10" y1="5" x2="10" y2="19"/><line x1="14" y1="8" x2="14" y2="16"/><line x1="18" y1="10" x2="18" y2="14"/><line x1="22" y1="12" x2="22" y2="12"/></svg>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
+
+      <!-- COL RI + COL RO (закомментировано)
+      <div class="hero__col hero__col--ri">
+        <article class="card">
+          <div class="card__header">Lacar Drive</div>
+          <div class="card__img-wrap card__img-wrap--lacar">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/2899a3df08be0d88fa4d4afd0d7e053b8ead27f1/LC.svg" alt="Lacar Drive" />
+          </div>
+          <button class="card__cta">Смотреть проект</button>
+          <span class="wire-dot" data-wire-color="#4daf6a" aria-hidden="true"></span>
+        </article>
+        <article class="card card--archive">
+          <div class="card__header">Архив</div>
+          <div class="card__img-wrap card__img-wrap--blue">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/efd780e6770ae3863fe1730147c932a43819eaff/Glitch.svg" alt="Архив" />
+          </div>
+          <button class="card__cta">Смотреть проект</button>
+          <span class="wire-dot" data-wire-color="#4daf6a" aria-hidden="true"></span>
+        </article>
+      </div>
+
+      COL RO
+      <div class="hero__col hero__col--ro">
+        <article class="card card--mse card--wip-border">
+          <div class="card__header card__header--yellow">MSE</div>
+          <div class="card__img-wrap">
+            <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/MSE/c3a01dd59275d25a96184e99df50a8dc3dd27667/MSESVG.svg" alt="MSE" />
+          </div>
+          <div class="card__wip">
+            <span class="card__wip-label card__wip-label--yellow">В разработке <span class="card__wip-ping card__wip-ping--dark"></span></span>
+          </div>
+          <span class="wire-dot" data-wire-color="#4d8cff" aria-hidden="true"></span>
+        </article>
+      </div>
+      -->
+
+        </div><!-- /.hero__chat -->
+        </div><!-- /.hero__chat-wrap -->
+
     </div>
-  </div>
-  
-  <!-- Scroll Down Button -->
-  <div class="hero-scroll-down" id="heroScrollDown">
-    <button class="hero-scroll-btn" id="heroScrollBtn">
-      <lottie-player class="scroll-lottie" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Scroll%20down.json" background="transparent" speed="1" loop autoplay></lottie-player>
-      <span>ГОРТАЙ ДАЛІ</span>
-      <lottie-player class="scroll-lottie" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Scroll%20down.json" background="transparent" speed="1" loop autoplay></lottie-player>
+
+    <!-- Оверлей-кнопка внизу hero -->
+    <button class="section-scroll-btn" id="scrollBtn">
+      <div class="lottie-arrow" id="lottieArrow1L"></div>
+      <span>Смотреть примеры</span>
+      <div class="lottie-arrow" id="lottieArrow1R"></div>
     </button>
-  </div>
-</section>
+  </section>
 
-<!-- hero card overlay — на стыке hero и bridge -->
-<div class="hero-card-overlay">
-  <div class="hero__card">
-    <p class="hero__slogan">Зупинись і знайди <span class="hero__slogan--glow">час для себе</span></p>
-    <a href="https://maps.google.com/?q=вул.+Захисників+Миколаєва,+15,+Миколаїв" class="map-chip hero__location--full" target="_blank" rel="noopener">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-      вул. Захисників Миколаєва, 15
-      <span class="map-chip__arrow">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </span>
-    </a>
-    <div class="hero__map">
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2735.5!2d31.9950!3d46.9750!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40c5c8f0!2z0LLRg9C7LiDQl9Cw0YXQuNGB0L3QuNC60ZbQstCh0LXQsdC1LCAxNSwg0JzQuNC60L7Qu9Cw0ZfQsg!5e0!3m2!1suk!2sua!4v1234567890"
-        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-        title="Час для себе на карті">
-      </iframe>
-    </div>
-    <div class="hero__cta-row">
-      <!-- Animated Telegram-style buttons -->
-      <div class="telegram-contacts" id="tgContacts">
-        <div class="tg-row">
-          <!-- Telegram -->
-          <div class="tg-tooltip-container tg-btn">
-            <div class="tg-tooltip">
-              <a class="tg-profile" href="https://t.me/pro_telo_niko" target="_blank" rel="noopener">
-                <div class="tg-img" style="--gradient: linear-gradient(135deg, #229ED9 0%, #1a7fb5 100%);">
-                  <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Travel%20and%20Places/Airplane.webp?raw=true" alt="" />
-                </div>
-                <div class="tg-details">
-                  <div class="tg-name">Telegram</div>
-                  <div class="tg-username">@pro_telo_niko</div>
-                </div>
-                <div class="tg-about">Напиши нам</div>
-              </a>
+  <!-- ══════════════════════════════════════
+       CASES
+  ═══════════════════════════════════════ -->
+  <section class="cases" id="cases">
+    <!-- Анимированная сетка с 0 и 1 -->
+    <div class="binary-grid" id="binaryGrid" aria-hidden="true"></div>
+
+    <!-- ── Folder tabs ── -->
+    <div class="cases-folder" id="casesFolder">
+      <div class="cases-folder__tabs" id="casesFolderTabs">
+        <button class="cases-folder__tab is-active" data-idx="0">
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+          <span class="cases-folder__tab-label">Веб</span>
+        </button>
+        <button class="cases-folder__tab" data-idx="1">
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
+          <span class="cases-folder__tab-label">3D / Печать</span>
+        </button>
+        <button class="cases-folder__tab" data-idx="2">
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="12" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="10" cy="18.5" r="2.5"/><path d="M9.5 9.5 8.5 11m4 1-1 2m5.5-5.5-1.5 2M10 15.5l-1-2"/></svg></span>
+          <span class="cases-folder__tab-label">Графика</span>
+        </button>
+        <button class="cases-folder__tab" data-idx="3">
+          <span class="cases-folder__tab-icon"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+          <span class="cases-folder__tab-label">Разное</span>
+        </button>
+      </div>
+
+      <!-- Оверлей "О проектах" — поверх всего блока, исчезает по клику -->
+      <div class="cases-folder__intro" id="casesFolderIntro">
+        <div class="intro-content">
+          <!-- Заголовок как checkpoint -->
+          <div class="checkpoint" style="margin-bottom: 18px;">
+            <div class="checkpoint__line"></div>
+            <div class="checkpoint__badge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7a2 2 0 0 1 2-2h3.172a2 2 0 0 1 1.414.586L10.414 6.4A2 2 0 0 0 11.828 7H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+              Мои проекты
             </div>
-            <div class="tg-icon">
-              <div class="tg-layer">
-                <span></span><span></span><span></span><span></span>
-                <span class="tg-svg">
-                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                    <path class="tg-glyph" d="M16.906 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                  </svg>
-                </span>
+            <div class="checkpoint__line"></div>
+          </div>
+
+          <p class="intro-text">Здесь собраны все мои работы. Показываю даже то, что ещё не сделал — потому что процесс интереснее результата. Каждый проект отмечен статусом:</p>
+          
+          <div class="think-tree">
+            <div class="think-tree__node">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">Смотреть</div>
+                <div class="think-tree__desc">Завершённые проекты, доступные для просмотра прямо сейчас</div>
               </div>
-              <div class="tg-text">Telegram</div>
             </div>
-          </div>
-
-          <!-- Instagram -->
-          <div class="tg-tooltip-container ig-btn">
-            <div class="tg-tooltip">
-              <a class="tg-profile" href="https://www.instagram.com/pro_telo_niko" target="_blank" rel="noopener">
-                <div class="tg-img" style="--gradient: linear-gradient(135deg, #E1306C 0%, #C13584 100%);">
-                  <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Television.webp?raw=true" alt="" />
-                </div>
-                <div class="tg-details">
-                  <div class="tg-name">Instagram</div>
-                  <div class="tg-username">@pro_telo_niko</div>
-                </div>
-                <div class="tg-about">Слідкуй за нами</div>
-              </a>
-            </div>
-            <div class="tg-icon">
-              <div class="tg-layer">
-                <span></span><span></span><span></span><span></span>
-                <span class="tg-svg">
-                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                    <rect class="tg-ring" x="2" y="2" width="20" height="20" rx="6"/>
-                    <circle class="tg-ring" cx="12" cy="12" r="4.8"/>
-                    <circle class="tg-glyph" cx="17.4" cy="6.6" r="1.3"/>
-                  </svg>
-                </span>
+            <div class="think-tree__node">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">Ещё делаю</div>
+                <div class="think-tree__desc">Показываю все процессы в реальном времени, можно поддержать для ускорения релиза</div>
               </div>
-              <div class="tg-text">Instagram</div>
             </div>
-          </div>
-
-          <!-- Phone -->
-          <div class="tg-tooltip-container ph-btn">
-            <div class="tg-tooltip">
-              <a class="tg-profile" href="tel:+380996335197">
-                <div class="tg-img" style="--gradient: linear-gradient(135deg, #25D366 0%, #1da851 100%);">
-                  <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Mobile%20Phone.webp?raw=true" alt="" />
-                </div>
-                <div class="tg-details">
-                  <div class="tg-name">Телефон</div>
-                  <div class="tg-username">+380 99 633-51-97</div>
-                </div>
-                <div class="tg-about">Дзвони в будь-який час</div>
-              </a>
-            </div>
-            <div class="tg-icon">
-              <div class="tg-layer">
-                <span></span><span></span><span></span><span></span>
-                <span class="tg-svg">
-                  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                    <path class="tg-glyph" transform="translate(2 2) scale(.83)" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                  </svg>
-                </span>
+            <div class="think-tree__node">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">NDA</div>
+                <div class="think-tree__desc">Проекты под договором конфиденциальности, показать не могу</div>
               </div>
-              <div class="tg-text">Телефон</div>
             </div>
-          </div>
-        </div>
-
-        <button class="tg-show-all" id="tgToggle" type="button">Показати всі контакти</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- gradient bridge hero → services -->
-<div class="section-bridge" aria-hidden="true"></div>
-
-<!-- ══════════════════════════════════════
-     SECTION 1 — ПОСЛУГИ
-══════════════════════════════════════ -->
-<section class="section section--alt" id="services">
-  <div class="col">
-    <h2 class="section-title">Послуги <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Gem%20Stone.webp?raw=true" class="section-title__ico" width="28" height="28" alt="" /></h2>
-
-    <div class="svc-list" id="svcList">
-
-      <!-- 1 -->
-      <div class="svc-item" data-idx="0">
-        <button class="svc-item__row" aria-expanded="false">
-          <span class="svc-item__row-left">
-            <span class="svc-item__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/classci.svg" alt="" /></span>
-            <span class="svc-item__name">Класичний масаж</span>
-          </span>
-          <svg class="svc-item__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="svc-item__body">
-          <div class="svc-item__card">
-            <div class="svc-item__card-header">
-              <h3 class="service-card__name">Класичний масаж</h3>
-              <div class="service-card__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/classci.svg" alt="" /></div>
-            </div>
-            <div class="service-card__tags"><span>розслаблення</span><span>втома</span><span>спина</span><span>стрес</span></div>
-            <p class="service-card__desc">Авторська методика. Поєднання шведської та рефлекторної технік — кожен рух з урахуванням вашого стану. Знімаю загальне напруження та накопичену втому. Покращую кровообіг, розганяю лімфу, відновлюю тонус м'язів. Повертаю тілу легкість, а голові — спокій. Ефект відчувається з першого сеансу.</p>
-            <div class="service-card__btns">
-              <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-              <a href="classic.html" class="btn btn--outline btn--full svc-detail-btn" data-hook="У 1813 році швед Пер Хенрік Лінг вилікував власний ревматизм руками — і випадково створив техніку, яка не змінилась за 200 років. Дослідники з Маастрихту виявили: 10 хвилин масажу вмикають гени клітинного відновлення. Що ще наука знає про найдавніший метод — читай у статті.">Читати статтю повністю</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2 -->
-      <div class="svc-item" data-idx="1">
-        <button class="svc-item__row" aria-expanded="false">
-          <span class="svc-item__row-left">
-            <span class="svc-item__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/stress.svg" alt="" /></span>
-            <span class="svc-item__name">Антистрес</span>
-          </span>
-          <svg class="svc-item__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="svc-item__body">
-          <div class="svc-item__card">
-            <div class="svc-item__card-header">
-              <h3 class="service-card__name">Антистрес</h3>
-              <div class="service-card__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/stress.svg" alt="" /></div>
-            </div>
-            <div class="service-card__tags"><span>нерви</span><span>сон</span><span>тривога</span><span>виснаження</span></div>
-            <p class="service-card__desc">Глибока робота з нервовою системою. М'які ритмічні техніки знижують рівень кортизолу і вводять тіло в режим відновлення. Особлива увага — шиї, основі черепа, скроням. Після сеансу — глибокий сон, менше тривоги, відчуття «перезавантаження».</p>
-            <div class="service-card__btns">
-              <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-              <a href="antistress.html" class="btn btn--outline btn--full svc-detail-btn" data-hook="Катерина три роки не могла заснути до третьої ночі. Медитація, спорт, заспокійливі — нічого не допомагало. Після першого антистрес-сеансу вона заснула о 22:30. Чому масаж може зробити те, чого не може сила волі — розповідаємо в статті.">Читати статтю повністю</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3 -->
-      <div class="svc-item" data-idx="2">
-        <button class="svc-item__row" aria-expanded="false">
-          <span class="svc-item__row-left">
-            <span class="svc-item__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/deep.svg" alt="" /></span>
-            <span class="svc-item__name">Глибокий тканинний</span>
-          </span>
-          <svg class="svc-item__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="svc-item__body">
-          <div class="svc-item__card">
-            <div class="svc-item__card-header">
-              <h3 class="service-card__name">Глибокий тканинний</h3>
-              <div class="service-card__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/deep.svg" alt="" /></div>
-            </div>
-            <div class="service-card__tags"><span>м'язи</span><span>спорт</span><span>перкусія</span><span>хронічний біль</span></div>
-            <p class="service-card__desc">Інтенсивна робота з глибокими шарами м'язів і фасціями. Розбиває хронічні затиски, усуває тригерні точки. Перкусія дає вібраційний вплив там, де рук не вистачає. Для спортсменів, людей з болями у спині та тих, кому потрібен реальний результат.</p>
-            <div class="service-card__btns">
-              <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-              <a href="deep-tissue.html" class="btn btn--outline btn--full svc-detail-btn" data-hook="Максим — тренер з кросфіту — три роки ходив з болем у попереку і думав, що це нормально. Виявилось, справа була не в попереку взагалі. Що таке фасція і чому вона важливіша за м'яз — читай у статті.">Читати статтю повністю</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4 -->
-      <div class="svc-item" data-idx="3">
-        <button class="svc-item__row" aria-expanded="false">
-          <span class="svc-item__row-left">
-            <span class="svc-item__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/stone.svg" alt="" /></span>
-            <span class="svc-item__name">Стоун-масаж</span>
-          </span>
-          <svg class="svc-item__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="svc-item__body">
-          <div class="svc-item__card">
-            <div class="svc-item__card-header">
-              <h3 class="service-card__name">Стоун-масаж</h3>
-              <div class="service-card__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/stone.svg" alt="" /></div>
-            </div>
-            <div class="service-card__tags"><span>каміння</span><span>тепло</span><span>спазм</span><span>глибокий релакс</span></div>
-            <p class="service-card__desc">Масаж гарячими базальтовими каменями. Тепло проникає глибше за руки — м'язи розслаблюються на рівні, якого не досягти звичайними техніками. Знімає хронічні спазми, покращує кровообіг, дарує відчуття тепла і легкості у всьому тілі.</p>
-            <div class="service-card__btns">
-              <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-              <a href="stone.html" class="btn btn--outline btn--full svc-detail-btn" data-hook="Масажистка Мері Хансон травмувала руку і сиділа вдома. Тримала нагріте каміння — і зрозуміла щось важливе. Так з'явився стоун-масаж у сучасному вигляді. Чому базальт тримає тепло в 7 разів краще за звичайний камінь — і що це означає для твоїх м'язів.">Читати статтю повністю</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5 -->
-      <div class="svc-item" data-idx="4">
-        <button class="svc-item__row" aria-expanded="false">
-          <span class="svc-item__row-left">
-            <span class="svc-item__ico"><img src="https://unpkg.com/lucide-static@latest/icons/syringe.svg" alt="" /></span>
-            <span class="svc-item__name">Dry Needling</span>
-          </span>
-          <svg class="svc-item__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="svc-item__body">
-          <div class="svc-item__card">
-            <div class="svc-item__card-header">
-              <h3 class="service-card__name">Dry Needling</h3>
-              <div class="service-card__ico"><img src="https://unpkg.com/lucide-static@latest/icons/syringe.svg" alt="" /></div>
-            </div>
-            <div class="service-card__tags"><span>тригери</span><span>голки</span><span>хронічний біль</span><span>фізіотерапія</span></div>
-            <p class="service-card__desc">Суха голкотерапія — точковий вплив на тригерні зони м'язів. Знімає хронічний біль там, де масаж вже не допомагає. Голка «розблоковує» спазм і запускає природне відновлення тканин. Виконується фізіотерапевтом з медичною освітою.</p>
-            <div class="service-card__btns">
-              <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-              <a href="dry-needling.html" class="btn btn--outline btn--full svc-detail-btn" data-hook="Ольга п'ять років лікувала біль у правому плечі. Рентген, МРТ — все чисто. Масажисти місяцями працювали із плечем. Проблема виявилась між лопатками. До 85% хронічних болів болять не там, де знаходяться — чому і що з цим робити.">Читати статтю повністю</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 6 -->
-      <div class="svc-item" data-idx="5">
-        <button class="svc-item__row" aria-expanded="false">
-          <span class="svc-item__row-left">
-            <span class="svc-item__ico"><img src="https://unpkg.com/lucide-static@latest/icons/sun.svg" alt="" /></span>
-            <span class="svc-item__name">Терапія червоним світлом</span>
-          </span>
-          <svg class="svc-item__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="svc-item__body">
-          <div class="svc-item__card">
-            <div class="svc-item__card-header">
-              <h3 class="service-card__name">Терапія червоним світлом</h3>
-              <div class="service-card__ico"><img src="https://unpkg.com/lucide-static@latest/icons/sun.svg" alt="" /></div>
-            </div>
-            <div class="service-card__tags"><span>відновлення</span><span>шкіра</span><span>запалення</span><span>фотобіомодуляція</span></div>
-            <p class="service-card__desc">Науково підтверджений метод відновлення тканин. Червоне та інфрачервоне світло (630–850 нм) проникає вглиб шкіри, активує мітохондрії і прискорює регенерацію клітин. Зменшує запалення, покращує стан шкіри, прискорює загоєння. Абсолютно безболісно.</p>
-            <div class="service-card__btns">
-              <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-              <a href="red-light.html" class="btn btn--outline btn--full svc-detail-btn" data-hook="NASA платить людям за те, щоб вони лежали під червоним світлом. Буквально — це частина програми відновлення астронавтів. 4000 наукових публікацій підтверджують ефект. Що відбувається з клітинами за 30 хвилин — читай у статті.">Читати статтю повністю</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 7 -->
-      <div class="svc-item" data-idx="6">
-        <button class="svc-item__row" aria-expanded="false">
-          <span class="svc-item__row-left">
-            <span class="svc-item__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/spa.svg" alt="" /></span>
-            <span class="svc-item__name">СПА-програма</span>
-          </span>
-          <svg class="svc-item__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="svc-item__body">
-          <div class="svc-item__card">
-            <div class="svc-item__card-header">
-              <h3 class="service-card__name">СПА-програма</h3>
-              <div class="service-card__ico"><img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/ce077278eb1d457a987479990b7aaa06c6862402/spa.svg" alt="" /></div>
-            </div>
-            <div class="service-card__tags"><span>спа</span><span>ароматерапія</span><span>релакс</span><span>подарунок</span></div>
-            <p class="service-card__desc">Комплексна програма відновлення: масаж, ароматерапія та стоун в одному сеансі. Для тих, хто хоче отримати максимум — або подарувати це комусь близькому. Тіло і голова повністю перемикаються. Ефект відчувається кілька днів.</p>
-            <div class="service-card__btns">
-              <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-              <a href="spa.html" class="btn btn--outline btn--full svc-detail-btn" data-hook="Іванна займається йогою, правильно харчується, висипається. Але всередині — напруга, яку не можна зняти самостійно. Чому існують речі, які неможливо зробити самому з собою — і що з цим можна зробити.">Читати статтю повністю</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-<!-- ══════════════════════════════════════
-     SECTION 2 — СЕРТИФІКАТИ (3D carousel)
-══════════════════════════════════════ -->
-<section class="section" id="certificates">
-
-  <div class="cert-carousel-wrap" style="position:relative;">
-    <div class="cert-flip-wrap" id="certFlipWrap">
-      <!-- Rays canvas — inside flip-wrap so it flips and changes color with card -->
-      <canvas id="certParticleCanvas" class="cert-particle-canvas"></canvas>
-      <!-- cert image card injected by JS -->
-    </div>
-  </div><!-- /.cert-carousel-wrap -->
-
-  <div class="snap-dots col" id="certDots"></div>
-
-  <!-- Folder tabs + Gift CTA block -->
-  <div class="col">
-    <div class="cert-tabs-wrap">
-      <div class="cert-tabs" id="certTabs">
-        <button class="cert-tab is-active" data-idx="0">2 500 ₴</button>
-        <button class="cert-tab" data-idx="1">5 000 ₴</button>
-        <button class="cert-tab" data-idx="2">7 500 ₴</button>
-        <button class="cert-tab" data-idx="3">9 000 ₴</button>
-      </div>
-    </div>
-    <div class="cert-gift-block" id="certGiftBlock">
-      <div class="cert-gift-block__top">
-        <div class="cert-gift-block__texts">
-          <strong class="cert-gift-block__title" id="certName">RELAX</strong>
-          <span class="cert-gift-block__sub" id="certDesc">3 відвідування · аромарелакс, масаж голови та ніг</span>
-        </div>
-        <svg id="certGiftIcon" class="cert-gift-block__icon-img" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-      </div>
-
-      <!-- Toggle program -->
-      <button class="cert-program-toggle" id="certProgramToggle" aria-expanded="false">
-        <span>Рекомендована програма</span>
-        <svg class="cert-program-toggle__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="cert-program-table" id="certProgramTable" aria-hidden="true">
-        <div class="cert-program-disclaimer">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-top:1px;opacity:0.7;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-          Це приклад програми. Ви можете обрати будь-які процедури на суму сертифіката.
-        </div>
-        <div class="cert-program-table__inner">
-          <table id="certTable">
-            <thead>
-              <tr>
-                <th>День</th>
-                <th>Процедура</th>
-                <th>Час</th>
-                <th>Сума</th>
-              </tr>
-            </thead>
-            <tbody id="certTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="cert-buy-wrap">
-        <a href="https://t.me/pro_telo_niko" class="btn btn--full cert-buy-btn" id="certBuyBtn" target="_blank" rel="noopener">
-          Придбати сертифікат за <strong id="certPrice">2 500 ₴</strong>
-        </a>
-        <canvas class="cert-buy-shimmer" id="certBuyShimmer"></canvas>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
-     SECTION 3 — ПРАЙС
-══════════════════════════════════════ -->
-<section class="section section--alt" id="price">
-  <div class="col">
-    <h2 class="section-title">Прайс <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Memo.webp?raw=true" class="section-title__ico" width="28" height="28" alt="" /></h2>
-
-    <div class="price-accordion" id="priceAccordion">
-
-      <!-- Масаж -->
-      <div class="price-acc__group">
-        <button class="price-acc__head" aria-expanded="false">
-          <div class="price-acc__head-left">
-            <img src="https://unpkg.com/lucide-static@latest/icons/hand.svg" class="price-acc__ico" alt="" />
-            <span class="price-acc__title">Масаж</span>
-          </div>
-        </button>
-        <div class="price-acc__body">
-          <div class="price-acc__inner">
-            <div class="price-row"><span>Класичний масаж (спина + шия)</span><span>від 600 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>Загальний масаж (все тіло)</span><span>від 900 <em>₴</em></span></div>
-            <div class="price-row"><span>Антистрес (60 хв)</span><span>700 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>Антистрес (90 хв)</span><span>1 000 <em>₴</em></span></div>
-            <div class="price-row"><span>Масаж голови + дарсонваль</span><span>750 <em>₴</em></span></div>
-            <div class="price-row"><span>Масаж ніг + стоп (гарячі камені)</span><span>850 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>Aroma Relax (90 хв)</span><span>900 <em>₴</em></span></div>
-            <div class="price-row"><span>Глибокий тканинний (60 хв)</span><span>від 800 <em>₴</em></span></div>
-            <div class="price-row"><span>Глибокий тканинний (90 хв)</span><span>від 1 100 <em>₴</em></span></div>
-            <div class="price-row"><span>Stretch Release Massage (75 хв)</span><span>1 200 <em>₴</em></span></div>
-          </div>
-          <div class="price-acc__fade"></div>
-        </div>
-        <button class="price-acc__more">Показати більше ↓</button>
-      </div>
-
-      <!-- Стоун та СПА -->
-      <div class="price-acc__group">
-        <button class="price-acc__head" aria-expanded="false">
-          <div class="price-acc__head-left">
-            <img src="https://unpkg.com/lucide-static@latest/icons/gem.svg" class="price-acc__ico" alt="" />
-            <span class="price-acc__title">Стоун та СПА</span>
-          </div>
-        </button>
-        <div class="price-acc__body">
-          <div class="price-acc__inner">
-            <div class="price-row price-row--hot"><span>Stone Massage (90 хв)</span><span>1 200 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>Stone Massage всього тіла (90 хв)</span><span>1 800 <em>₴</em></span></div>
-            <div class="price-row"><span>Вогняне відновлення (90 хв)</span><span>1 500 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>СПА-програма (120 хв)</span><span>1 800 <em>₴</em></span></div>
-            <div class="price-row"><span>Баночний масаж (спина)</span><span>від 500 <em>₴</em></span></div>
-            <div class="price-row"><span>Масаж спини + баночний масаж</span><span>1 200 <em>₴</em></span></div>
-          </div>
-          <div class="price-acc__fade"></div>
-        </div>
-        <button class="price-acc__more">Показати більше ↓</button>
-      </div>
-
-      <!-- Фізіотерапія -->
-      <div class="price-acc__group">
-        <button class="price-acc__head" aria-expanded="false">
-          <div class="price-acc__head-left">
-            <img src="https://unpkg.com/lucide-static@latest/icons/syringe.svg" class="price-acc__ico" alt="" />
-            <span class="price-acc__title">Фізіотерапія</span>
-          </div>
-        </button>
-        <div class="price-acc__body">
-          <div class="price-acc__inner">
-            <div class="price-row price-row--hot"><span>Dry Needling (локальна зона)</span><span>від 500 <em>₴</em></span></div>
-            <div class="price-row"><span>Dry Needling (кілька зон)</span><span>від 800 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>Масаж спини + сухі голки</span><span>1 350 <em>₴</em></span></div>
-            <div class="price-row"><span>Терапія червоним світлом (30 хв)</span><span>від 400 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>Терапія червоним світлом (60 хв)</span><span>від 700 <em>₴</em></span></div>
-            <div class="price-row price-row--hot"><span>Aroma Relax + червоне світло (90 хв)</span><span>900 <em>₴</em></span></div>
-            <div class="price-row"><span>Перкусія (локальна)</span><span>від 300 <em>₴</em></span></div>
-            <div class="price-row"><span>Перкусія (загальна)</span><span>від 500 <em>₴</em></span></div>
-          </div>
-          <div class="price-acc__fade"></div>
-        </div>
-        <button class="price-acc__more">Показати більше ↓</button>
-      </div>
-
-    </div>
-
-    <div class="price-note" style="margin-top:32px;margin-bottom:4px;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-top:2px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-      Точну вартість назве майстер після консультації — але ви завжди можете її знизити, взявши участь у миттєвій лотереї нижче.
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
-     SECTION 3b — ЛОТЕРЕЯ
-══════════════════════════════════════ -->
-<section class="section" id="lottery">
-  <div class="col">
-    <div class="price-list">
-      <!-- SCRATCH LOTTERY CARD -->
-      <div class="lot-scene">
-        <div class="lot-tilt-wrap" id="lotTiltWrap">
-        <!-- Rays canvas — outside card, tilts with it -->
-        <canvas id="lotRaysCanvas" class="lot-rays-canvas"></canvas>
-        <div class="lot-card" id="lotCard">
-          <!-- Shimmer border canvas — inside card, clipped by overflow:hidden -->
-          <canvas class="lot-shimmer-canvas" id="lotShimmerCanvas"></canvas>
-          <!-- SVG icon pattern wrap — positioned relative to lot-card -->
-          <div class="lot-card__pattern-wrap" id="lotPatternWrap"></div>
-          <div class="lot-card__top">
-            <span class="lot-card__title">МИТТЄВА ЛОТЕРЕЯ</span>
-          </div>
-          <div class="lot-card__body" id="lotCardBody">
-            
-            <div class="lot-card__rules-note">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;opacity:0.6;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-              Стирай покриття пальцем — код діє при записі сьогодні. Одна спроба на добу. Удачі.
-            </div>
-            <div class="lot-card__scratch-zone">
-              <div class="lot-card__prize" id="lotPrize">
-                <span id="lotValue">TTM...</span>
+            <div class="think-tree__node">
+              <div class="think-tree__dot"></div>
+              <div class="think-tree__content">
+                <div class="think-tree__label">Open Source</div>
+                <div class="think-tree__desc">Мои бесплатные проекты, которые можно поддержать донатом</div>
               </div>
-              <canvas id="scratchCanvas" class="lot-card__canvas"></canvas>
             </div>
-            <!-- "already played" note — sits below scratch, stays inside card, small -->
-            <p class="lot-card__played-note" id="lotPlayedNote" style="display:none;">
-              Ви вже спробували сьогодні. Повертайтесь завтра.
-            </p>
           </div>
+
+          <!-- Кнопка внизу на всю ширину -->
+          <button class="intro-btn" id="casesFolderIntroDismiss">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7a2 2 0 0 1 2-2h3.172a2 2 0 0 1 1.414.586L10.414 6.4A2 2 0 0 0 11.828 7H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+            Открыть проекты
+          </button>
         </div>
-
-        <!-- Telegram door flap — back inside tilt-wrap to inherit sway -->
-        <div class="lot-door-wrap" id="lotBotAction"></div>
-      </div><!-- /.lot-tilt-wrap -->
-      </div><!-- /.lot-scene -->
-    </div>
-
-  </div>
-</section>
-
-<!-- ══════════════════════════════════════
-     SECTION 4 — КОНТАКТИ
-══════════════════════════════════════ -->
-<section class="section section--alt" id="contacts">
-  <div class="col">
-    <h2 class="section-title">Цікаві матеріали <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/File%20Folder.webp?raw=true" class="section-title__ico" width="28" height="28" alt="" /></h2>
-
-    <div class="contacts-block">
-      <!-- Articles footer links -->
-      <nav class="footer-links">
-        <div class="footer-links__grid">
-          <a href="classic.html" class="footer-link">Класичний масаж</a>
-          <a href="antistress.html" class="footer-link">Антистрес</a>
-          <a href="deep-tissue.html" class="footer-link">Глибокий тканинний</a>
-          <a href="stone.html" class="footer-link">Стоун-масаж</a>
-          <a href="dry-needling.html" class="footer-link">Dry Needling</a>
-          <a href="red-light.html" class="footer-link">Терапія червоним світлом</a>
-          <a href="spa.html" class="footer-link">СПА-програма</a>
-        </div>
-      </nav>
-    </div>
-  </div>
-</section>
-
-<!-- FLOATING NAVBAR -->
-<div class="fnav" id="floatCta">
-
-  <!-- LEFT 65% — рекламна карусель -->
-  <div class="fnav__ads" id="fnavAds">
-    <!-- <div class="fnav__indicator" id="fnavIndicator"></div> -->
-    <div class="fnav__track-wrap">
-      <div class="fnav__track" id="fnavTrack">
-
-        <!-- 1 — Вогняний масаж -->
-        <div class="fnav__slide">
-          <div class="fnav__slide-ico fnav__slide-ico--bare">
-            <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Activity/Firecracker.webp?raw=true" alt="" width="36" height="36" />
-          </div>
-          <div class="fnav__slide-body">
-            <strong>Масаж з вогнем</strong>
-            <span>Краще один раз відчути — ніж читати</span>
-          </div>
-        </div>
-
-        <!-- 2 — Подарунковий сертифікат -->
-        <div class="fnav__slide">
-          <div class="fnav__slide-ico fnav__slide-ico--bare">
-            <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Symbols/Free%20Button.webp?raw=true" alt="" width="36" height="36" />
-          </div>
-          <div class="fnav__slide-body">
-            <strong>Подарунковий сертифікат</strong>
-            <span>За сертифікатом виходить дешевше</span>
-          </div>
-        </div>
-
-        <!-- 3 — Dry Needling -->
-        <div class="fnav__slide">
-          <div class="fnav__slide-ico fnav__slide-ico--bare">
-            <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Syringe.webp?raw=true" alt="" width="36" height="36" />
-          </div>
-          <div class="fnav__slide-body">
-            <strong>Dry Needling</strong>
-            <span>Ефект, якого не дає жоден інший масаж</span>
-          </div>
-        </div>
-
-        <!-- 4 — Стоун-масаж -->
-        <div class="fnav__slide">
-          <div class="fnav__slide-ico fnav__slide-ico--bare">
-            <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Travel%20and%20Places/Moai.webp?raw=true" alt="" width="36" height="36" />
-          </div>
-          <div class="fnav__slide-body">
-            <strong>Стоун-масаж</strong>
-            <span>Рідкісне базальтове каміння з Китаю</span>
-          </div>
-        </div>
-
-        <!-- 5 — Терапія світлом -->
-        <div class="fnav__slide">
-          <div class="fnav__slide-ico fnav__slide-ico--bare">
-            <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Light%20Bulb.webp?raw=true" alt="" width="36" height="36" />
-          </div>
-          <div class="fnav__slide-body">
-            <strong>Терапія червоним світлом</strong>
-            <span>Передова технологія відновлення тканин</span>
-          </div>
-        </div>
-
-        <!-- 6 — Перкусійний масаж -->
-        <div class="fnav__slide">
-          <div class="fnav__slide-ico fnav__slide-ico--bare">
-            <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Objects/Toolbox.webp?raw=true" alt="" width="36" height="36" />
-          </div>
-          <div class="fnav__slide-body">
-            <strong>Перкусійний масаж</strong>
-            <span>Топове обладнання — глибокий результат</span>
-          </div>
-        </div>
-
-        <!-- 7 — Лотерея -->
-        <div class="fnav__slide">
-          <div class="fnav__slide-ico fnav__slide-ico--bare">
-            <img src="https://github.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/blob/main/Activity/Confetti%20Ball.webp?raw=true" alt="" width="36" height="36" />
-          </div>
-          <div class="fnav__slide-body">
-            <strong>Миттєва лотерея</strong>
-            <span>Зіграти безкоштовно — просто стирай</span>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </div>
 
-  <!-- RIGHT 35% — кнопка запису -->
-  <div class="fnav__book-wrap">
-    <button class="fnav__book" id="fnavBook">
-      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/2f37ee482c3b80118c4aa47593f75c24b2f6cce7/calendar-lines-pen-svgrepo-com.svg" alt="" width="16" height="16" style="filter:brightness(0) invert(1);flex-shrink:0;" />
-      <span>Записатись</span>
+      <div class="cases-folder__panel">
+
+        <!-- 0. Web-разработка -->
+        <div class="cases-folder__page is-active" data-page="0">
+          <div class="cases__fade-top"></div>
+          <div class="cases__fade-bot"></div>
+          <ul class="cases__list">
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Prism</h3><span class="case-item__cat">Управление 3D фермой</span></div><button class="btn btn--nda case-item__btn" onclick="window.location.href='prism.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">MSE Core</h3><span class="case-item__cat">Мессенджер</span></div><button class="btn btn--nda case-item__btn" onclick="window.location.href='mse.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Panacea</h3><span class="case-item__cat">Веб-приложение</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='panacea.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Кремуа</h3><span class="case-item__cat">Telegram Mini App</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='bentobox.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Nodata.info</h3><span class="case-item__cat">Личный блог</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='glitch.html'">СМОТРЕТЬ</button></li>
+          </ul>
+        </div>
+
+        <!-- 1. 3D / Печать -->
+        <div class="cases-folder__page" data-page="1">
+          <div class="cases__fade-top"></div>
+          <div class="cases__fade-bot"></div>
+          <ul class="cases__list">
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Maya</h3><span class="case-item__cat">3D Анимация и VFX</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='maya.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Blender</h3><span class="case-item__cat">3D Моделирование</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='blender.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Cinema 4D</h3><span class="case-item__cat">Motion Design</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='cinema4d.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Bambu Lab</h3><span class="case-item__cat">3D Печать</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='bambulab.html'">СМОТРЕТЬ</button></li>
+          </ul>
+        </div>
+
+        <!-- 2. Графика -->
+        <div class="cases-folder__page" data-page="2">
+          <div class="cases__fade-top"></div>
+          <div class="cases__fade-bot"></div>
+          <ul class="cases__list">
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Photoshop</h3><span class="case-item__cat">Растровая графика</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='photoshop.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">After Effects</h3><span class="case-item__cat">Моушн-дизайн</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='aftereffects.html'">СМОТРЕТЬ</button></li>
+            <li class="case-item"><div class="case-item__meta"><h3 class="case-item__title">Illustrator</h3><span class="case-item__cat">Векторная графика</span></div><button class="btn btn--view case-item__btn" onclick="window.location.href='illustrator.html'">СМОТРЕТЬ</button></li>
+          </ul>
+        </div>
+
+        <!-- 3. Полиграфия -->
+        <div class="cases-folder__page" data-page="3">
+          <div class="cases__fade-top"></div>
+          <div class="cases__fade-bot"></div>
+          <ul class="cases__list">
+            <!-- Список пуст, проекты в разработке -->
+          </ul>
+        </div>
+
+      </div><!-- /.cases-folder__panel -->
+    </div><!-- /.cases-folder -->
+
+    <!-- Оверлей-кнопка внизу cases -->
+    <button class="section-scroll-btn" id="orderBtn">
+      <div class="lottie-arrow" id="lottieArrow2L"></div>
+      <span>Заказать разработку</span>
+      <div class="lottie-arrow" id="lottieArrow2R"></div>
     </button>
-  </div>
+  </section>
 
-</div>
+  <!-- ══════════════════════════════════════
+       CONTACT FORM
+  ═══════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════
+       CONTACT
+  ═══════════════════════════════════════ -->
+  <section class="contact" id="contact">
+    <canvas id="orbitCanvas" class="orbit-canvas" aria-hidden="true"></canvas>
 
-<script>
-/* Colour loader model same as hero */
-/* Colour loader model same as hero — removed, loader now uses img */
+    <!-- Размытый передний план -->
+    <div class="contact__fg" aria-hidden="true">
+      <div class="contact__fg-tile contact__fg-tile--tl" style="background:#e8ddd0;"></div>
+      <div class="contact__fg-tile contact__fg-tile--tr" style="background:#3d0f1a;"></div>
+      <div class="contact__fg-tile contact__fg-tile--bl" style="background:#0000ff;"></div>
+      <div class="contact__fg-tile contact__fg-tile--br" style="background:#000000;"></div>
+    </div>
 
-(function () {
-  const mv = document.getElementById('heroModel');
-  if (!mv) return;
+    <div class="contact__inner">
 
-  const BASE_PHI    = 105;   // твій поточний phi
-  const SWING_DEG   = 10;    // ±10° по azimuth (Y)
-  const PERIOD_MS   = 8000;  // повний цикл туди-назад
-  let   startTime   = null;
-  let   userTouched = false;
-  let   resumeTimer = null;
+      <!-- Мобильная версия — folder tabs -->
+      <div class="contact-folder" id="contactFolder">
+        <div class="contact-folder__tabs" id="contactFolderTabs">
+          <button class="contact-folder__tab is-active" data-idx="0">
+            <img class="contact-folder__tab-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/mail-alt-svgrepo-com.svg" alt="" />
+            <span class="contact-folder__tab-label">Обратная связь</span>
+          </button>
+          <button class="contact-folder__tab" data-idx="1">
+            <img class="contact-folder__tab-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/credit-card-01-svgrepo-com.svg" alt="" />
+            <span class="contact-folder__tab-label">Поддержать</span>
+          </button>
+          <button class="contact-folder__tab" data-idx="2">
+            <img class="contact-folder__tab-icon" src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/order-svgrepo-com.svg" alt="" />
+            <span class="contact-folder__tab-label">Заявка</span>
+          </button>
+        </div>
+        <div class="contact-folder__panel" id="contactFolderPanel">
+          <div class="contact-folder__page is-active" data-page="0">
+            <!-- форма заявки — клонируется JS -->
+          </div>
+          <div class="contact-folder__page" data-page="1">
+            <!-- форма обратной связи — клонируется JS -->
+          </div>
+          <div class="contact-folder__page" data-page="2">
+            <!-- донат — клонируется JS -->
+          </div>
+        </div>
+      </div>
 
-  function tick(ts) {
-    if (!userTouched) {
-      if (!startTime) startTime = ts;
-      const t = (ts - startTime) / PERIOD_MS;
-      const azimuth = SWING_DEG * Math.sin(2 * Math.PI * t);
-      mv.cameraOrbit = `${azimuth}deg ${BASE_PHI}deg 90%`;
-    }
-    requestAnimationFrame(tick);
-  }
+      <div class="cstack">
 
-  // Зупиняємо коли юзер взаємодіє
-  mv.addEventListener('camera-change', (e) => {
-    if (e.detail.source === 'user-interaction') {
-      userTouched = true;
-      startTime = null;
-      clearTimeout(resumeTimer);
-      // Відновлюємо через 300мс після того як відпустив
-      resumeTimer = setTimeout(() => { userTouched = false; }, 300);
-    }
-  });
+        <!-- КАРТОЧКА 2: Обратная связь (задний план) -->
+        <div class="cstack__card" data-card="feedback">
+          <div class="cform__wrap">
+            <div class="cform__header cform__header--green">
+              <h2 class="cform__title">Обратная связь</h2>
+              <img class="contact__emoji"
+                src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/mail-alt-svgrepo-com.svg"
+                alt="" aria-hidden="true" />
+            </div>
+            <form class="cform" id="feedbackForm" novalidate onsubmit="return false">
+              <div class="cform__group">
+                <input class="cform__input" type="text" name="fb_contact" placeholder="@username" autocomplete="off" />
+              </div>
+              <div class="cform__group cform__group--grow">
+                <textarea class="cform__textarea cform__textarea--grow" name="fb_message" placeholder="Ваше сообщение…"></textarea>
+              </div>
+            </form>
+            <button type="button" id="feedbackSubmitBtn" class="btn btn--primary cform__submit cform__submit--green send-btn">
+              <div class="send-btn__state send-btn__state--default">
+                <div class="send-btn__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.2199 21.63C13.0399 21.63 11.3699 20.8 10.0499 16.83L9.32988 14.67L7.16988 13.95C3.20988 12.63 2.37988 10.96 2.37988 9.78001C2.37988 8.61001 3.20988 6.93001 7.16988 5.60001L15.6599 2.77001C17.7799 2.06001 19.5499 2.27001 20.6399 3.35001C21.7299 4.43001 21.9399 6.21001 21.2299 8.33001L18.3999 16.82C17.0699 20.8 15.3999 21.63 14.2199 21.63ZM7.63988 7.03001C4.85988 7.96001 3.86988 9.06001 3.86988 9.78001C3.86988 10.5 4.85988 11.6 7.63988 12.52L10.1599 13.36C10.3799 13.43 10.5599 13.61 10.6299 13.83L11.4699 16.35C12.3899 19.13 13.4999 20.12 14.2199 20.12C14.9399 20.12 16.0399 19.13 16.9699 16.35L19.7999 7.86001C20.3099 6.32001 20.2199 5.06001 19.5699 4.41001C18.9199 3.76001 17.6599 3.68001 16.1299 4.19001L7.63988 7.03001Z" fill="currentColor"/>
+                    <path d="M10.11 14.4C9.92005 14.4 9.73005 14.33 9.58005 14.18C9.29005 13.89 9.29005 13.41 9.58005 13.12L13.16 9.53C13.45 9.24 13.93 9.24 14.22 9.53C14.51 9.82 14.51 10.3 14.22 10.59L10.64 14.18C10.5 14.33 10.3 14.4 10.11 14.4Z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <p class="send-btn__text">Отправить</p>
+              </div>
+              <div class="send-btn__state send-btn__state--sent">
+                <div class="send-btn__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
+                    <path fill="currentColor" d="M12 22.75C6.07 22.75 1.25 17.93 1.25 12C1.25 6.07 6.07 1.25 12 1.25C17.93 1.25 22.75 6.07 22.75 12C22.75 17.93 17.93 22.75 12 22.75ZM12 2.75C6.9 2.75 2.75 6.9 2.75 12C2.75 17.1 6.9 21.25 12 21.25C17.1 21.25 21.25 17.1 21.25 12C21.25 6.9 17.1 2.75 12 2.75Z"/>
+                    <path fill="currentColor" d="M10.5795 15.5801C10.3795 15.5801 10.1895 15.5001 10.0495 15.3601L7.21945 12.5301C6.92945 12.2401 6.92945 11.7601 7.21945 11.4701C7.50945 11.1801 7.98945 11.1801 8.27945 11.4701L10.5795 13.7701L15.7195 8.6301C16.0095 8.3401 16.4895 8.3401 16.7795 8.6301C17.0695 8.9201 17.0695 9.4001 16.7795 9.6901L11.1095 15.3601C10.9695 15.5001 10.7795 15.5801 10.5795 15.5801Z"/>
+                  </svg>
+                </div>
+                <p class="send-btn__text">Отправлено</p>
+              </div>
+            </button>
+          </div>
+        </div>
 
-  mv.addEventListener('load', () => {
-    const materials = mv.model.materials;
+        <!-- КАРТОЧКА 3: Поддержка open-source (задний план) -->
+        <div class="cstack__card" data-card="donate">
+          <div class="cform__wrap">
+            <div class="cform__header cform__header--yellow">
+              <h2 class="cform__title cform__title--dark">Поддержать open-source</h2>
+              <img class="contact__emoji"
+                src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/credit-card-01-svgrepo-com.svg"
+                alt="" aria-hidden="true" />
+            </div>
+            <div class="cform cform--donate">
+              <p class="donate__desc">Все мои open-source проекты бесплатны. Если хочешь ускорить выход — можно поддержать криптой.</p>
+              <div class="donate__slider">
+                <div class="donate__slide donate__slide--list">
+                <div class="donate__grid">
 
-    // Стартовый цвет — чёрный (невидимый)
-    materials.forEach((mat) => {
-      mat.pbrMetallicRoughness.setBaseColorFactor([0, 0, 0, 1]);
-      mat.pbrMetallicRoughness.setMetallicFactor(0.0);
-      mat.pbrMetallicRoughness.setRoughnessFactor(0.6);
-    });
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">TRC-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="TF8kWDzWBRHY3q5tjsCNicm4UAzy62fLPm" data-qr="TF8kWDzWBRHY3q5tjsCNicm4UAzy62fLPm" data-net="USDT TRC-20" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="TF8kWDzWBRHY3q5tjsCNicm4UAzy62fLPm" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-    const targetColors = [
-      [0.30, 0.75, 1.0, 1.0],
-      [0.15, 0.55, 0.90, 1.0],
-    ];
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">ERC-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-qr="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-net="USDT ERC-20" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-    // Запускаем анимацию цвета после hero-ready
-    function animateColor() {
-      const DURATION = 1000; // ms — плавное появление цвета
-      const start = performance.now();
-      function step(now) {
-        const t = Math.min((now - start) / DURATION, 1);
-        const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // easeInOut
-        materials.forEach((mat, i) => {
-          const c = targetColors[i % targetColors.length];
-          mat.pbrMetallicRoughness.setBaseColorFactor([
-            c[0] * ease, c[1] * ease, c[2] * ease, 1
-          ]);
-        });
-        if (t < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">BEP-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-qr="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-net="USDT BEP-20" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-    // Слушаем hero-ready через MutationObserver на body
-    const observer = new MutationObserver(() => {
-      if (document.body.classList.contains('hero-ready')) {
-        observer.disconnect();
-        animateColor();
-      }
-    });
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+                <div class="donate__cell">
+                  <span class="donate__coin">USDT <span class="donate__net">SOL</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="GcVhy54HcJyomXSnjiDgE6g25UfNnmwwi2XLsD7jxDXa" data-qr="GcVhy54HcJyomXSnjiDgE6g25UfNnmwwi2XLsD7jxDXa" data-net="USDT (Solana)" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="GcVhy54HcJyomXSnjiDgE6g25UfNnmwwi2XLsD7jxDXa" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-    // Also check immediately — hero-ready may already be set if model loaded late
-    if (document.body.classList.contains('hero-ready')) {
-      observer.disconnect();
-      animateColor();
-    }
+                <div class="donate__cell">
+                  <span class="donate__coin">USDC <span class="donate__net">ERC-20</span></span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-qr="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-net="USDC ERC-20" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-    if (mv.availableAnimations.length) {
-      mv.animationName = mv.availableAnimations[0];
-      mv.timeScale = 0.25;
-      mv.play({ repetitions: Infinity });
-    }
-    requestAnimationFrame(tick);
-  });
-})();
-</script>
-<script src="app.js?v=27"></script>
-<script>
-/* ── Phone button: tel: on mobile, clipboard on desktop ── */
-(function() {
-  const btn = document.getElementById('phoneBtn');
-  const txt = document.getElementById('phoneBtnText');
-  if (!btn) return;
-  const phone = '0996335197';
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                <div class="donate__cell">
+                  <span class="donate__coin">ETH</span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-qr="0x49128Dbe1267030F6Ba563858fd76772417b3178" data-net="Ethereum (ERC-20)" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="0x49128Dbe1267030F6Ba563858fd76772417b3178" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-  function showToast(msg) {
-    const t = document.createElement('div');
-    t.textContent = msg;
-    t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(20,28,60,0.92);color:#c8d8f4;font-size:13px;font-weight:600;padding:10px 20px;border-radius:24px;border:1px solid rgba(77,140,255,0.3);backdrop-filter:blur(12px);z-index:9999;pointer-events:none;transition:opacity 0.3s ease;white-space:nowrap;';
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2200);
-  }
+                <div class="donate__cell donate__cell--wide">
+                  <span class="donate__coin">BTC</span>
+                  <div class="donate__actions">
+                    <button class="donate__copy" data-copy="bc1qj74lu0qmv3vr83n8f5qjxmmdmu66jgxzry944t" data-qr="bc1qj74lu0qmv3vr83n8f5qjxmmdmu66jgxzry944t" data-net="Bitcoin (BTC)" aria-label="QR-код">
+                      <img src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/ce0586bbdaf2c871f16a1d29353b1d355e99f6c5/qrcode-svgrepo-com.svg" width="14" height="14" alt="" />
+                    </button>
+                    <button class="donate__copy" data-copy="bc1qj74lu0qmv3vr83n8f5qjxmmdmu66jgxzry944t" aria-label="Скопировать">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                </div>
 
-  if (!isMobile) {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      navigator.clipboard.writeText(phone).then(() => {
-        txt.textContent = 'Скопійовано!';
-        showToast('📋 Номер скопійовано у буфер обміну');
-        setTimeout(() => { txt.textContent = phone; }, 2500);
-      }).catch(() => {
-        window.location.href = 'tel:+380' + phone.replace(/^0/, '');
-      });
-    });
-  }
-})();
-/* ── Review card avatars: Telegram emojis ── */
-(function() {
-  const BASE = 'https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/';
-  const emojis = [
-    BASE + 'Objects/Gem%20Stone.webp',
-    BASE + 'Objects/Crown.webp',
-    BASE + 'Objects/Bomb.webp',
-    BASE + 'Objects/Hourglass%20Done.webp',
-    BASE + 'Objects/Stethoscope.webp',
-    BASE + 'Objects/Light%20Bulb.webp',
-    BASE + 'Objects/Pill.webp',
-    BASE + 'Objects/Microscope.webp',
-    BASE + 'Animals%20and%20Nature/Fire.webp',
-    BASE + 'Animals%20and%20Nature/Butterfly.webp',
-    BASE + 'Animals%20and%20Nature/Snowflake.webp',
-    BASE + 'Animals%20and%20Nature/Rainbow.webp',
-    BASE + 'Animals%20and%20Nature/Octopus.webp',
-    BASE + 'Animals%20and%20Nature/Bat.webp',
-    BASE + 'Animals%20and%20Nature/Fox.webp',
-    BASE + 'Travel%20and%20Places/Rocket.webp',
-    BASE + 'Travel%20and%20Places/Moai.webp',
-    BASE + 'Travel%20and%20Places/Hot%20Springs.webp',
-  ];
+              </div><!-- /donate__grid -->
+              </div><!-- /donate__slide--list -->
 
-  const cards = document.querySelectorAll('.hero-review-card');
-  cards.forEach((card, i) => {
-    const avatar = card.querySelector('.hero-review-card__avatar');
-    if (!avatar) return;
-    const src = emojis[i % emojis.length];
-    avatar.innerHTML = `<img src="${src}" alt="" width="12" height="12" style="width:12px;height:12px;object-fit:contain;display:block;" loading="lazy" />`;
-  });
-})();
-</script>
-<script>
-/* ── Desktop icon pattern — DISABLED ── */
-/* ── Desktop icon pattern — single fixed layer, no seam between sections ── */
-(function() {
-  if (window.innerWidth < 900) return;
-  const ICON_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/65757fa20ff65e9e580f742c00c5137ed1e0f445/Icon.svg';
-  const FILT = 'brightness(0) saturate(100%) invert(12%) sepia(50%) hue-rotate(202deg) saturate(300%) brightness(120%)';
+                <div class="donate__slide donate__slide--qr" id="donateQrInline" aria-hidden="true">
+                  <div class="donate__qr-frame">
+                    <div id="donateQrCanvas" class="donate__qr-canvas-inline"></div>
+                    <p class="donate__qr-addr" id="donateQrAddr"></p>
+                  </div>
+                </div>
 
-  const cols = [
-    { size: '86px 144px', offsetRight: 280, cls: '1' },
-    { size: '65px 120px', offsetRight: 150, cls: '2' },
-    { size: '46px 96px',  offsetRight: 30,  cls: '3' },
-  ];
+              </div><!-- /donate__slider -->
 
-  // One fixed wrapper behind everything
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;';
-  document.body.appendChild(wrap);
+            </div>
+            <div class="cform__submit cform__submit--yellow" id="donateFooter">
+              <span>СПАСИБО ЗА ПОДДЕРЖКУ</span>
+            </div>
+          </div>
+        </div>
 
-  cols.forEach(c => {
-    const sz = parseInt(c.size);
-    const w = `calc(50% - 240px - ${c.offsetRight}px + ${sz}px)`;
+        <!-- КАРТОЧКА 1: Заявка на разработку (передний план) -->
+        <!-- КАРТОЧКА 1: Заявка на разработку (передний план) -->
+        <div class="cstack__card cstack__card--active" data-card="order">
+          <div class="cform__wrap">
+            <div class="cform__header">
+              <h2 class="cform__title">Заявка на разработку</h2>
+              <img class="contact__emoji"
+                src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/776dcaacaee6e54fb0bbc8934bb78b888a4097b0/order-svgrepo-com.svg"
+                alt="" aria-hidden="true" />
+            </div>
+            <form class="cform" id="contactForm" novalidate onsubmit="return false">
 
-    const l = document.createElement('div');
-    l.style.cssText = `
-      position:absolute; top:0; bottom:0;
-      right:calc(50% + 240px + ${c.offsetRight}px - ${sz}px);
-      width:${w};
-      background-image:url('${ICON_URL}');
-      background-size:${c.size};
-      background-repeat:repeat;
-      filter:${FILT};
-    `;
-    wrap.appendChild(l);
+              <fieldset class="cform__group">
+                <div class="cform__checks">
+                  <label class="cform__check"><input type="checkbox" name="type" value="web" /><span>Веб-сайт</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="ad" /><span>Реклама</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="print" /><span>Полиграфия</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="motion" /><span>Моушн</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="video" /><span>Видео</span></label>
+                  <label class="cform__check"><input type="checkbox" name="type" value="3d" /><span>3D</span></label>
+                </div>
+              </fieldset>
 
-    const r = document.createElement('div');
-    r.style.cssText = `
-      position:absolute; top:0; bottom:0;
-      left:calc(50% + 240px + ${c.offsetRight}px - ${sz}px);
-      width:${w};
-      background-image:url('${ICON_URL}');
-      background-size:${c.size};
-      background-repeat:repeat;
-      filter:${FILT};
-    `;
-    wrap.appendChild(r);
-  });
+              <div class="cform__group">
+                <input class="cform__input" type="text" id="name" name="name" placeholder="Суть задачи, кратко..." autocomplete="name" />
+              </div>
 
-  window.addEventListener('resize', () => {
-    if (window.innerWidth < 900) wrap.style.display = 'none';
-    else wrap.style.display = '';
-  });
-})();
-*/
-</script>
+              <div class="cform__group cform__group--row">
+                <input class="cform__input cform__input--half" type="text" id="contact" name="contact" placeholder="@username" autocomplete="off" />
+                <div class="cform__messenger-btns">
+                  <label class="cform__check"><input type="radio" name="channel" value="telegram" /><span>Telegram</span></label>
+                  <label class="cform__check"><input type="radio" name="channel" value="whatsapp" /><span>WhatsApp</span></label>
+                  <label class="cform__check"><input type="radio" name="channel" value="email" /><span>Email</span></label>
+                </div>
+              </div>
 
-<script>
-/* ── Lot card icon pattern — SVG imgs, crisp vector ── */
-(function() {
-  const wrap = document.getElementById('lotPatternWrap');
-  const body = document.getElementById('lotCardBody');
-  if (!wrap || !body) return;
+              <div class="cform__group">
+                <textarea class="cform__textarea" id="comment" name="comment" rows="3" placeholder="Пожелания, референсы, сроки…"></textarea>
+              </div>
 
-  const ICON = 'https://raw.githubusercontent.com/CakeBoxDeveloper/timetome/65757fa20ff65e9e580f742c00c5137ed1e0f445/Icon.svg';
-  // dark yellow via CSS filter: brightness(0) sepia(1) saturate(3) hue-rotate(5deg) brightness(0.5)
-  const FILTER = 'brightness(0) sepia(1) saturate(4) hue-rotate(5deg) brightness(0.45)';
+            </form>
+            <button type="button" id="contactSubmitBtn" class="btn btn--primary cform__submit send-btn">
+              <div class="send-btn__state send-btn__state--default">
+                <div class="send-btn__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.2199 21.63C13.0399 21.63 11.3699 20.8 10.0499 16.83L9.32988 14.67L7.16988 13.95C3.20988 12.63 2.37988 10.96 2.37988 9.78001C2.37988 8.61001 3.20988 6.93001 7.16988 5.60001L15.6599 2.77001C17.7799 2.06001 19.5499 2.27001 20.6399 3.35001C21.7299 4.43001 21.9399 6.21001 21.2299 8.33001L18.3999 16.82C17.0699 20.8 15.3999 21.63 14.2199 21.63ZM7.63988 7.03001C4.85988 7.96001 3.86988 9.06001 3.86988 9.78001C3.86988 10.5 4.85988 11.6 7.63988 12.52L10.1599 13.36C10.3799 13.43 10.5599 13.61 10.6299 13.83L11.4699 16.35C12.3899 19.13 13.4999 20.12 14.2199 20.12C14.9399 20.12 16.0399 19.13 16.9699 16.35L19.7999 7.86001C20.3099 6.32001 20.2199 5.06001 19.5699 4.41001C18.9199 3.76001 17.6599 3.68001 16.1299 4.19001L7.63988 7.03001Z" fill="currentColor"/>
+                    <path d="M10.11 14.4C9.92005 14.4 9.73005 14.33 9.58005 14.18C9.29005 13.89 9.29005 13.41 9.58005 13.12L13.16 9.53C13.45 9.24 13.93 9.24 14.22 9.53C14.51 9.82 14.51 10.3 14.22 10.59L10.64 14.18C10.5 14.33 10.3 14.4 10.11 14.4Z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <p class="send-btn__text">Отправить заявку</p>
+              </div>
+              <div class="send-btn__state send-btn__state--sent">
+                <div class="send-btn__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
+                    <path fill="currentColor" d="M12 22.75C6.07 22.75 1.25 17.93 1.25 12C1.25 6.07 6.07 1.25 12 1.25C17.93 1.25 22.75 6.07 22.75 12C22.75 17.93 17.93 22.75 12 22.75ZM12 2.75C6.9 2.75 2.75 6.9 2.75 12C2.75 17.1 6.9 21.25 12 21.25C17.1 21.25 21.25 17.1 21.25 12C21.25 6.9 17.1 2.75 12 2.75Z"/>
+                    <path fill="currentColor" d="M10.5795 15.5801C10.3795 15.5801 10.1895 15.5001 10.0495 15.3601L7.21945 12.5301C6.92945 12.2401 6.92945 11.7601 7.21945 11.4701C7.50945 11.1801 7.98945 11.1801 8.27945 11.4701L10.5795 13.7701L15.7195 8.6301C16.0095 8.3401 16.4895 8.3401 16.7795 8.6301C17.0695 8.9201 17.0695 9.4001 16.7795 9.6901L11.1095 15.3601C10.9695 15.5001 10.7795 15.5801 10.5795 15.5801Z"/>
+                  </svg>
+                </div>
+                <p class="send-btn__text">Отправлено</p>
+              </div>
+            </button>
+          </div>
+        </div>
 
-  // rings: [radius, size, opacity, angles[]]
-  const rings = [
-    { r: 40,  s: 46, o: 0.60, angles: [45] },
-    { r: 87,  s: 32, o: 0.38, angles: [0, 45, 90] },
-    { r: 122, s: 22, o: 0.22, angles: [0, 22.5, 45, 67.5, 90] },
-  ];
+      </div><!-- /cstack -->
+    </div>
 
-  function place() {
-    wrap.innerHTML = '';
-    const card = document.getElementById('lotCard');
-    const body = document.getElementById('lotCardBody');
-    if (!card || !body) return;
-    const cw = card.offsetWidth;
-    const ch = card.offsetHeight;
-    const bodyTop = body.offsetTop; // real px measured from card top
-    if (!cw || !ch || !bodyTop) return;
+  </section>
 
-    // Constrain wrap to body area only
-    wrap.style.top    = bodyTop + 'px';
-    wrap.style.height = (ch - bodyTop) + 'px';
-    const wh = ch - bodyTop;
 
-    // Corners relative to wrap
-    const corners = [
-      { ox: cw,  oy: wh,  dir: -1 },  // bottom-right → fan left+up
-      { ox: 0,   oy: 0,   dir:  1 },  // top-left → fan right+down
-    ];
-
-    corners.forEach(({ ox, oy, dir }) => {
-      rings.forEach(({ r, s, o, angles }) => {
-        angles.forEach(deg => {
-          const a = deg * Math.PI / 180;
-          const cx = ox + dir * r * Math.cos(a);
-          const cy = oy + dir * r * Math.sin(a);
-          const el = document.createElement('img');
-          el.src = ICON;
-          el.style.cssText = `
-            position:absolute;
-            width:${s}px; height:${s}px;
-            left:${cx - s/2}px; top:${cy - s/2}px;
-            opacity:${o};
-            filter:${FILTER};
-            pointer-events:none;
-          `;
-          wrap.appendChild(el);
-        });
-      });
-    });
-  }
-
-  // Wait for layout to settle, then place
-  window.addEventListener('load', () => setTimeout(place, 200));
-  setTimeout(place, 500); // fallback if load already fired
-  window.addEventListener('resize', place);
-})();
-
-/* ── Deep-link actions via URL hash ── */
-(function() {
-  const hash = window.location.hash; // e.g. #lottery | #action=cert | #action=svc&card=4
-  if (!hash) return;
-
-  // Helper — scroll element into view after page load settles
-  function afterLoad(fn) {
-    if (document.readyState === 'complete') {
-      setTimeout(fn, 500);
-    } else {
-      window.addEventListener('load', () => setTimeout(fn, 500), { once: true });
-    }
-  }
-
-  // Simple lottery anchor
-  if (hash === '#lottery' || hash === '#action=lottery') {
-    afterLoad(() => {
-      const el = document.getElementById('lottery');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
-    return;
-  }
-
-  // Parse #action=X or #action=X&card=N
-  const params = {};
-  hash.slice(1).split('&').forEach(p => {
-    const [k, v] = p.split('=');
-    if (k) params[k] = v || '';
-  });
-
-  if (params.action === 'cert') {
-    afterLoad(() => {
-      const certSection = document.getElementById('certificates');
-      if (certSection) {
-        certSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setTimeout(() => {
-          const toggle    = document.getElementById('certProgramToggle');
-          const tableWrap = document.getElementById('certProgramTable');
-          if (toggle && tableWrap && !tableWrap.classList.contains('is-open')) {
-            tableWrap.classList.add('is-open');
-            toggle.setAttribute('aria-expanded', 'true');
-          }
-        }, 1000);
-      }
-    });
-    return;
-  }
-
-  if (params.action === 'svc') {
-    const cardIndex = parseInt(params.card, 10);
-    if (isNaN(cardIndex)) return;
-    afterLoad(() => {
-      const svcSection = document.getElementById('services');
-      if (!svcSection) return;
-      svcSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setTimeout(() => {
-        const track = document.getElementById('servicesTrack');
-        if (!track) return;
-        const inner = track.querySelector('.snap-inner');
-        if (!inner) return;
-        const cards = Array.from(inner.children);
-        const card  = cards[cardIndex];
-        if (!card) return;
-        const left = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
-        track.scrollTo({ left, behavior: 'smooth' });
-        setTimeout(() => {
-          const detailLink = card.querySelector('a.btn--outline');
-          if (detailLink) detailLink.click();
-        }, 1000);
-      }, 900);
-    });
-    return;
-  }
-})();
-/* ── Cert glow + rays ── */
-(function() {
-  const canvas = document.getElementById('certParticleCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-
-  let glowColor = '#7d5c5b';
-  let rayR = 125, rayG = 92, rayB = 91;
-
-  window.setCertGlowColor = (bg, fg) => {
-    glowColor = bg;
-    // parse hex to rgb for rays
-    const hex = bg.replace('#','');
-    if (hex.length === 6) {
-      rayR = parseInt(hex.slice(0,2),16);
-      rayG = parseInt(hex.slice(2,4),16);
-      rayB = parseInt(hex.slice(4,6),16);
-    }
-  };
-
-  // Draw radial glow
-  function drawGlow(w, h) {
-    const cx = w / 2, cy = h * 0.65;
-    const r  = Math.min(w, h) * 0.38;
-    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    grd.addColorStop(0,   glowColor + '88');
-    grd.addColorStop(0.5, glowColor + '44');
-    grd.addColorStop(1,   glowColor + '00');
-    ctx.save();
-    ctx.filter = 'blur(24px)';
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, w, h);
-    ctx.restore();
-  }
-
-  const RAY_COUNT = 18;
-  let t = 0;
-
-  function drawRays(w, h) {
-    const cx = w / 2;
-    const cy = h * 0.5;
-
-    for (let i = 0; i < RAY_COUNT; i++) {
-      const baseAngle = (i / RAY_COUNT) * Math.PI * 2;
-      const wave = 0.04 * Math.sin(t * 0.9 + i * 1.3);
-      const angle = baseAngle + wave;
-
-      const pulse = 0.5 + 0.5 * Math.sin(t * 1.4 + i * 0.8);
-      const len = (0.30 + 0.08 * pulse) * Math.max(w, h);  // разница длин сужена: было 0.17, теперь 0.08
-      const halfW = (3 + 7 * Math.sin(Math.PI * i / RAY_COUNT)) * (0.7 + 0.3 * pulse);
-
-      const ex = cx + Math.cos(angle) * len;
-      const ey = cy + Math.sin(angle) * len;
-
-      // расширяется к концу: у центра узкий, на конце широкий
-      const nxNear =  Math.sin(angle) * 1;
-      const nyNear = -Math.cos(angle) * 1;
-      const nxFar  =  Math.sin(angle) * halfW;
-      const nyFar  = -Math.cos(angle) * halfW;
-
-      const alpha = 0.168 + 0.12 * pulse;
-
-      const grad = ctx.createLinearGradient(cx, cy, ex, ey);
-      grad.addColorStop(0,    `rgba(${rayR},${rayG},${rayB},0)`);
-      grad.addColorStop(0.25, `rgba(${rayR},${rayG},${rayB},${alpha * 0.6})`);
-      grad.addColorStop(0.6,  `rgba(${rayR},${rayG},${rayB},${alpha})`);
-      grad.addColorStop(0.85, `rgba(${rayR},${rayG},${rayB},${alpha * 0.4})`);
-      grad.addColorStop(1,    'rgba(0,0,0,0)');
-
-      ctx.beginPath();
-      ctx.moveTo(cx + nxNear, cy + nyNear);
-      ctx.lineTo(ex + nxFar, ey + nyFar);
-      ctx.lineTo(ex - nxFar, ey - nyFar);
-      ctx.lineTo(cx - nxNear, cy - nyNear);
-      ctx.closePath();
-      ctx.fillStyle = grad;
-      ctx.fill();
-    }
-  }
-
-  let lastTs = 0;
-  function draw(ts) {
-    const dt = Math.min(ts - lastTs, 50);
-    lastTs = ts;
-    t += dt * 0.001;
-
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvas.offsetWidth;
-    const h = canvas.offsetHeight;
-    if (!w || !h) { requestAnimationFrame(draw); return; }
-    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-      canvas.width  = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-      ctx.scale(dpr, dpr);
-    }
-
-    ctx.clearRect(0, 0, w, h);
-    drawGlow(w, h);
-    drawRays(w, h);
-
-    requestAnimationFrame(draw);
-  }
-
-  requestAnimationFrame(draw);
-})();
-
-document.querySelectorAll('.cert-model-viewer').forEach(mv => {
-  mv.addEventListener('load', () => {
-    mv.model.materials.forEach(mat => {
-      mat.pbrMetallicRoughness.setMetallicFactor(0.0);
-      mat.pbrMetallicRoughness.setRoughnessFactor(0.9);
-    });
-  });
-});
-</script>
 </body>
 </html>

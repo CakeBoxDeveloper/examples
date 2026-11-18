@@ -1,1824 +1,1152 @@
-'use strict';
+/* Portfolio — app.js */
 
-/* ══════════════════════════════════════
-   LOADER + PROGRESS BAR
-══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   LOADER
+═══════════════════════════════════════ */
 (function () {
-  const loader = document.getElementById('siteLoader');
-  const bar    = document.getElementById('loaderBar');
-  if (!loader || !bar) return;
+  var loaderEl     = document.getElementById('loader');
+  var loaderLottie = document.getElementById('loaderLottie');
+  var heroLottie   = document.getElementById('heroLottie');
+  if (!loaderEl || !loaderLottie || typeof lottie === 'undefined') return;
 
-  const MIN_SHOW_MS = 900;
-  const startTime   = Date.now();
-  let   progress    = 0;
-  let   pageReady   = false;
-
-  function setProgress(target) {
-    if (target <= progress) return;
-    progress = target;
-    bar.style.width = progress + '%';
+  // Тема лоадера по локальному времени: 8:00–20:00 = день
+  var hour = new Date().getHours();
+  var isDaytime = hour >= 8 && hour < 20;
+  if (isDaytime) {
+    loaderEl.classList.add('loader--day');
+    document.body.classList.add('theme-light');
   }
 
-  let phase1Done = false, phase1Val = 0;
-  function phase1() {
-    phase1Val += 2.5;
-    setProgress(phase1Val);
-    if (phase1Val < 30) { setTimeout(phase1, 60); }
-    else { phase1Done = true; phase2(); }
+  var SMALL = 110; // начальный размер
+  var LARGE = 220; // финальный размер (совпадает с hero)
+
+  // Позиционируем лоадер-лотти точно по центру hero-лотти
+  function positionLoader() {
+    if (!heroLottie) return;
+    var r = heroLottie.getBoundingClientRect();
+    var cx = r.left + r.width  / 2;
+    var cy = r.top  + r.height / 2;
+    loaderLottie.style.left = (cx - SMALL / 2) + 'px';
+    loaderLottie.style.top  = (cy - SMALL / 2) + 'px';
   }
 
-  let phase2Val = 30;
-  function phase2() {
-    const step = Math.max(0.3, (80 - phase2Val) * 0.04);
-    phase2Val += step;
-    setProgress(phase2Val);
-    if (phase2Val < 80 && !pageReady) { setTimeout(phase2, 120); }
-    else if (pageReady) { finish(); }
-    else { setTimeout(phase2, 120); }
-  }
+  // Ждём DOMContentLoaded чтобы getBoundingClientRect был точным
+  document.addEventListener('DOMContentLoaded', positionLoader);
+  window.addEventListener('resize', positionLoader);
+  // На случай если скрипт запускается после DOMContentLoaded
+  if (document.readyState !== 'loading') positionLoader();
 
-  function finish() {
-    setProgress(100);
-    const elapsed = Date.now() - startTime;
-    const delay   = Math.max(0, MIN_SHOW_MS - elapsed) + 280;
-    setTimeout(() => {
-      loader.classList.add('is-hidden');
-      setTimeout(() => { 
-        document.body.classList.add('hero-ready');
-        // Dispatch custom event for confetti
-        document.body.dispatchEvent(new CustomEvent('heroReady'));
-      }, 600);
-      setTimeout(() => { if (loader.parentNode) loader.parentNode.removeChild(loader); }, 600);
-    }, delay);
-  }
+  var loaderAnim = lottie.loadAnimation({
+    container: loaderLottie,
+    renderer:  'svg',
+    loop:      true,
+    autoplay:  true,
+    path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json',
+  });
 
-  // Hard fallback: if something delays loader logic, still set hero-ready after 4s
-  setTimeout(() => { 
-    document.body.classList.add('hero-ready');
-    document.body.dispatchEvent(new CustomEvent('heroReady'));
-  }, 4000);
+  loaderAnim.setSpeed(3); // втрое быстрее
 
-  function onPageLoad() {
-    if (pageReady) return;
+  var pageReady    = false;
+  var cycleCount   = 0;
+  var dismissed    = false;
+
+  loaderAnim.addEventListener('loopComplete', function () {
+    cycleCount++;
+    if (pageReady && cycleCount >= 3 && !dismissed) dismiss();
+  });
+
+  window.addEventListener('load', function () {
     pageReady = true;
-    finish(); // always finish when page is ready, regardless of phase
-  }
-
-  if (document.readyState === 'complete') { onPageLoad(); }
-  else { window.addEventListener('load', onPageLoad, { once: true }); }
-
-  const mv = document.querySelector('.loader__model-wrap model-viewer');
-  if (mv) { mv.addEventListener('load', () => setProgress(Math.max(progress, 70)), { once: true }); }
-
-  phase1();
-})();
-
-/* ══════════════════════════════════════════════
-   CERT CAROUSEL — single card flip
-══════════════════════════════════════════════ */
-(function () {
-  const flipWrap  = document.getElementById('certFlipWrap');
-  const giftBlock = document.getElementById('certGiftBlock');
-  const priceEl   = document.getElementById('certPrice');
-  const buyBtn    = document.getElementById('certBuyBtn');
-  const tabsEl    = document.getElementById('certTabs');
-  if (!flipWrap) return;
-  const mv = null; // all certs are now PNG images, no model-viewer
-
-  let activeIndex = 0;
-  let flipping = false;
-
-  // Cert data
-  const certData = [
-    {
-      price: '2 500 ₴', bg: '#7d5c5b', fg: '#f5d9d5', border: '#d4a9a6',
-      name: 'Какао',
-      src: null,
-      img: 'https://github.com/CakeBoxDeveloper/timetome/blob/main/ChockoMin_1.png?raw=true',
-      desc: 'М\'який старт — зняти напругу, відпочити та відчути перші результати від комплексного догляду.',
-      rows: [
-        ['1', 'Aroma Relax + терапія червоним світлом',        '90 хв', '900 ₴'],
-        ['2', 'Масаж голови + дарсонваль з насадкою-гребінцем','60 хв', '750 ₴'],
-        ['3', 'Масаж ніг + масаж стоп з гарячими камінням',   '75 хв', '850 ₴'],
-      ],
-    },
-    {
-      price: '5 000 ₴', bg: '#780115', fg: '#f7b638', border: '#c88020',
-      name: 'Бамбл',
-      src: null,
-      img: 'https://github.com/CakeBoxDeveloper/timetome/blob/main/MustMin_1.png?raw=true',
-      desc: 'Повноцінний курс для тіла — відновлення м\'язів, зняття хронічної втоми та покращення кровообігу.',
-      rows: [
-        ['1', 'Загальний класичний масаж + масаж голови',      '90 хв', '1 100 ₴'],
-        ['2', 'Масаж спини + терапія червоним світлом',        '75 хв', '1 150 ₴'],
-        ['3', 'Масаж спини + баночний масаж',                  '75 хв', '1 200 ₴'],
-        ['4', 'Масаж ніг + масаж стоп з гарячими камінням',   '75 хв',   '850 ₴'],
-      ],
-    },
-    {
-      price: '7 500 ₴', bg: '#383f0c', fg: '#c4d18b', border: '#8fa055',
-      name: 'Матча',
-      src: null,
-      img: 'https://github.com/CakeBoxDeveloper/timetome/blob/main/MatchaMin_1.png?raw=true',
-      desc: 'Глибока робота з тілом — вогняне відновлення, стоун і сухі голки для тих, хто хоче відчути реальний результат.',
-      rows: [
-        ['1', 'Вогняне відновлення',                           '90 хв', '1 500 ₴'],
-        ['2', 'Загальний масаж + масаж голови',                '90 хв', '1 100 ₴'],
-        ['3', 'Stone Massage всього тіла',                     '90 хв', '1 800 ₴'],
-        ['4', 'Масаж спини + сухі голки',                     '75 хв', '1 350 ₴'],
-        ['5', 'Aroma Relax + терапія червоним світлом',        '90 хв',   '900 ₴'],
-      ],
-    },
-    {
-      price: '9 000 ₴', bg: '#3730a2', fg: '#c8bbe7', border: '#8a7fc4',
-      name: 'Айс-латте',
-      src: null,
-      img: 'https://github.com/CakeBoxDeveloper/timetome/blob/main/BlueMin_1.png?raw=true',
-      desc: 'Максимальна програма відновлення — від вогняного масажу до стретчингу та аромарелаксу.',
-      rows: [
-        ['1', 'Вогняне відновлення',                           '90 хв', '1 500 ₴'],
-        ['2', 'Загальний масаж + масаж голови',                '90 хв', '1 100 ₴'],
-        ['3', 'Stone Massage всього тіла',                     '90 хв', '1 800 ₴'],
-        ['4', 'Stretch Release Massage',                       '75 хв', '1 200 ₴'],
-        ['5', 'Масаж спини + баночний масаж',                  '75 хв', '1 200 ₴'],
-        ['6', 'Aroma Relax + терапія червоним світлом',        '90 хв',   '900 ₴'],
-      ],
-    },
-  ];
-
-  // Preload all cert images — keep references to prevent GC
-  const _preloadedImgs = certData
-    .filter(d => d.img)
-    .map(d => { const img = new Image(); img.src = d.img; return img; });
-
-  const tabs      = tabsEl ? Array.from(tabsEl.querySelectorAll('.cert-tab')) : [];
-  const nameEl    = document.getElementById('certName');
-  const descEl    = document.getElementById('certDesc');
-  const tableBody = document.getElementById('certTableBody');
-  const toggle    = document.getElementById('certProgramToggle');
-  const tableWrap = document.getElementById('certProgramTable');
-
-  if (toggle && tableWrap) {
-    toggle.addEventListener('click', () => {
-      const open = tableWrap.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', String(open));
-    });
-  }
-
-  // ── PNG cert shimmer border ──
-  let _certImgShimmerRaf = null;
-  function _certImgShimmer(canvas, streakColor) {
-    if (!canvas) return;
-    if (_certImgShimmerRaf) cancelAnimationFrame(_certImgShimmerRaf);
-    const ctx = canvas.getContext('2d');
-    let t = 0;
-    const R = 20;
-    const SPEED = 0.018;
-    const color = streakColor || '#ffffff';
-
-    function point(rect, pct) {
-      const {x,y,w,h,r} = rect;
-      const arc = (Math.PI/2)*r;
-      const segs = [w-2*r, arc, h-2*r, arc, w-2*r, arc, h-2*r, arc];
-      const total = segs.reduce((a,b)=>a+b,0);
-      let dist = (((pct%1)+1)%1)*total;
-      // top-left arc
-      let s=arc; if(dist<s){const a=Math.PI+(dist/s)*(Math.PI/2);return{x:x+r+r*Math.cos(a),y:y+r+r*Math.sin(a)};} dist-=s;
-      // top
-      s=w-2*r; if(dist<s) return{x:x+r+dist,y:y}; dist-=s;
-      // top-right arc
-      s=arc; if(dist<s){const a=-Math.PI/2+(dist/s)*(Math.PI/2);return{x:x+w-r+r*Math.cos(a),y:y+r+r*Math.sin(a)};} dist-=s;
-      // right
-      s=h-2*r; if(dist<s) return{x:x+w,y:y+r+dist}; dist-=s;
-      // bottom-right arc
-      s=arc; if(dist<s){const a=(dist/s)*(Math.PI/2);return{x:x+w-r+r*Math.cos(a),y:y+h-r+r*Math.sin(a)};} dist-=s;
-      // bottom
-      s=w-2*r; if(dist<s) return{x:x+w-r-dist,y:y+h}; dist-=s;
-      // bottom-left arc
-      s=arc; if(dist<s){const a=Math.PI/2+(dist/s)*(Math.PI/2);return{x:x+r+r*Math.cos(a),y:y+h-r+r*Math.sin(a)};} dist-=s;
-      return{x:x,y:y+h-r-dist};
-    }
-
-    function rr(c,x,y,w,h,r){
-      c.beginPath();
-      c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);
-      c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-      c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);
-      c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();
-    }
-
-    let last = 0;
-    function draw(ts) {
-      if (!canvas.isConnected) return; // stop if removed from DOM
-      const dt = Math.min((ts-last)/1000, 0.05); last = ts;
-      t = (t + dt*SPEED) % 1;
-      const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
-      if (!cw||!ch){_certImgShimmerRaf=requestAnimationFrame(draw);return;}
-      if (canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch;}
-      ctx.clearRect(0,0,cw,ch);
-      const pad=1, rect={x:pad,y:pad,w:cw-pad*2,h:ch-pad*2,r:R};
-      // static border — cert fg color
-      ctx.strokeStyle = color + '55'; ctx.lineWidth=1.5;
-      rr(ctx,rect.x,rect.y,rect.w,rect.h,rect.r);ctx.stroke();
-      // shimmer streak
-      const gLen=0.18;
-      const pt1=point(rect,((t-gLen/2)+1)%1);
-      const pt2=point(rect,(t+gLen/2)%1);
-      const grd=ctx.createLinearGradient(pt1.x,pt1.y,pt2.x,pt2.y);
-      grd.addColorStop(0, color + '00');
-      grd.addColorStop(0.3, color + 'bb');
-      grd.addColorStop(0.5, color + 'ff');
-      grd.addColorStop(0.7, color + 'bb');
-      grd.addColorStop(1, color + '00');
-      ctx.strokeStyle=grd;ctx.lineWidth=2.5;
-      rr(ctx,rect.x,rect.y,rect.w,rect.h,rect.r);ctx.stroke();
-      _certImgShimmerRaf=requestAnimationFrame(draw);
-    }
-    _certImgShimmerRaf=requestAnimationFrame(draw);
-  }
-
-  function applyData(i) {
-    const d = certData[i];
-    if (giftBlock) giftBlock.style.borderRadius = '0 0 var(--r) var(--r)';
-    if (window.setCertGlowColor) window.setCertGlowColor(d.bg, d.fg);
-
-    const wrap = flipWrap;
-    wrap.style.position = 'relative';
-
-    // Reuse existing card — just swap img src, don't recreate
-    let card  = document.getElementById('certImgCard');
-    let imgEl = document.getElementById('certImgEl');
-    let inner = document.getElementById('certImgInner');
-
-    if (!card) {
-      // First time — create structure
-      card = document.createElement('div');
-      card.id = 'certImgCard';
-      card.className = 'cert-img-card';
-      card.innerHTML =
-        `<div class="cert-img-card__inner" id="certImgInner">` +
-        `<img src="" class="cert-img-card__img" id="certImgEl" alt="Сертифікат" />` +
-        `<div class="cert-img-card__sheen"></div>` +
-        `<canvas class="cert-img-card__shimmer" id="certImgShimmer"></canvas>` +
-        `</div>`;
-      wrap.appendChild(card);
-      imgEl = document.getElementById('certImgEl');
-      inner = document.getElementById('certImgInner');
-
-      // Start shimmer once — it runs continuously
-      requestAnimationFrame(() => _certImgShimmer(document.getElementById('certImgShimmer'), d.fg));
-    } else {
-      // Update shimmer color only
-      _certImgShimmer(document.getElementById('certImgShimmer'), d.fg);
-    }
-
-    // Swap image — if already cached browser shows instantly
-    if (imgEl.src !== d.img) {
-      imgEl.src = d.img;
-    }
-
-    // Sync size
-    function syncSize() {
-      const w = imgEl.naturalWidth, h = imgEl.naturalHeight;
-      if (!w || !h) return;
-      const ratio = w / h;
-      inner.style.width  = (360 * ratio) + 'px';
-      inner.style.height = '360px';
-    }
-    if (imgEl.complete && imgEl.naturalWidth) syncSize();
-    else imgEl.addEventListener('load', syncSize, { once: true });
-    // Info block
-    if (giftBlock) {
-      giftBlock.style.background  = d.bg;
-      giftBlock.style.borderColor = d.bg;
-      giftBlock.style.color       = d.fg;
-    }
-    if (nameEl)  nameEl.textContent  = d.name;
-    if (descEl)  descEl.textContent  = d.desc;
-    if (priceEl) priceEl.textContent = d.price;
-    if (buyBtn) {
-      buyBtn.style.background    = d.fg;
-      buyBtn.style.color         = d.bg;
-    }
-    if (tableBody) {
-      tableBody.innerHTML = d.rows.map(([day, proc, time, sum]) =>
-        `<tr><td>${day}</td><td>${proc}</td><td>${time}</td><td>${sum}</td></tr>`
-      ).join('');
-    }
-    // Tabs
-    tabs.forEach((t, ti) => {
-      t.classList.toggle('is-active', ti === i);
-      t.style.background = ti === i ? d.bg : 'rgba(255,255,255,0.08)';
-      t.style.color      = ti === i ? d.fg : 'rgba(255,255,255,0.45)';
-      if (ti === i) t.style.setProperty('--active-bg', d.bg);
-    });
-  }
-
-  function switchTo(i) {
-    if (i === activeIndex || flipping) return;
-    flipping = true;
-
-    if (tableWrap && tableWrap.classList.contains('is-open')) {
-      tableWrap.classList.remove('is-open');
-      toggle?.setAttribute('aria-expanded', 'false');
-    }
-
-    // PRE-LOAD: swap image src BEFORE animation starts so it's ready at scaleX=0
-    const nextImg = document.getElementById('certImgEl');
-    if (nextImg && certData[i].img && nextImg.src !== certData[i].img) {
-      nextImg.src = certData[i].img;
-    }
-
-    // Phase 1: flip out — double spin on desktop, single on mobile
-    flipWrap.classList.add('is-flipping-out');
-
-    const isMobile = window.matchMedia('(max-width: 639px)').matches;
-    const swapAt  = isMobile ? 180 : 180;  // midpoint of first half-rotation
-    const phase2At = isMobile ? 360 : 360; // total animation duration
-
-    // Swap at midpoint of first rotation
-    setTimeout(() => {
-      activeIndex = i;
-      applyData(i);
-    }, swapAt);
-
-    // Phase 2: flip in
-    setTimeout(() => {
-      flipWrap.classList.remove('is-flipping-out');
-      flipWrap.classList.add('is-flipping-in');
-      setTimeout(() => {
-        flipWrap.classList.remove('is-flipping-in');
-        flipping = false;
-      }, 360);
-    }, phase2At);
-  }
-
-  // Tab clicks
-  tabs.forEach((tab, i) => tab.addEventListener('click', () => switchTo(i)));
-
-  // Init
-  applyData(0);
-})();
-
-/* ══════════════════════════════════════
-   SERVICES SNAP DOTS
-══════════════════════════════════════ */
-(function () {
-  function initSnapDots(trackId, dotsId) {
-    const track  = document.getElementById(trackId);
-    const dotsEl = document.getElementById(dotsId);
-    if (!track || !dotsEl) return;
-    const inner = track.querySelector('.snap-inner');
-    if (!inner) return;
-    const cards = Array.from(inner.children);
-    dotsEl.innerHTML = '';
-    const dots = cards.map((card, i) => {
-      const d = document.createElement('span');
-      d.className = 'snap-dot' + (i === 0 ? ' is-active' : '');
-      d.addEventListener('click', () => {
-        track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' });
-      });
-      dotsEl.appendChild(d);
-      return d;
-    });
-    let raf;
-    let userScrolled = false;
-    let programmaticScroll = false; // flag to ignore our own instant scroll
-
-    track.addEventListener('scroll', () => {
-      if (programmaticScroll) return; // ignore initial center scroll
-      // Stop hint animation on first user scroll
-      if (!userScrolled) {
-        userScrolled = true;
-        inner.classList.remove('snap-hint');
-        inner.style.animation = 'none';
-      }
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const center = track.scrollLeft + track.clientWidth / 2;
-        let closest = 0, minDist = Infinity;
-        cards.forEach((card, i) => {
-          const d = Math.abs(center - (card.offsetLeft + card.offsetWidth / 2));
-          if (d < minDist) { minDist = d; closest = i; }
-        });
-        dots.forEach((d, i) => d.classList.toggle('is-active', i === closest));
-      });
-    }, { passive: true });
-
-    requestAnimationFrame(() => {
-      const mid = Math.floor(cards.length / 2);
-      const midCard = cards[mid];
-      programmaticScroll = true;
-      track.scrollTo({ left: midCard.offsetLeft - (track.clientWidth - midCard.offsetWidth) / 2, behavior: 'instant' });
-      dots.forEach((d, i) => d.classList.toggle('is-active', i === mid));
-      // Allow scroll events again after a tick
-      requestAnimationFrame(() => { programmaticScroll = false; });
-
-      // Start hint sway animation after short delay
-      setTimeout(() => {
-        if (!userScrolled) inner.classList.add('snap-hint');
-      }, 1200);
-    });
-  }
-  initSnapDots('servicesTrack', 'servicesDots');
-
-  // Desktop: click on side cards scrolls to them
-  (function () {
-    const track = document.getElementById('servicesTrack');
-    if (!track) return;
-    const inner = track.querySelector('.snap-inner');
-    if (!inner) return;
-    inner.addEventListener('click', (e) => {
-      const card = e.target.closest('.service-card');
-      if (!card) return;
-      // if button inside card clicked — let it handle itself
-      if (e.target.closest('button, a')) return;
-      track.scrollTo({ left: card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2, behavior: 'smooth' });
-    });
-  })();
-})();
-
-/* ══════════════════════════════════════
-   LOTTERY — tilt + shimmer border + scratch + bot code
-══════════════════════════════════════ */
-(function () {
-
-  /* ── Canvas shimmer border ── */
-  (function shimmerBorder() {
-    const wrap   = document.getElementById('lotTiltWrap');
-    const canvas = document.getElementById('lotShimmerCanvas');
-    if (!wrap || !canvas) return;
-    const ctx = canvas.getContext('2d');
-    let shimmerT = 0;
-    const SPEED = 0.04; // ~25s full cycle
-    const R = 16;
-
-    function shimmerPoint(rect, t) {
-      const { x, y, w, h, r } = rect;
-      const sTop = w-2*r, sRight = h-2*r, sBot = w-2*r, sLeft = h-2*r;
-      const arc = (Math.PI/2)*r;
-      const total = sTop+arc+sRight+arc+sBot+arc+sLeft+arc;
-      let dist = (((t%1)+1)%1)*total;
-      let seg;
-      seg=arc;    if(dist<seg){const a=Math.PI+(dist/seg)*(Math.PI/2); return{x:x+r+r*Math.cos(a),y:y+r+r*Math.sin(a)};} dist-=seg;
-      seg=sTop;   if(dist<seg) return{x:x+r+dist,y};                                                                      dist-=seg;
-      seg=arc;    if(dist<seg){const a=-Math.PI/2+(dist/seg)*(Math.PI/2); return{x:x+w-r+r*Math.cos(a),y:y+r+r*Math.sin(a)};} dist-=seg;
-      seg=sRight; if(dist<seg) return{x:x+w,y:y+r+dist};                                                                  dist-=seg;
-      seg=arc;    if(dist<seg){const a=(dist/seg)*(Math.PI/2); return{x:x+w-r+r*Math.cos(a),y:y+h-r+r*Math.sin(a)};}     dist-=seg;
-      seg=sBot;   if(dist<seg) return{x:x+w-r-dist,y:y+h};                                                                dist-=seg;
-      seg=arc;    if(dist<seg){const a=Math.PI/2+(dist/seg)*(Math.PI/2); return{x:x+r+r*Math.cos(a),y:y+h-r+r*Math.sin(a)};} dist-=seg;
-      return{x,y:y+h-r-dist};
-    }
-
-    function rr(c, x, y, w, h, r) {
-      c.beginPath();
-      c.moveTo(x+r,y); c.lineTo(x+w-r,y); c.quadraticCurveTo(x+w,y,x+w,y+r);
-      c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-      c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r);
-      c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
-    }
-
-    let last = 0;
-    function draw(ts) {
-      const delta = Math.min((ts-last)/1000, 0.05); last = ts;
-      shimmerT = (shimmerT + delta*SPEED) % 1;
-
-      const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
-      if (!cw || !ch) { requestAnimationFrame(draw); return; }
-      if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
-      ctx.clearRect(0, 0, cw, ch);
-
-      const pad = 0;
-      const rect = { x:pad, y:pad, w:cw-pad*2, h:ch-pad*2, r:R };
-
-      // Static base border — gold
-      ctx.strokeStyle = 'rgba(200,160,0,0.35)';
-      ctx.lineWidth = 1.5;
-      rr(ctx, rect.x, rect.y, rect.w, rect.h, rect.r);
-      ctx.stroke();
-
-      // Animated shimmer streak — bright yellow
-      const gLen = 0.20;
-      const pt1 = shimmerPoint(rect, ((shimmerT - gLen/2)+1)%1);
-      const pt2 = shimmerPoint(rect, (shimmerT + gLen/2)%1);
-      const grd = ctx.createLinearGradient(pt1.x, pt1.y, pt2.x, pt2.y);
-      grd.addColorStop(0,    'rgba(255,210,0,0.00)');
-      grd.addColorStop(0.25, 'rgba(255,220,0,0.70)');
-      grd.addColorStop(0.5,  'rgba(255,245,80,1.00)');
-      grd.addColorStop(0.75, 'rgba(255,220,0,0.70)');
-      grd.addColorStop(1,    'rgba(255,210,0,0.00)');
-      ctx.strokeStyle = grd;
-      ctx.lineWidth   = 2.8;
-      rr(ctx, rect.x, rect.y, rect.w, rect.h, rect.r);
-      ctx.stroke();
-
-      requestAnimationFrame(draw);
-    }
-    requestAnimationFrame(draw);
-  })();
-
-  /* ── Tilt ── */
-  (function tilt() {
-    const wrap = document.getElementById('lotTiltWrap');
-    if (!wrap) return;
-    // Passive idle sway: CSS animation handles it, no mouse tracking
-    // Keep animation duration from CSS (8s), don't override it
-    // wrap.style.animation = 'lotSway 8s ease-in-out infinite';
-  })();
-
-  /* ── Scratch card ── */
-  const canvas     = document.getElementById('scratchCanvas');
-  const valEl      = document.getElementById('lotValue');
-  const botAction  = document.getElementById('lotBotAction');
-  if (!canvas) return;
-
-  const STORAGE_KEY   = 'ttm_scratch_date';
-  const today         = new Date().toISOString().slice(0, 10);
-  const alreadyPlayed = localStorage.getItem(STORAGE_KEY) === today;
-
-  // Bot-verifiable code: TTM + day_hex2 + mon_hex2 + checksum + rand5
-  const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  function genCode() {
-    const d = new Date();
-    const day = d.getDate(), mon = d.getMonth() + 1;
-    const chk = CHARS[(day ^ mon ^ 0x5A) % 32];
-    let rand = '';
-    for (let i = 0; i < 5; i++) rand += CHARS[Math.floor(Math.random() * 32)];
-    return 'TTM' + day.toString(16).toUpperCase().padStart(2,'0') +
-                   mon.toString(16).toUpperCase().padStart(2,'0') + chk + rand;
-  }
-  const botCode = genCode();
-
-  if (valEl) {
-    valEl.textContent         = botCode;
-    valEl.style.fontFamily    = 'monospace';
-    valEl.style.fontSize      = 'clamp(14px, 4vw, 18px)';
-    valEl.style.fontWeight    = '700';
-    valEl.style.letterSpacing = '0.10em';
-    valEl.style.color         = '#7a4e00';
-  }
-
-  const ctx = canvas.getContext('2d');
-  let drawing = false, revealed = false;
-
-  function drawLayer() {
-    const W = canvas.width, H = canvas.height;
-    ctx.fillStyle = '#9a9aaa';
-    ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-    ctx.lineWidth = 1;
-    const cx2 = W*0.5, cy2 = H*0.5;
-    for (let i = 1; i <= 14; i++) {
-      const r = (i/14)*Math.max(W,H)*0.7;
-      ctx.beginPath();
-      for (let a = 0; a <= Math.PI*2; a += 0.06) {
-        const wb = 1 + 0.04*Math.sin(a*6+i*1.3);
-        const x = cx2 + Math.cos(a)*r*wb, y = cy2 + Math.sin(a)*r*wb*0.55;
-        a === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-      }
-      ctx.closePath(); ctx.stroke();
-    }
-    ctx.strokeStyle = 'rgba(255,255,255,0.10)'; ctx.lineWidth = 0.5;
-    for (let y = 2; y < H; y += 4) {
-      ctx.beginPath(); ctx.moveTo(0, y+Math.sin(y*0.4)*1.5);
-      for (let x = 0; x <= W; x += 3) ctx.lineTo(x, y+Math.sin(y*0.4+x*0.05)*1.5);
-      ctx.stroke();
-    }
-  }
-
-  function resize() {
-    const r = canvas.getBoundingClientRect();
-    const w = r.width  || canvas.offsetWidth  || canvas.clientWidth;
-    const h = r.height || canvas.offsetHeight || canvas.clientHeight;
-    if (!w || !h) return;
-    canvas.width = w; canvas.height = h;
-    if (!revealed) drawLayer();
-    const prize = document.getElementById('lotPrize');
-    if (prize) prize.style.visibility = 'visible';
-  }
-
-  function erase(x, y) {
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    // +30% larger erase area
-    ctx.ellipse(x, y, 13+Math.random()*8, 8+Math.random()*5, Math.random()*Math.PI, 0, Math.PI*2);
-    ctx.fill();
-    for (let i = 0; i < 2; i++) {
-      ctx.beginPath();
-      ctx.arc(x+(Math.random()-0.5)*18, y+(Math.random()-0.5)*10, 3+Math.random()*6, 0, Math.PI*2);
-      ctx.fill();
-    }
-    ctx.globalCompositeOperation = 'source-over';
-    checkReveal();
-  }
-
-  function checkReveal() {
-    if (revealed) return;
-    const d = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let t = 0;
-    for (let i = 3; i < d.length; i += 4) if (d[i] < 128) t++;
-    if (t / (canvas.width * canvas.height) > 0.65) { revealed = true; showBotLink(); }
-  }
-
-  function showBotLink() {
-    if (!botAction) return;
-    const botUsername = 'pro_telo_niko_bot';
-    const url = `https://t.me/${botUsername}?start=${botCode}`;
-
-    // Telegram icon — img with white filter, same as contacts block
-    const tgSvg =
-      `<img src="https://www.svgrepo.com/show/388724/telegram.svg" alt="" ` +
-      `style="width:20px;height:20px;filter:brightness(0) invert(1);flex-shrink:0;" />`;
-
-    botAction.innerHTML =
-      `<a href="${url}" target="_blank" rel="noopener" class="lot-door-flap">` +
-      `<span>Дізнайся бонус у нашому Telegram-боті</span>` +
-      tgSvg +
-      `</a>`;
-
-    // Trigger animation on next frame so CSS transition kicks in
-    requestAnimationFrame(() => {
-      const flap = botAction.querySelector('.lot-door-flap');
-      if (flap) {
-        requestAnimationFrame(() => flap.classList.add('is-open'));
-      }
-    });
-  }
-
-  function pos(e) {
-    const r = canvas.getBoundingClientRect(), s = e.touches ? e.touches[0] : e;
-    return [s.clientX - r.left, s.clientY - r.top];
-  }
-
-  canvas.addEventListener('mousedown', e => {
-    if (alreadyPlayed) return; drawing = true; erase(...pos(e));
-    localStorage.setItem(STORAGE_KEY, today);
-  });
-  canvas.addEventListener('touchstart', e => {
-    if (alreadyPlayed) return;
-    // Ensure canvas is sized before first touch
-    if (!canvas.width || !canvas.height) resize();
-    e.preventDefault();
-    drawing = true;
-    erase(...pos(e));
-    localStorage.setItem(STORAGE_KEY, today);
-  }, { passive: false });
-  document.addEventListener('mousemove', e => { if (drawing) erase(...pos(e)); });
-  document.addEventListener('touchmove', e => { if (!drawing) return; e.preventDefault(); erase(...pos(e)); }, { passive: false });
-  document.addEventListener('mouseup',  () => drawing = false);
-  document.addEventListener('touchend', () => drawing = false);
-
-  if (alreadyPlayed && botAction) {
-    // Show "already played" note inside card
-    const playedNote = document.getElementById('lotPlayedNote');
-    if (playedNote) playedNote.style.display = 'block';
-  }
-
-  if (document.readyState === 'complete') setTimeout(resize, 100);
-  else window.addEventListener('load', () => setTimeout(resize, 100));
-  window.addEventListener('resize', () => { if (!revealed) resize(); });
-
-  // Trigger resize when canvas scrolls into view (fixes mobile first-touch issue)
-  if ('IntersectionObserver' in window) {
-    const obs = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && (!canvas.width || !canvas.height)) {
-        resize();
-      }
-    }, { threshold: 0.1 });
-    obs.observe(canvas);
-  }
-})();
-
-/* ══════════════════════════════════════
-   FLOATING NAVBAR — vertical ad carousel + book btn
-══════════════════════════════════════ */
-(function () {
-  const fnav    = document.getElementById('floatCta');
-  const track   = document.getElementById('fnavTrack');
-  const indEl   = document.getElementById('fnavIndicator');
-  const bookBtn = document.getElementById('fnavBook');
-  if (!fnav || !track) return;
-
-  // Detect if we're on the main page
-  const isMain = !window.location.pathname.split('/').pop().includes('.html')
-              || window.location.pathname.endsWith('index.html')
-              || window.location.pathname.endsWith('/');
-
-  // ── Scroll helpers ──
-
-  // Smoothly scroll element into view with optional offset
-  function scrollTo(el, block) {
-    el.scrollIntoView({ behavior: 'smooth', block: block || 'start' });
-  }
-
-  // Center a specific service card in the snap-track and optionally click its CTA
-  function openServiceCard(cardIndex, clickDetailBtn) {
-    const svcSection = document.getElementById('services');
-    if (!svcSection) return;
-    scrollTo(svcSection, 'start');
-
-    setTimeout(() => {
-      const track = document.getElementById('servicesTrack');
-      if (!track) return;
-      const inner = track.querySelector('.snap-inner');
-      if (!inner) return;
-      const cards = Array.from(inner.children);
-      const card  = cards[cardIndex];
-      if (!card) return;
-
-      // Scroll card to center
-      const left = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
-      track.scrollTo({ left, behavior: 'smooth' });
-
-      if (clickDetailBtn) {
-        // Wait for scroll animation to finish, then navigate
-        setTimeout(() => {
-          const detailLink = card.querySelector('a.btn--outline');
-          if (detailLink) detailLink.click();
-        }, 1000);
-      }
-    }, 900);
-  }
-
-  // Scroll to cert section and open toggle for given cert tab index
-  function openCertificate(tabIndex) {
-    const certSection = document.getElementById('certificates');
-    if (!certSection) return;
-    scrollTo(certSection, 'start');
-    setTimeout(() => {
-      // Switch cert tab if needed
-      if (tabIndex != null) {
-        const tabs = document.querySelectorAll('#certTabs .cert-tab');
-        if (tabs[tabIndex]) tabs[tabIndex].click();
-      }
-      // Open program toggle after tab flip animation settles
-      setTimeout(() => {
-        const toggle    = document.getElementById('certProgramToggle');
-        const tableWrap = document.getElementById('certProgramTable');
-        if (toggle && tableWrap && !tableWrap.classList.contains('is-open')) {
-          tableWrap.classList.add('is-open');
-          toggle.setAttribute('aria-expanded', 'true');
-        }
-        // Scroll again to show toggle content
-        const certSection2 = document.getElementById('certificates');
-        if (certSection2) scrollTo(certSection2, 'start');
-      }, 700);
-    }, 900);
-  }
-
-  // Navigate away from a service page, passing action as hash
-  function gotoMain(hash) {
-    window.location.href = 'index.html' + hash;
-  }
-
-  // ── Actions per slide (0-indexed, matches HTML slide order) ──
-  // New order: light, needle, stone, perc, cert, lottery, fire
-  const SERVICE_CARD_IDX = {
-    light:  5,  // Терапія червоним світлом
-    needle: 4,  // Dry Needling
-    stone:  3,  // Стоун
-    perc:   2,  // Глибокий тканинний (перкусія)
-    fire:   6,  // СПА-програма (closest to вогняне)
-  };
-
-  function handleSlide(slideKey) {
-    switch (slideKey) {
-      case 'light':
-        window.location.href = 'red-light.html';
-        break;
-      case 'needle':
-        window.location.href = 'dry-needling.html';
-        break;
-      case 'stone':
-        window.location.href = 'stone.html';
-        break;
-      case 'perc':
-        window.location.href = 'deep-tissue.html';
-        break;
-      case 'cert':
-        if (isMain) { openCertificate(0); }
-        else { gotoMain('#action=cert'); }
-        break;
-      case 'lottery':
-        if (isMain) {
-          const lot = document.getElementById('lottery');
-          if (lot) scrollTo(lot, 'center');
-        } else { gotoMain('#action=lottery'); }
-        break;
-      case 'fire':
-        window.location.href = 'spa.html';
-        break;
-    }
-  }
-
-  // Map slide elements to their keys — must match HTML slide order
-  // Current order: fire, cert, needle, stone, light, perc, lottery
-  const slideKeys = ['fire', 'cert', 'needle', 'stone', 'light', 'perc', 'lottery'];
-
-  // Attach click handlers
-  track.querySelectorAll('.fnav__slide').forEach((slide, i) => {
-    slide.style.cursor = 'pointer';
-    slide.addEventListener('click', () => handleSlide(slideKeys[i]));
+    if (cycleCount >= 3 && !dismissed) dismiss();
   });
 
-  // Show/hide on scroll — on service pages show after any scroll, on main after hero
-  function updateVisibility() {
-    const hero = document.querySelector('.hero');
-    if (hero) {
-      fnav.classList.toggle('is-visible', window.scrollY > hero.offsetHeight * 0.6);
-    } else {
-      // Service pages — show after scrolling 80px
-      fnav.classList.toggle('is-visible', window.scrollY > 80);
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+
+    // Шаг 1: лотти вырастает до финального размера на месте hero
+    var r = heroLottie ? heroLottie.getBoundingClientRect() : null;
+    if (r) {
+      var cx = r.left + r.width  / 2;
+      var cy = r.top  + r.height / 2;
+      loaderLottie.style.transition =
+        'width 0.18s cubic-bezier(0.4,0,0.2,1),' +
+        'height 0.18s cubic-bezier(0.4,0,0.2,1),' +
+        'left 0.18s cubic-bezier(0.4,0,0.2,1),' +
+        'top 0.18s cubic-bezier(0.4,0,0.2,1)';
+      loaderLottie.style.width  = LARGE + 'px';
+      loaderLottie.style.height = LARGE + 'px';
+      loaderLottie.style.left   = (cx - LARGE / 2) + 'px';
+      loaderLottie.style.top    = (cy - LARGE / 2) + 'px';
     }
+
+    // Шаг 2: после роста — лоадер уходит fade
+    setTimeout(function () {
+      loaderEl.classList.add('is-hiding');
+
+      // Шаг 3: полное скрытие
+      setTimeout(function () {
+        loaderEl.classList.add('is-hidden');
+        loaderAnim.destroy();
+        document.dispatchEvent(new CustomEvent('loaderDone'));
+      }, 280);
+    }, 200);
   }
-  window.addEventListener('scroll', updateVisibility, { passive: true });
-  updateVisibility();
-
-  // Book button → Telegram bot always
-  if (bookBtn) {
-    bookBtn.addEventListener('click', () => {
-      window.open('https://t.me/dailyprize_bot', '_blank', 'noopener');
-    });
-  }
-
-  // Build indicator dots (only if indicator element exists)
-  const slides  = Array.from(track.querySelectorAll('.fnav__slide'));
-  const total   = slides.length;
-  const dots    = [];
-  slides.forEach((_, i) => {
-    if (!indEl) return; // indicator commented out — skip
-    const d = document.createElement('div');
-    d.className = 'fnav__indicator-dot' + (i === 0 ? ' is-active' : '');
-    indEl.appendChild(d);
-    dots.push(d);
-  });
-
-  let current   = 0;
-  let autoTimer = null;
-  const SLIDE_H = 58;
-  const AUTO_MS = 3200;
-
-  function goTo(idx, animated) {
-    if (animated === undefined) animated = true;
-    current = ((idx % total) + total) % total;
-    track.style.transition = animated
-      ? 'transform 0.42s cubic-bezier(0.4,0,0.2,1)'
-      : 'none';
-    track.style.transform = `translateY(-${current * SLIDE_H}px)`;
-    dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
-  }
-
-  function startAuto() {
-    stopAuto();
-    autoTimer = setInterval(() => goTo(current + 1), AUTO_MS);
-  }
-  function stopAuto() {
-    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
-  }
-
-  goTo(0, false);
-  startAuto();
-
-  // Pause on hover (desktop)
-  fnav.addEventListener('mouseenter', stopAuto);
-  fnav.addEventListener('mouseleave', startAuto);
 })();
 
-/* ══════════════════════════════════════
-   PRICE ACCORDION
-══════════════════════════════════════ */
-(function () {
-  document.querySelectorAll('.price-acc__group').forEach(group => {
-    const body = group.querySelector('.price-acc__body');
-    const more = group.querySelector('.price-acc__more');
-    if (!body || !more) return;
-
-    function toggle() {
-      const open = body.classList.toggle('is-open');
-      if (more) more.textContent = open ? 'Згорнути ↑' : 'Показати більше ↓';
-    }
-
-    // Only "Показати більше" button toggles — NOT the head
-    more.addEventListener('click', toggle);
-  });
-})();
-
-/* ── Lottery rays — yellow ── */
-(function() {
-  const canvas = document.getElementById('lotRaysCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const RAY_COUNT = 18;
-  let t = 0;
-  let lastTs = 0;
-
-  function draw(ts) {
-    const dt = Math.min(ts - lastTs, 50);
-    lastTs = ts;
-    t += dt * 0.001;
-
-    const dpr = window.devicePixelRatio || 1;
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    if (!w || !h) { requestAnimationFrame(draw); return; }
-    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-      canvas.width  = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-      ctx.scale(dpr, dpr);
-    }
-    ctx.clearRect(0, 0, w, h);
-
-    const cx = w / 2, cy = h / 2;
-    for (let i = 0; i < RAY_COUNT; i++) {
-      const baseAngle = (i / RAY_COUNT) * Math.PI * 2;
-      const wave = 0.04 * Math.sin(t * 0.9 + i * 1.3);
-      const angle = baseAngle + wave;
-      const pulse = 0.5 + 0.5 * Math.sin(t * 1.4 + i * 0.8);
-      const len = (0.30 + 0.08 * pulse) * Math.max(w, h);
-      const halfW = (3 + 7 * Math.sin(Math.PI * i / RAY_COUNT)) * (0.7 + 0.3 * pulse);
-      const ex = cx + Math.cos(angle) * len;
-      const ey = cy + Math.sin(angle) * len;
-      const nxNear =  Math.sin(angle) * 1;
-      const nyNear = -Math.cos(angle) * 1;
-      const nxFar  =  Math.sin(angle) * halfW;
-      const nyFar  = -Math.cos(angle) * halfW;
-      const alpha = 0.12 + 0.096 * pulse;
-      const grad = ctx.createLinearGradient(cx, cy, ex, ey);
-      grad.addColorStop(0,    `rgba(200,160,0,0)`);
-      grad.addColorStop(0.25, `rgba(200,160,0,${alpha * 0.6})`);
-      grad.addColorStop(0.6,  `rgba(220,180,0,${alpha})`);
-      grad.addColorStop(0.85, `rgba(200,160,0,${alpha * 0.4})`);
-      grad.addColorStop(1,    'rgba(0,0,0,0)');
-      ctx.beginPath();
-      ctx.moveTo(cx + nxNear, cy + nyNear);
-      ctx.lineTo(ex + nxFar, ey + nyFar);
-      ctx.lineTo(ex - nxFar, ey - nyFar);
-      ctx.lineTo(cx - nxNear, cy - nyNear);
-      ctx.closePath();
-      ctx.fillStyle = grad;
-      ctx.fill();
-    }
-    requestAnimationFrame(draw);
-  }
-  requestAnimationFrame(draw);
-})();
-document.querySelectorAll('.cert-buy-btn, .svc-book-btn').forEach(btn => {
-  btn.addEventListener('click', () => window.open('https://t.me/dailyprize_bot', '_blank', 'noopener'));
+/* ── Scroll buttons ── */
+document.getElementById('scrollBtn')?.addEventListener('click', () => {
+  document.getElementById('cases')?.scrollIntoView({ behavior: 'smooth' });
+});
+document.getElementById('orderBtn')?.addEventListener('click', () => {
+  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
 });
 
-/* ══════════════════════════════════════
-   HERO MODEL — idle orbit animation
-══════════════════════════════════════ */
-
-/* ══════════════════════════════════════
-   SVC LIST ACCORDION
-══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   CASES FOLDER TABS
+═══════════════════════════════════════ */
 (function () {
-  const list = document.getElementById('svcList');
-  if (!list) return;
-  const items = Array.from(list.querySelectorAll('.svc-item'));
-  let expandedCard = null;
+  const tabs  = Array.from(document.querySelectorAll('#casesFolderTabs .cases-folder__tab'));
+  const pages = Array.from(document.querySelectorAll('.cases-folder__page'));
+  if (!tabs.length || !pages.length) return;
 
-  function getCardHTML(item) {
-    const body = item.querySelector('.svc-item__body');
-    if (!body) return '';
-    const inner = body.querySelector('.svc-item__card');
-    if (!inner) return '';
-
-    const header = inner.querySelector('.svc-item__card-header')?.outerHTML || '';
-    const tags   = inner.querySelector('.service-card__tags')?.outerHTML || '';
-    const desc   = inner.querySelector('.service-card__desc')?.outerHTML || '';
-    const detailLink = inner.querySelector('.svc-detail-btn');
-    const hook   = detailLink?.dataset.hook || '';
-    const url    = detailLink?.href || '#';
-
-    const spoilerHTML = hook ? `
-      <div class="svc-read-more">
-        <a href="${url}" class="svc-read-more__toggle">
-          <span class="svc-read-more__label">читати статтю повністю</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-      </div>` : '';
-
-    return `
-      <button class="svc-expanded-card__back">← до інших видів послуг</button>
-      <div class="svc-expanded-card__content">
-        ${header}
-        ${tags}
-        ${desc}
-        ${spoilerHTML}
-      </div>
-      <div class="svc-expanded-card__footer">
-        <button class="btn btn--accent btn--full svc-book-btn">Записатись</button>
-      </div>
-    `;
+  function switchTo(idx) {
+    tabs.forEach((t, i)  => t.classList.toggle('is-active', i === idx));
+    pages.forEach((p, i) => p.classList.toggle('is-active', i === idx));
+    initFade({ querySelector: (s) => pages[idx].querySelector(s) });
   }
 
-  function open(item) {
-    if (expandedCard) removeCard(false);
-
-    // Measure row position relative to list
-    const listRect = list.getBoundingClientRect();
-    const rowRect = item.querySelector('.svc-item__row').getBoundingClientRect();
-    const originY = rowRect.top - listRect.top;
-    const originH = rowRect.height;
-
-    // Create overlay card
-    expandedCard = document.createElement('div');
-    expandedCard.className = 'svc-expanded-card';
-    expandedCard.style.setProperty('--svc-origin-y', originY + 'px');
-    expandedCard.style.setProperty('--svc-origin-bottom', (originY + originH) + 'px');
-    expandedCard.innerHTML = getCardHTML(item);
-
-    // Wire close button
-    const closeBtn = expandedCard.querySelector('.svc-expanded-card__back');
-    if (closeBtn) closeBtn.addEventListener('click', () => removeCard(true));
-
-    // Wire book buttons
-    expandedCard.querySelectorAll('.svc-book-btn').forEach(btn => {
-      btn.addEventListener('click', () => window.open('https://t.me/dailyprize_bot', '_blank', 'noopener'));
-    });
-
-    list.appendChild(expandedCard);
-    item.classList.add('is-open');
-  }
-
-  function removeCard(animate) {
-    if (!expandedCard) return;
-    const card = expandedCard;
-    expandedCard = null;
-    items.forEach(i => i.classList.remove('is-open'));
-
-    if (animate) {
-      card.classList.add('is-closing');
-      card.addEventListener('animationend', () => card.remove(), { once: true });
-    } else {
-      card.remove();
-    }
-  }
-
-  items.forEach(item => {
-    item.querySelector('.svc-item__row').addEventListener('click', () => {
-      item.classList.contains('is-open') ? removeCard(true) : open(item);
-    });
-  });
+  tabs.forEach((tab, i) => tab.addEventListener('click', () => switchTo(i)));
+  switchTo(0);
 })();
 
-/* All booking buttons → Telegram Bot */
-
-/* ══════════════════════════════════════
-   CERT DEEP-LINK — index.html?cert=N
-   Opens main page, scrolls to cert section, selects tab N (0-based)
-══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   CASES FOLDER — INTRO OVERLAY
+═══════════════════════════════════════ */
 (function () {
-  const params = new URLSearchParams(window.location.search);
-  const certIdx = parseInt(params.get('cert'), 10);
-  if (isNaN(certIdx)) return;
+  const overlay = document.getElementById('casesFolderIntro');
+  const btn     = document.getElementById('casesFolderIntroDismiss');
+  const folder  = document.getElementById('casesFolder');
+  if (!overlay || !btn || !folder) return;
 
-  // Remove param from URL without reload
-  const url = new URL(window.location.href);
-  url.searchParams.delete('cert');
-  window.history.replaceState({}, '', url);
-
-  function openCert() {
-    const certSection = document.getElementById('certificates');
-    if (!certSection) return;
-    certSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setTimeout(() => {
-      const tabs = document.querySelectorAll('#certTabs .cert-tab');
-      if (tabs[certIdx]) tabs[certIdx].click();
-    }, 700);
+  function dismiss() {
+    overlay.classList.add('is-hidden');
+    // после окончания transition убираем из потока
+    overlay.addEventListener('transitionend', () => {
+      overlay.style.display = 'none';
+    }, { once: true });
   }
 
-  // Wait for page to be ready before scrolling
-  if (document.readyState === 'complete') {
-    setTimeout(openCert, 300);
-  } else {
-    window.addEventListener('load', () => setTimeout(openCert, 300), { once: true });
-  }
-})();
+  btn.addEventListener('click', dismiss);
 
-
-/* ══════════════════════════════════════
-   MOBILE ANIMATION FIX
-   Ensure animations run at correct speed on mobile devices
-══════════════════════════════════════ */
-(function () {
-  // Check if we're on mobile
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-                || window.innerWidth <= 768;
-  
-  if (!isMobile) return;
-  
-  // Function to fully reset animation to ensure proper playback
-  function resetAnimationCompletely(selector, animationName, duration, timingFunction, iterationCount) {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach(el => {
-      // Remove animation temporarily
-      const oldAnimation = el.style.animation;
-      el.style.animation = 'none';
-      
-      // Force reflow
-      void el.offsetHeight;
-      
-      // Reapply with explicit values
-      el.style.animationName = animationName;
-      el.style.animationDuration = duration;
-      el.style.animationTimingFunction = timingFunction || 'ease-in-out';
-      el.style.animationIterationCount = iterationCount || 'infinite';
-      el.style.animationPlayState = 'running';
-      el.style.animationFillMode = 'none';
-      
-      console.log(`Reset animation for ${selector}: ${animationName} ${duration}`);
-    });
-  }
-  
-  // Wait for page to load and animations to be applied
-  function applyFixes() {
-    // Fix certificate animations with full reset
-    resetAnimationCompletely('.cert-img-card', 'certImgSway', '6s', 'ease-in-out', 'infinite');
-    resetAnimationCompletely('.cert-img-card__sheen', 'certImgSheen', '4s', 'ease-in-out', 'infinite');
-    
-    // Fix lottery animations with full reset
-    resetAnimationCompletely('.lot-tilt-wrap', 'lotSway', '8s', 'ease-in-out', 'infinite');
-    
-    // For ::before pseudo-element, we need to target the parent
-    const lotCards = document.querySelectorAll('.lot-card');
-    lotCards.forEach(card => {
-      // Force re-render of ::before
-      card.style.setProperty('--force-rerender', Math.random());
-    });
-    
-    console.log('Mobile animation fixes applied completely');
-  }
-  
-  // Apply fixes after page load and after a short delay
-  if (document.readyState === 'complete') {
-    setTimeout(applyFixes, 100);
-  } else {
-    window.addEventListener('load', () => setTimeout(applyFixes, 100));
-  }
-  
-  // Also apply on window resize (orientation change)
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(applyFixes, 250);
-  });
-})();
-
-
-/* ══════════════════════════════════════
-   TELEGRAM-STYLE ANIMATED BUTTONS
-   Click-only logic with "Show All" button
-══════════════════════════════════════ */
-(function () {
-  const box = document.getElementById('tgContacts');
-  const btn = document.getElementById('tgToggle');
-  const containers = document.querySelectorAll('.tg-tooltip-container');
-  
-  if (!box || !btn || !containers.length) return;
-
-  // Click on individual button
-  containers.forEach(container => {
-    const icon = container.querySelector('.tg-icon');
-    const profile = container.querySelector('.tg-profile');
-    
-    if (!icon) return;
-
-    icon.addEventListener('click', (e) => {
-      const isActive = container.classList.contains('active');
-      
-      if (isActive) {
-        // Second click - allow link to work (don't prevent)
-        // But if clicking on icon again (not profile link), toggle off
-        if (!e.target.closest('.tg-profile')) {
-          e.preventDefault();
-          container.classList.remove('active');
-        }
-      } else {
-        // First click - open this tooltip, close others
-        e.preventDefault();
-        
-        // Close all others
-        containers.forEach(other => {
-          if (other !== container) {
-            other.classList.remove('active');
-          }
-        });
-        
-        // Open this one
-        container.classList.add('active');
-      }
-    });
-  });
-
-  // "Show All" / "Hide All" button
-  btn.addEventListener('click', () => {
-    const isOpen = box.classList.toggle('open');
-    
-    containers.forEach(container => {
-      container.classList.toggle('active', isOpen);
-    });
-    
-    btn.textContent = isOpen ? 'Сховати контакти' : 'Показати всі контакти';
-  });
-
-  // Close tooltips when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.telegram-contacts')) {
-      containers.forEach(container => {
-        container.classList.remove('active');
-      });
-      box.classList.remove('open');
-      btn.textContent = 'Показати всі контакти';
-    }
-  });
-})();
-
-
-/* ══════════════════════════════════════════════
-   FLIP CARD — WebM animation + contacts
-   - Animation: 6 sec, flip at 5.5s to hide end
-   - Video restarts on every flip to front
-   - Front shown 5.5s, back shown 5s
-   - Click on front: flip to back, disable auto-flip
-   - Click on back: flip to front, then auto-flip back after 5.5s
-   - Always flip clockwise (continuous cycle effect)
-   
-   iOS DEBUG: Comprehensive logging with download button
-══════════════════════════════════════════════ */
-(function() {
-  const card = document.getElementById('heroFlipCard');
-  const inner = card?.querySelector('.hero__flip-inner');
-  const video = document.getElementById('heroFlipVideo');
-  if (!card || !inner || !video) return;
-
-  // ═══════════════════════════════════════════
-  // iOS DEBUG LOGGING SYSTEM
-  // ═══════════════════════════════════════════
-  const logs = [];
-  function log(message) {
-    const timestamp = new Date().toISOString();
-    const entry = `[${timestamp}] ${message}`;
-    logs.push(entry);
-    console.log('[FLIP DEBUG]', message);
-  }
-
-  // Log initial state
-  log('=== FLIP CARD INIT ===');
-  log(`User Agent: ${navigator.userAgent}`);
-  log(`Platform: ${navigator.platform}`);
-  log(`Video element exists: ${!!video}`);
-  log(`Video readyState: ${video.readyState}`);
-  log(`Video paused: ${video.paused}`);
-  log(`Video muted: ${video.muted}`);
-  log(`Video autoplay: ${video.autoplay}`);
-  log(`Video playsinline: ${video.playsInline}`);
-  log(`Video currentSrc: ${video.currentSrc}`);
-  log(`Video networkState: ${video.networkState}`);
-  log(`Document hidden: ${document.hidden}`);
-  log(`Window innerWidth: ${window.innerWidth}`);
-  log(`Window innerHeight: ${window.innerHeight}`);
-
-  // Create debug button (mobile only)
-  if (window.innerWidth < 768) {
-    const debugBtn = document.createElement('button');
-    debugBtn.textContent = '📋 Копіювати лог';
-    debugBtn.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 99999;
-      padding: 12px 16px;
-      background: rgba(255, 0, 0, 0.8);
-      color: white;
-      border: 2px solid white;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      backdrop-filter: blur(10px);
-      transition: all 0.2s ease;
-    `;
-    
-    debugBtn.addEventListener('click', async () => {
-      const content = logs.join('\n');
-      try {
-        // Modern Clipboard API (iOS Safari 13.4+)
-        await navigator.clipboard.writeText(content);
-        debugBtn.textContent = '✅ Скопійовано!';
-        debugBtn.style.background = 'rgba(0, 200, 0, 0.8)';
-        log('Debug log copied to clipboard');
-        
-        setTimeout(() => {
-          debugBtn.textContent = '📋 Копіювати лог';
-          debugBtn.style.background = 'rgba(255, 0, 0, 0.8)';
-        }, 2000);
-      } catch (err) {
-        // Fallback for older browsers
-        log(`Clipboard API failed: ${err.message}, trying fallback`);
-        const textarea = document.createElement('textarea');
-        textarea.value = content;
-        textarea.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
-        document.body.appendChild(textarea);
-        textarea.select();
-        textarea.setSelectionRange(0, 99999); // For iOS
-        
-        try {
-          document.execCommand('copy');
-          debugBtn.textContent = '✅ Скопійовано!';
-          debugBtn.style.background = 'rgba(0, 200, 0, 0.8)';
-          log('Debug log copied via execCommand');
-          
-          setTimeout(() => {
-            debugBtn.textContent = '📋 Копіювати лог';
-            debugBtn.style.background = 'rgba(255, 0, 0, 0.8)';
-          }, 2000);
-        } catch (err2) {
-          debugBtn.textContent = '❌ Помилка';
-          log(`Copy failed: ${err2.message}`);
-          
-          setTimeout(() => {
-            debugBtn.textContent = '📋 Копіювати лог';
-          }, 2000);
-        } finally {
-          document.body.removeChild(textarea);
-        }
-      }
-    });
-    
-    document.body.appendChild(debugBtn);
-    log('Debug button created (clipboard copy)');
-  }
-
-  // Monitor video events
-  video.addEventListener('loadstart', () => log('VIDEO: loadstart'));
-  video.addEventListener('loadedmetadata', () => {
-    log(`VIDEO: loadedmetadata (duration: ${video.duration})`);
-    log(`VIDEO: Using source - ${video.currentSrc}`);
-    log(`VIDEO: Video size: ${video.videoWidth}x${video.videoHeight}`);
-  });
-  video.addEventListener('loadeddata', () => log(`VIDEO: loadeddata (readyState: ${video.readyState})`));
-  video.addEventListener('canplay', () => log('VIDEO: canplay'));
-  video.addEventListener('canplaythrough', () => log('VIDEO: canplaythrough'));
-  video.addEventListener('play', () => log(`VIDEO: play event (currentTime: ${video.currentTime})`));
-  video.addEventListener('playing', () => log(`VIDEO: playing (currentTime: ${video.currentTime})`));
-  video.addEventListener('pause', () => log('VIDEO: pause'));
-  video.addEventListener('waiting', () => log('VIDEO: waiting'));
-  video.addEventListener('stalled', () => log('VIDEO: stalled'));
-  video.addEventListener('suspend', () => log('VIDEO: suspend'));
-  
-  // Log only first 3 timeupdate events to avoid spam
-  let timeupdateCount = 0;
-  video.addEventListener('timeupdate', () => {
-    if (timeupdateCount < 3) {
-      log(`VIDEO: timeupdate #${++timeupdateCount} - currentTime: ${video.currentTime.toFixed(3)}s`);
-    }
-  });
-  
-  video.addEventListener('error', (e) => {
-    log(`VIDEO: error - ${video.error?.code} ${video.error?.message}`);
-    if (video.error) {
-      const errorCodes = ['', 'MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK', 'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED'];
-      log(`VIDEO: error code meaning - ${errorCodes[video.error.code] || 'UNKNOWN'}`);
-    }
-  });
-
-  // Monitor visibility changes
-  document.addEventListener('visibilitychange', () => {
-    log(`Document visibility changed: hidden=${document.hidden}`);
-  });
-
-  // ═══════════════════════════════════════════
-  // FLIP CARD LOGIC
-  // ═══════════════════════════════════════════
-  let rotationCount = 0;
-  let autoFlipEnabled = true;
-  let autoFlipTimer = null;
-  let isPageVisible = !document.hidden;
-  
-  const ANIMATION_DURATION = 6000;
-  const FLIP_BEFORE_END = 500;
-  const BACK_DISPLAY_TIME = 5000;
-
-  inner.style.transform = 'rotateY(0deg)';
-  log('Initial transform set to 0deg');
-
-  function isShowingFront() {
-    return rotationCount % 2 === 0;
-  }
-
-  function flipClockwise() {
-    rotationCount++;
-    const degrees = rotationCount * 180;
-    inner.style.transform = `rotateY(${degrees}deg)`;
-    log(`Flip to ${degrees}deg (showing ${isShowingFront() ? 'front' : 'back'})`);
-    
-    if (isShowingFront()) {
-      log(`Restarting video (currentTime: ${video.currentTime} -> 0)`);
-      video.currentTime = 0;
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => log('VIDEO: play() promise resolved'))
-          .catch(err => log(`VIDEO: play() promise rejected - ${err.name}: ${err.message}`));
-      } else {
-        log('VIDEO: play() returned undefined (no promise)');
-      }
-    }
-  }
-
-  function scheduleAutoFlip() {
-    if (!autoFlipEnabled || !isPageVisible) {
-      log(`Auto-flip not scheduled (enabled: ${autoFlipEnabled}, visible: ${isPageVisible})`);
-      return;
-    }
-    clearTimeout(autoFlipTimer);
-    
-    if (isShowingFront()) {
-      const delay = ANIMATION_DURATION - FLIP_BEFORE_END;
-      log(`Scheduling auto-flip in ${delay}ms (front -> back)`);
-      autoFlipTimer = setTimeout(() => {
-        if (isPageVisible) {
-          flipClockwise();
-          scheduleAutoFlip();
-        }
-      }, delay);
-    } else {
-      log(`Scheduling auto-flip in ${BACK_DISPLAY_TIME}ms (back -> front)`);
-      autoFlipTimer = setTimeout(() => {
-        if (isPageVisible) {
-          flipClockwise();
-          scheduleAutoFlip();
-        }
-      }, BACK_DISPLAY_TIME);
-    }
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    isPageVisible = !document.hidden;
-    
-    if (isPageVisible) {
-      log('Page became visible');
-      if (autoFlipEnabled) {
-        scheduleAutoFlip();
-      }
-      if (isShowingFront()) {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => log('VIDEO: resumed on visibility'))
-            .catch(err => log(`VIDEO: resume failed - ${err.name}: ${err.message}`));
-        }
-      }
-    } else {
-      log('Page became hidden');
-      clearTimeout(autoFlipTimer);
-      video.pause();
-    }
-  });
-
-  card.addEventListener('click', (e) => {
-    if (e.target.tagName === 'A' || e.target.closest('a')) return;
-    
-    if (isShowingFront()) {
-      log('User clicked front - disabling auto-flip');
-      autoFlipEnabled = false;
-      clearTimeout(autoFlipTimer);
-      flipClockwise();
-    } else {
-      log('User clicked back - enabling auto-flip');
-      flipClockwise();
-      autoFlipEnabled = true;
-      clearTimeout(autoFlipTimer);
-      scheduleAutoFlip();
-    }
-  });
-
-  // Initial play attempt
-  log('Attempting initial video.play()');
-  const initialPlay = video.play();
-  if (initialPlay !== undefined) {
-    initialPlay
-      .then(() => {
-        log('VIDEO: Initial play() SUCCESS');
-        scheduleAutoFlip();
-      })
-      .catch(err => {
-        log(`VIDEO: Initial play() FAILED - ${err.name}: ${err.message}`);
-        log('This is expected on iOS - autoplay requires user interaction');
-        // Schedule auto-flip anyway - video will play on first user interaction
-        scheduleAutoFlip();
-      });
-  } else {
-    log('VIDEO: Initial play() returned undefined');
-    scheduleAutoFlip();
-  }
-
-  // Log final readyState after a delay
-  setTimeout(() => {
-    log(`Video state after 1s: readyState=${video.readyState}, paused=${video.paused}, currentTime=${video.currentTime}`);
-  }, 1000);
-
-  setTimeout(() => {
-    log(`Video state after 3s: readyState=${video.readyState}, paused=${video.paused}, currentTime=${video.currentTime}`);
-    
-    // WORKAROUND: If video is "playing" but stuck at 0, force restart
-    if (!video.paused && video.currentTime === 0 && video.readyState >= 2) {
-      log('WORKAROUND: Video stuck at 0 - forcing restart');
-      video.pause();
-      video.currentTime = 0.01; // Tiny offset to unstick
-      setTimeout(() => {
-        video.play()
-          .then(() => log('WORKAROUND: Restart successful'))
-          .catch(err => log(`WORKAROUND: Restart failed - ${err.message}`));
-      }, 100);
-    }
-  }, 3000);
-
-  setTimeout(() => {
-    log(`Video state after 5s: readyState=${video.readyState}, paused=${video.paused}, currentTime=${video.currentTime}`);
-  }, 5000);
-})();
-
-/* ══════════════════════════════════════════════
-   HERO SCROLL DOWN BUTTON
-══════════════════════════════════════════════ */
-(function() {
-  // Ждём полной загрузки DOM
-  function initScrollButton() {
-    const scrollBtn = document.getElementById('heroScrollBtn');
-    const scrollContainer = document.getElementById('heroScrollDown');
-    const heroSection = document.querySelector('section.hero');
-    
-    console.log('Scroll button init:', {scrollBtn, scrollContainer, heroSection});
-    
-    if (!scrollBtn || !scrollContainer || !heroSection) {
-      console.warn('Scroll button elements not found');
-      return;
-    }
-    
-    let hidden = false;
-    
-    function hideButton() {
-      if (hidden) return;
-      hidden = true;
-      scrollContainer.classList.add('hidden');
-      console.log('Button hidden');
-    }
-    
-    // Скрыть при клике
-    scrollBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('Button clicked');
-      hideButton();
-      const servicesSection = document.getElementById('services');
-      if (servicesSection) {
-        servicesSection.scrollIntoView({behavior:'smooth'});
-      }
-    });
-    
-    // Скрыть при скролле за пределы hero секции
-    let rafId;
-    window.addEventListener('scroll', () => {
-      if (hidden) return;
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        const heroBottom = heroSection.getBoundingClientRect().bottom;
-        const threshold = window.innerHeight * 0.3;
-        if (heroBottom < threshold) {
-          hideButton();
+  // Показываем только при первом скролле до секции cases
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // появился в viewport — показываем оверлей (он уже видимый по умолчанию)
+          observer.disconnect();
         }
       });
-    }, { passive: true });
-    
-    console.log('Scroll button initialized');
-  }
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initScrollButton);
-  } else {
-    initScrollButton();
-  }
+    },
+    { threshold: 0.3 }
+  );
+  observer.observe(folder);
 })();
 
-/* ══════════════════════════════════════════════
-   BODY BACKGROUND FADE ON SCROLL
-══════════════════════════════════════════════ */
-(function() {
-  function initBodyBackgroundFade() {
-    const heroSection = document.querySelector('section.hero');
-    if (!heroSection) return;
-    
-    let rafId;
-    
-    function updateBodyBackground() {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        const scrollY = window.scrollY || window.pageYOffset;
-        const heroHeight = heroSection.offsetHeight;
-        
-        if (heroHeight === 0) return;
-        
-        const transitionStart = heroHeight * 0.2;
-        const transitionEnd = heroHeight * 1.2;
-        
-        let progress = 0;
-        if (scrollY > transitionStart) {
-          progress = Math.min(1, (scrollY - transitionStart) / (transitionEnd - transitionStart));
-        }
-        
-        // Interpolate RGB: светлый серый -> темно-синий
-        // #d8dae5 (216, 218, 229) -> #0c0e1a (12, 14, 26)
-        const r = Math.round(216 - 204 * progress);  // 216 -> 12
-        const g = Math.round(218 - 204 * progress);  // 218 -> 14
-        const b = Math.round(229 - 203 * progress);  // 229 -> 26
-        
-        document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+/* ═══════════════════════════════════════
+   FADE для cases__list
+═══════════════════════════════════════ */
+function initFade(pageEl) {
+  const list    = pageEl?.querySelector('.cases__list');
+  const fadeTop = pageEl?.querySelector('.cases__fade-top');
+  const fadeBot = pageEl?.querySelector('.cases__fade-bot');
+  if (!list || !fadeTop || !fadeBot) return;
+
+  function update() {
+    const { scrollTop, scrollHeight, clientHeight } = list;
+    fadeTop.style.opacity = scrollTop > 4 ? '1' : '0';
+    fadeBot.style.opacity = scrollTop + clientHeight >= scrollHeight - 4 ? '0' : '1';
+  }
+
+  list.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+/* ── Form toggle ── */
+document.querySelectorAll('.cform__check input').forEach((input) => {
+  input.closest('.cform__check').classList.toggle('is-checked', input.checked);
+  input.addEventListener('change', () => {
+    if (input.type === 'radio') {
+      document.querySelectorAll(`.cform__check input[name="${input.name}"]`).forEach((r) => {
+        r.closest('.cform__check').classList.toggle('is-checked', r === input);
       });
+    } else {
+      input.closest('.cform__check').classList.toggle('is-checked', input.checked);
     }
-    
-    window.addEventListener('scroll', updateBodyBackground, { passive: true });
-    updateBodyBackground();
+  });
+});
+
+/* ── Shimmer на кнопке заявки когда форма готова ── */
+(function () {
+  var form    = document.getElementById('contactForm');
+  var submitBtn = document.getElementById('contactSubmitBtn');
+  if (!form || !submitBtn) return;
+  var shimmer = submitBtn.querySelector('.btn__shimmer');
+  if (!shimmer) return;
+
+  function checkReady() {
+    var task    = form.querySelector('input[name="task"]');
+    var contact = form.querySelector('input[name="contact"]');
+    var typeChecked = form.querySelector('input[name="type"]:checked');
+    var taskVal = task ? task.value.trim() : form.querySelector('input[id="name"]')?.value.trim();
+    var contactVal = contact ? contact.value.trim() : '';
+    var ready = !!(typeChecked && taskVal && contactVal);
+    shimmer.classList.toggle('btn__shimmer--hidden', !ready);
   }
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBodyBackgroundFade);
-  } else {
-    initBodyBackgroundFade();
-  }
+
+  form.addEventListener('input', checkReady);
+  form.addEventListener('change', checkReady);
+  checkReady();
 })();
 
+/* ── Hero fade-in ── */
+window.addEventListener('DOMContentLoaded', () => {
+  ['.hero__laptop-wrap', '.hero__title', '.hero__sub'].forEach((sel, i) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.style.cssText += `opacity:0;transform:translateY(14px);transition:opacity .5s ease ${.1 + i * .1}s,transform .5s ease ${.1 + i * .1}s`;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    }));
+  });
+});
 
+/* ── Wire canvas ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById('wireCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-/* ══════════════════════════════════════════════
-   CONFETTI EXPLOSION (синхронно з вильотом карток)
-══════════════════════════════════════════════ */
-(function() {
-  const PALETTE = ['#42A5F5', '#F05537', '#FBC02D', '#8DC68F', '#797A9E', '#F4B3A8'];
-  
-  function createRng(seed) {
-    let s = seed % 2147483647;
-    if (s <= 0) s += 2147483646;
-    return function () {
-      s = (s * 16807) % 2147483647;
-      return (s - 1) / 2147483646;
+  const target = document.getElementById('wireTarget');
+  const dots   = Array.from(document.querySelectorAll('.hero .wire-dot'));
+
+  function resize() {
+    const hero = canvas.parentElement;
+    canvas.width  = hero.offsetWidth;
+    canvas.height = hero.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function getCenter(el) {
+    const heroRect = canvas.parentElement.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return {
+      x: r.left - heroRect.left + r.width  / 2,
+      y: r.top  - heroRect.top  + r.height / 2,
     };
   }
 
-  function computeBallisticKeyframes(name, params) {
-    const {vx0, vy0, drag, vTerminal, swayAmp, swayFreq, swayPhase, rotSpeed, rot0, flipFreq, flipPhase, maxOp, totalTime} = params;
-    const steps = 22;
-    const subSteps = 6;
-    const dtTotal = totalTime / steps;
-    const dtSub = dtTotal / subSteps;
+  /* Hex → rgba с alpha */
+  function hexAlpha(hex, a) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
 
-    let t = 0, x = 0, y = 0;
-    let frames = [];
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let i = 0; i <= steps; i++) {
-      const pct = ((i / steps) * 100).toFixed(1).replace(/\.0$/, '');
-      const rot = (rot0 + rotSpeed * t).toFixed(1);
-      const scaleIntro = i === 0 ? 0.2 : Math.min(1, 0.2 + (t / 0.14) * 0.8);
-      const sy = (Math.cos(flipFreq * t + flipPhase) * scaleIntro).toFixed(3);
-      const sx = scaleIntro.toFixed(3);
+    if (!target) { requestAnimationFrame(draw); return; }
 
-      let opacity = maxOp;
-      if (i === 0) opacity = 0;
-      else if (t < 0.08) opacity = +(maxOp * (t / 0.08)).toFixed(2);
-      else if (i === steps) opacity = 0;
+    const T = getCenter(target);
 
-      frames.push(`  ${pct}% { opacity: ${opacity}; transform: translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot}deg) scale(${sx}, ${sy}); }`);
+    dots.forEach(dot => {
+      const heroRect = canvas.parentElement.getBoundingClientRect();
+      const r = dot.getBoundingClientRect();
+      /* Точка привязки — верх карточки, по центру */
+      const D = {
+        x: r.left - heroRect.left + r.width / 2,
+        y: r.top  - heroRect.top  + r.height / 2,
+      };
+      const color = dot.dataset.wireColor || '#4d8cff';
 
-      if (i < steps) {
-        for (let s = 0; s < subSteps; s++) {
-          const tMid = t + dtSub * 0.5;
-          const decay = Math.exp(-drag * tMid);
-          const vx = vx0 * decay + swayAmp * Math.sin(swayFreq * tMid + swayPhase);
-          const vy = (vy0 - vTerminal) * decay + vTerminal;
-          x += vx * dtSub;
-          y += vy * dtSub;
-          t += dtSub;
-        }
+      const plugH = 20;
+      const plugW = 8;
+
+      /* Низ штекера — откуда начинается провод */
+      const wireStart = { x: D.x, y: D.y + plugH };
+
+      const dx   = T.x - wireStart.x;
+      const sagY = Math.abs(dx) * 0.65 + 100;
+
+      const cx1 = wireStart.x;        // вертикально вниз от штекера
+      const cy1 = wireStart.y + sagY; // далеко вниз
+
+      const cx2 = T.x;                // вертикально над целью
+      const cy2 = T.y - sagY * 0.6;  // далеко вверх от цели
+
+      /* Градиент */
+      const grad = ctx.createLinearGradient(wireStart.x, wireStart.y, T.x, T.y);
+      grad.addColorStop(0,   hexAlpha(color, 0.95));
+      grad.addColorStop(0.5, hexAlpha(color, 0.6));
+      grad.addColorStop(1,   hexAlpha(color, 0.2));
+
+      /* Провод */
+      ctx.beginPath();
+      ctx.moveTo(wireStart.x, wireStart.y);
+      ctx.bezierCurveTo(cx1, cy1, cx2, cy2, T.x, T.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = 4.5;
+      ctx.lineCap     = 'round';
+      ctx.stroke();
+
+      /* Штекер — прямоугольник вертикально вниз от верха карточки */
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(D.x - plugW / 2, D.y, plugW, plugH, 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+});
+
+/* ── Lottie ── */
+const LOTTIE_URL = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Scroll%20down.json';
+window.addEventListener('DOMContentLoaded', () => {
+  ['lottieArrow1L','lottieArrow1R','lottieArrow2L','lottieArrow2R'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || typeof lottie === 'undefined') return;
+    lottie.loadAnimation({ container: el, renderer: 'svg', loop: true, autoplay: true, path: LOTTIE_URL });
+  });
+});
+
+/* ═══════════════════════════════════════
+   CONTACT STACK — веер по бокам
+═══════════════════════════════════════ */
+(function () {
+  const stack = document.querySelector('.cstack');
+  if (!stack) return;
+
+  const cards = Array.from(stack.querySelectorAll('.cstack__card'));
+  if (cards.length < 2) return;
+
+  // Порядок позиций при activeIdx:
+  // 3 карточки: [0,1,2] — одна center, одна left, одна right
+  // При смене активной — анимируем как тасование
+
+  let order = [0, 1, 2]; // order[0]=left, order[1]=center, order[2]=right
+  // Изначально карточка с --active — center
+  const initActive = cards.findIndex(c => c.classList.contains('cstack__card--active'));
+  // Строим order: center = initActive
+  if (initActive === 0)      order = [1, 0, 2];
+  else if (initActive === 1) order = [0, 1, 2];
+  else                       order = [0, 2, 1];
+
+  const POS = ['left', 'center', 'right'];
+
+  function applyLayout() {
+    order.forEach((cardIdx, posIdx) => {
+      const card = cards[cardIdx];
+      card.dataset.pos = POS[posIdx];
+      card.classList.toggle('cstack__card--active', POS[posIdx] === 'center');
+    });
+  }
+
+  function updateHeight() { /* высота фиксирована в CSS */ }
+
+  // Клик по левой — она едет в центр, центральная → right, правая → left
+  // Клик по правой — она едет в центр, центральная → left, левая → right
+  cards.forEach((card) => {
+    card.addEventListener('click', function () {
+      const pos = this.dataset.pos;
+      if (pos === 'center') return;
+
+      if (pos === 'left') {
+        // left→center, center→right, right→left
+        order = [order[2], order[0], order[1]];
+      } else {
+        // right→center, center→left, left→right
+        order = [order[1], order[2], order[0]];
+      }
+      applyLayout();
+      setTimeout(updateHeight, 520);
+    });
+  });
+
+  // Свайп на мобиле (pointer events)
+  (function () {
+    let startX = null, dx = 0;
+    stack.addEventListener('pointerdown', function (e) {
+      // только на мобиле
+      if (window.innerWidth > 860) return;
+      startX = e.clientX;
+      dx = 0;
+      stack.setPointerCapture(e.pointerId);
+    });
+    stack.addEventListener('pointermove', function (e) {
+      if (startX === null) return;
+      dx = e.clientX - startX;
+    });
+    stack.addEventListener('pointerup', function () {
+      if (startX === null) return;
+      startX = null;
+      const threshold = window.innerWidth * 0.25;
+      if (dx < -threshold) {
+        // свайп влево — правая карточка в центр
+        const rightCardIdx = order[2];
+        const rightCard = cards[rightCardIdx];
+        if (rightCard) rightCard.click();
+      } else if (dx > threshold) {
+        // свайп вправо — левая карточка в центр
+        const leftCardIdx = order[0];
+        const leftCard = cards[leftCardIdx];
+        if (leftCard) leftCard.click();
+      }
+    });
+    stack.addEventListener('pointercancel', function () { startX = null; });
+  })();
+
+  stack.addEventListener('click', function (e) {
+    // Только кнопки "Скопировать" (aria-label="Скопировать"), не QR
+    const btn = e.target.closest('.donate__copy[aria-label="Скопировать"]');
+    if (!btn) return;
+    e.stopPropagation();
+    const text = btn.dataset.copy;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1500);
+    });
+  });
+
+  // Инициализация
+  window.addEventListener('load', () => { applyLayout(); updateHeight(); });
+  window.addEventListener('resize', updateHeight);
+  applyLayout();
+  setTimeout(updateHeight, 100);
+})();
+
+/* ═══════════════════════════════════════
+   LACAR DRIVE — партикли от логотипа
+═══════════════════════════════════════ */
+(function () {
+  const wrap = document.querySelector('.card__img-wrap--lacar');
+  if (!wrap) return;
+
+  const COUNT = 18;
+
+  for (let i = 0; i < COUNT; i++) {
+    const p = document.createElement('span');
+    p.className = 'lacar-particle';
+
+    // Размер 1.8–4.2px (на 40% меньше исходных 3–7px)
+    const size = 1.8 + Math.random() * 2.4;
+    p.style.width  = size + 'px';
+    p.style.height = size + 'px';
+
+    // Стартовая позиция — рядом с центром (±15%)
+    const sx = 42 + Math.random() * 16; // 42–58%
+    const sy = 42 + Math.random() * 16;
+    p.style.left = sx + '%';
+    p.style.top  = sy + '%';
+    p.style.transform = 'translate(-50%, -50%)';
+
+    // Направление полёта — в любую сторону, 40–110px
+    const angle = Math.random() * Math.PI * 2;
+    const dist  = 40 + Math.random() * 70;
+    p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+
+    // Скорость и задержка — на 30% медленнее
+    const dur   = 3.25 + Math.random() * 3.25;
+    const delay = Math.random() * dur;
+    p.style.setProperty('--dur',   dur   + 's');
+    p.style.setProperty('--delay', delay + 's');
+
+    wrap.appendChild(p);
+  }
+})();
+
+
+
+/* ── QR-коды в доне — заменено новым inline QR IIFE ниже ── */
+(function () {
+  // Старый overlay удалён — логика перенесена в блок "DONATE — inline QR"
+})();
+(function () {
+  const btn  = document.getElementById('themeToggle');
+  const body = document.body;
+
+  const SUN  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const MOON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`;
+
+  function apply(theme) {
+    document.documentElement.classList.add('theme-switching');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.documentElement.classList.remove('theme-switching');
+    }));
+    if (theme === 'light') {
+      body.classList.add('theme-light');
+      if (btn) { btn.innerHTML = MOON; btn.title = 'Тёмная тема'; }
+    } else {
+      body.classList.remove('theme-light');
+      if (btn) { btn.innerHTML = SUN; btn.title = 'Светлая тема'; }
+    }
+    var dayBtn   = document.getElementById('chatModeDay');
+    var nightBtn = document.getElementById('chatModeNight');
+    if (dayBtn && nightBtn) {
+      dayBtn.classList.toggle('hero__chat-mode-btn--active',   theme === 'light');
+      nightBtn.classList.toggle('hero__chat-mode-btn--active', theme !== 'light');
+    }
+  }
+
+  // Тема по времени — без localStorage, только сессия
+  // Лоадер уже мог поставить theme-light, синхронизируем иконку
+  var currentTheme = body.classList.contains('theme-light') ? 'light' : 'dark';
+  apply(currentTheme);
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const next = body.classList.contains('theme-light') ? 'dark' : 'light';
+      apply(next);
+    });
+  }
+
+  // Кнопки День/Ночь в чате
+  var dayBtn   = document.getElementById('chatModeDay');
+  var nightBtn = document.getElementById('chatModeNight');
+  if (dayBtn)   dayBtn.addEventListener('click',   function () { apply('light'); });
+  if (nightBtn) nightBtn.addEventListener('click', function () { apply('dark');  });
+})();
+
+
+/* ═══════════════════════════════════════
+   MATRIX CODE RAIN — hero background
+   Алгоритм по мотивам BambuFarm/rain.py
+═══════════════════════════════════════ */
+(function () {
+  const root = document.querySelector('.hero');
+  const cv   = document.getElementById('matrixCanvas');
+  if (!root || !cv) return;
+  const ctx  = cv.getContext('2d');
+  // НЕ проверяем prefers-reduced-motion — всегда анимируем
+  const calm = false;
+
+  // Символы как в rain.py
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*+-=/<>|ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ'.split('');
+
+  const CELL    = 26;         // размер ячейки px
+  const COL_GAP = CELL * 2;   // шаг колонок — каждая вторая, не накладываются
+  const FPS     = 20;         // ~как sleep(0.05) в rain.py
+  const STEP    = 1000 / FPS;
+
+  // Цвета зависят от темы
+  function getTheme() {
+    return document.body.classList.contains('theme-light') ? 'light' : 'dark';
+  }
+
+  function palette() {
+    if (getTheme() === 'light') return {
+      bg:     'rgba(240,241,245,0.25)', // светлый fade
+      white:  'rgba(60,60,70,1.0)',     // голова — тёмно-серая
+      bright: 'rgba(90,95,110,0.85)',
+      mid:    'rgba(130,135,150,0.6)',
+      dim:    'rgba(170,175,185,0.35)',
+    };
+    return {
+      bg:     'rgba(8,9,15,0.2)',
+      white:  'rgba(230,255,240,1.0)',
+      bright: 'rgba(0,255,100,0.9)',
+      mid:    'rgba(0,200,70,0.65)',
+      dim:    'rgba(0,120,40,0.35)',
+    };
+  }
+
+  let w = 0, h = 0, dpr = 1, cols = 0, drops = [];
+  let raf = 0, live = false, last = 0;
+
+  const pick = () => CHARS[(Math.random() * CHARS.length) | 0];
+  const rows = () => Math.ceil(h / CELL);
+
+  function makeCol(x) {
+    const r = rows();
+    return {
+      x,
+      head:   -(Math.random() * r | 0),
+      length: 6 + (Math.random() * Math.max(1, r / 2) | 0),
+      speed:  Math.random() < 0.75 ? 1 : 2,  // 75% = speed 1, 25% = speed 2
+      chars:  Array.from({ length: r + 4 }, pick),
+      tick:   0,
+    };
+  }
+
+  function size() {
+    const r = root.getBoundingClientRect();
+    w = r.width; h = r.height;
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    cv.width  = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font         = 'bold ' + CELL + 'px ui-monospace, Menlo, monospace';
+    ctx.textBaseline = 'top';
+    cols  = Math.ceil(w / COL_GAP);
+    drops = Array.from({ length: cols }, (_, i) => makeCol(i * COL_GAP));
+    // Заливаем фон
+    ctx.fillStyle = '#08090f';
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function stepCol(d) {
+    d.tick++;
+    if (d.tick < d.speed) return;
+    d.tick = 0;
+    d.head++;
+    // 12% шанс мутации случайного символа в хвосте (как в rain.py)
+    if (Math.random() < 0.12) {
+      const ri = Math.random() * d.chars.length | 0;
+      d.chars[ri] = pick();
+    }
+    // Сброс колонки
+    const r = rows();
+    if (d.head - d.length > r) {
+      d.head   = -(Math.random() * r / 2 | 0);
+      d.length = 6 + (Math.random() * Math.max(1, r / 2) | 0);
+      d.speed  = Math.random() < 0.75 ? 1 : 2;
+      d.chars  = Array.from({ length: r + 4 }, pick);
+    }
+  }
+
+  function drawCol(d) {
+    const r = rows();
+    const p = palette();
+    for (let row = 0; row < r; row++) {
+      const dist = d.head - row;
+      const y    = row * CELL;
+      const ch   = d.chars[row] || ' ';
+
+      if (dist === 0) {
+        ctx.fillStyle = p.white;
+        ctx.fillText(ch, d.x, y);
+      } else if (dist > 0 && dist <= 2) {
+        ctx.fillStyle = p.bright;
+        ctx.fillText(ch, d.x, y);
+      } else if (dist > 0 && dist <= d.length / 2) {
+        ctx.fillStyle = p.mid;
+        ctx.fillText(ch, d.x, y);
+      } else if (dist > 0 && dist <= d.length) {
+        ctx.fillStyle = p.dim;
+        ctx.fillText(ch, d.x, y);
       }
     }
-    return `@keyframes ${name} {\n${frames.join('\n')}\n}`;
   }
 
-  function generateConfetti() {
-    const rng = createRng(42077);
-    const vw = Math.max(window.innerWidth, 375);
-    const vh = Math.max(window.innerHeight, 667);
-    const originX = vw / 2;
-    const originY = vh / 2;
-    
-    // Зменшуємо кількість частинок на mobile для продуктивності
-    const isMobile = window.innerWidth < 768;
-    const countMultiplier = isMobile ? 0.5 : 1;
+  function draw() {
+    const p = palette();
+    ctx.fillStyle = p.bg;
+    ctx.fillRect(0, 0, w, h);
+    for (const d of drops) {
+      stepCol(d);
+      drawCol(d);
+    }
+  }
 
-    const layers = [
-      {id: 'layer-far-bg', filter: 'url(#dof-bg)', count: Math.round(42 * countMultiplier), wRange: [13, 21], ratioRange: [1.75, 2.3], speedRange: [950, 2150], dragRange: [2.7, 3.4], vTermRange: [340, 440], swayRange: [18, 42], opacity: 0.65},
-      {id: 'layer-mid-sharp', filter: 'url(#dof-mid)', count: Math.round(66 * countMultiplier), wRange: [18, 46], ratioRange: [1.8, 2.45], speedRange: [1150, 2750], dragRange: [2.3, 3.0], vTermRange: [440, 580], swayRange: [25, 58], opacity: 0.98},
-      {id: 'layer-foreground-bokeh', filter: 'url(#dof-fg)', count: Math.round(18 * countMultiplier), wRange: [88, 134], ratioRange: [1.8, 2.25], speedRange: [1450, 2950], dragRange: [1.95, 2.55], vTermRange: [560, 740], swayRange: [20, 48], opacity: 0.85}
-    ];
+  function frame(now) {
+    if (now - last >= STEP) { last = now; draw(); }
+    if (live) raf = requestAnimationFrame(frame);
+  }
 
-    let groupsMarkup = '';
-    let keyframesList = [];
-    let particleIndex = 0;
+  const start = () => { if (!live && !calm) { live = true; raf = requestAnimationFrame(frame); } };
+  const stop  = () => { /* не останавливаем — мигание при скролле */ };
 
-    layers.forEach((layer) => {
-      let rects = '';
-      for (let i = 0; i < layer.count; i++) {
-        particleIndex++;
-        const animName = `cb-${particleIndex}`;
-        const color = PALETTE[Math.floor(rng() * PALETTE.length)];
-        const width = Math.round(layer.wRange[0] + rng() * (layer.wRange[1] - layer.wRange[0]));
-        const ratio = layer.ratioRange[0] + rng() * (layer.ratioRange[1] - layer.ratioRange[0]);
-        const height = Math.round(width * ratio);
+  size();
+  if (calm) { for (let i = 0; i < 30; i++) draw(); }
+  else start(); // всегда работает, не зависит от viewport
 
-        const baseAngle = (i / layer.count) * Math.PI * 2;
-        const jitterAngle = (rng() - 0.5) * ((Math.PI * 2) / layer.count) * 0.85;
-        const angle = baseAngle + jitterAngle;
+  let t;
+  addEventListener('resize', () => {
+    clearTimeout(t);
+    t = setTimeout(() => { size(); }, 180);
+  });
+})();
 
-        const radialFactor = 0.25 + Math.pow(rng(), 0.72) * 0.75;
-        const speed = layer.speedRange[0] + radialFactor * (layer.speedRange[1] - layer.speedRange[0]);
-        const vx0 = Math.cos(angle) * speed;
-        const vy0 = Math.sin(angle) * speed - (Math.sin(angle) < 0 ? 180 : 0);
+/* ── APNG loop fallback ── */
+(function () {
+  const img = document.querySelector('.hero__laptop');
+  if (!img) return;
+  const src = img.src;
+  // Перезагружаем src каждые N мс — грубо но работает для APNG без loop
+  // Лучше всего задать loop прямо в APNG-файле
+  // Этот код только как fallback если файл не зациклен
+  // img.addEventListener('load', ...) не стреляет повторно для APNG
+  // Поэтому просто убеждаемся что src валиден
+  img.src = src;
+})();
 
-        const drag = layer.dragRange[0] + rng() * (layer.dragRange[1] - layer.dragRange[0]);
-        const vTerminal = layer.vTermRange[0] + rng() * (layer.vTermRange[1] - layer.vTermRange[0]);
-        const swayAmp = layer.swayRange[0] + rng() * (layer.swayRange[1] - layer.swayRange[0]);
-        const swayFreq = 2.6 + rng() * 2.4;
-        const swayPhase = rng() * Math.PI * 2;
+/* ═══════════════════════════════════════
+   HERO CHAT — Lottie typing indicator
+═══════════════════════════════════════ */
+(function () {
+  var el = document.getElementById('heroLottie');
+  if (!el || typeof lottie === 'undefined') return;
 
-        const rot0 = Math.round(rng() * 360);
-        const rotSpeed = (rng() > 0.5 ? 1 : -1) * (160 + rng() * 260);
-        const flipFreq = 4.5 + rng() * 5.0;
-        const flipPhase = rng() * Math.PI * 2;
+  var anim = lottie.loadAnimation({
+    container: el,
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/Edelweiss.json',
+  });
 
-        const impulseOffset = (vy0 - vTerminal) / drag;
-        const targetDy = vh * 0.6; // Використовуємо vh замість window.innerHeight
-        const exactDuration = Math.max(2.1, (targetDy - impulseOffset) / vTerminal) / 2; // Вдвічі швидше
-        const durStr = exactDuration.toFixed(2);
+  anim.setSpeed(0.5); // пассивная — вдвое медленнее лоадера
 
-        const kfCss = computeBallisticKeyframes(animName, {vx0, vy0, drag, vTerminal, swayAmp, swayFreq, swayPhase, rotSpeed, rot0, flipFreq, flipPhase, maxOp: layer.opacity, totalTime: exactDuration});
-        keyframesList.push(kfCss);
+  var isHovering = false;
+  var totalFrames = 0;
+  var resumeTimer = null;
+  var mouseEnabled = false; // включается после лоадера
 
-        const x = originX - Math.round(width / 2);
-        const y = originY - Math.round(height / 2);
+  anim.addEventListener('DOMLoaded', function () {
+    totalFrames = anim.totalFrames;
+  });
 
-        rects += `      <rect class="confetti-piece" x="${x}" y="${y}" width="${width}" height="${height}" rx="1.5" fill="${color}" style="--anim-name:${animName};--dur:${durStr}s;" />\n`;
+  // Разрешаем mouse-driven после скрытия лоадера
+  document.addEventListener('loaderDone', function () {
+    mouseEnabled = true;
+  });
+
+  // Радиус зоны реакции вокруг центра лотти (px)
+  var RADIUS = 160;
+
+  function getCenterOf(el) {
+    var r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    if (!totalFrames || !mouseEnabled) return;
+    var c = getCenterOf(el);
+    var dx = e.clientX - c.x;
+    var dy = e.clientY - c.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < RADIUS) {
+      if (!isHovering) {
+        isHovering = true;
+        anim.pause();
+        clearTimeout(resumeTimer);
       }
+      // Угол от -PI до PI, сдвигаем чтобы 0 был сверху (-PI/2)
+      var angle = Math.atan2(dy, dx) + Math.PI / 2;
+      if (angle < 0) angle += Math.PI * 2;
+      // Нормализуем в 0..1
+      var progress = angle / (Math.PI * 2);
+      anim.goToAndStop(progress * totalFrames, true);
+    } else {
+      if (isHovering) {
+        isHovering = false;
+        // Плавный возврат к автоплею через 300ms
+        resumeTimer = setTimeout(function () {
+          anim.play();
+        }, 300);
+      }
+    }
+  });
+})();
 
-      const filterAttr = layer.filter ? ` filter="${layer.filter}"` : '';
-      groupsMarkup += `    <g id="${layer.id}"${filterAttr}>\n${rects}    </g>\n`;
-    });
 
-    const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${vw} ${vh}" preserveAspectRatio="xMidYMid slice" class="confetti-svg">
-  <defs>
-    <filter id="dof-bg" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" /></filter>
-    <filter id="dof-mid" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="0.6" /></filter>
-    <filter id="dof-fg" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="13" /></filter>
-  </defs>
-${groupsMarkup}</svg>`;
 
-    return { svgMarkup, keyframesCss: keyframesList.join('\n') };
+
+
+/* ═══════════════════════════════════════
+   CONTACT FOLDER TABS (mobile)
+═══════════════════════════════════════ */
+(function () {
+  if (window.innerWidth > 860) return;
+
+  var folder = document.getElementById('contactFolder');
+  var tabs   = Array.from(document.querySelectorAll('#contactFolderTabs .contact-folder__tab'));
+  var pages  = Array.from(document.querySelectorAll('#contactFolderPanel .contact-folder__page'));
+  var cards  = Array.from(document.querySelectorAll('.cstack .cstack__card'));
+  if (!folder || !tabs.length || !cards.length) return;
+
+  // Клонируем содержимое каждой карточки в соответствующую страницу
+  cards.forEach(function(card, i) {
+    var page = pages[i];
+    if (!page) return;
+    var wrap = card.querySelector('.cform__wrap');
+    if (wrap) {
+      var clone = wrap.cloneNode(true);
+      // Убираем border-radius у header
+      var header = clone.querySelector('.cform__header');
+      if (header) header.style.borderRadius = '0';
+      // Убираем id у форм в клоне (дублирующиеся id ломают DOM)
+      // и блокируем нативный submit
+      clone.querySelectorAll('form').forEach(function(f) {
+        f.removeAttribute('id');
+        f.addEventListener('submit', function(e) { e.preventDefault(); });
+      });
+      // Убираем id у кнопок в клоне
+      clone.querySelectorAll('button[id]').forEach(function(b) {
+        b.removeAttribute('id');
+      });
+      page.appendChild(clone);
+    }
+  });
+
+  function switchTo(idx) {
+    tabs.forEach(function(t, i)  { t.classList.toggle('is-active', i === idx); });
+    pages.forEach(function(p, i) { p.classList.toggle('is-active', i === idx); });
   }
 
-  function initConfetti() {
-    const stageEl = document.getElementById('confettiStage');
-    const keyframesEl = document.getElementById('confettiKeyframes');
-    
-    if (!stageEl || !keyframesEl) return;
+  tabs.forEach(function(tab, i) {
+    tab.addEventListener('click', function() { switchTo(i); });
+  });
 
-    const { svgMarkup, keyframesCss } = generateConfetti();
-    keyframesEl.textContent = keyframesCss;
-    stageEl.innerHTML = svgMarkup;
+  switchTo(0);
+})();
 
-    let hasPlayed = false; // Прапорець щоб конфетті запустилось тільки один раз
+/* ═══════════════════════════════════════
+   DL-BUTTON Lottie — инициализация иконок
+═══════════════════════════════════════ */
+/* Lottie для кнопок отправки — не используется (кнопки заменены на простые) */
 
-    // Запускаємо confetti синхронно з карточками (0.6s delay після hero-ready)
-    document.body.addEventListener('heroReady', () => {
-      if (hasPlayed) return; // Якщо вже грало - не запускаємо знову
-      hasPlayed = true;
-      
-      setTimeout(() => {
-        stageEl.classList.add('is-playing');
-        // Прибираємо confetti через 2 секунди (вдвічі швидше)
-        setTimeout(() => {
-          stageEl.classList.remove('is-playing');
-          setTimeout(() => {
-            stageEl.style.opacity = '0';
-          }, 300);
-        }, 2000); // Було 4000, стало 2000
-      }, 600); // Синхронно з delay карточок
+/* ═══════════════════════════════════════
+   DL-BUTTON — оригинальный jQuery-код + авто-сброс через 3с
+═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   SUBMIT BUTTONS — простые кнопки отправки
+═══════════════════════════════════════ */
+(function () {
+  [
+    { btnId: 'feedbackSubmitBtn', formId: 'feedbackForm' },
+    { btnId: 'contactSubmitBtn',  formId: 'contactForm'  },
+  ].forEach(function (cfg) {
+    var btn  = document.getElementById(cfg.btnId);
+    var form = document.getElementById(cfg.formId);
+    if (!btn) return;
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (btn.disabled) return;
+
+      var origText = btn.textContent.trim().replace(/\s+/g,' ');
+
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+
+      setTimeout(function () {
+        btn.style.opacity = '1';
+
+        /* сброс через 3с */
+        setTimeout(function () {
+          btn.disabled = false;
+          if (form) form.reset();
+        }, 3000);
+      }, 1200);
+    });
+  });
+})();
+
+/* ═══════════════════════════════════════
+   DONATE — слайд-QR + «СПАСИБО»
+═══════════════════════════════════════ */
+(function () {
+  var slider    = document.querySelector('.donate__slider');
+  var listSlide = document.querySelector('.donate__slide--list');
+  var qrCanvas  = document.getElementById('donateQrCanvas');
+  var addrEl    = document.getElementById('donateQrAddr');
+  var footer    = document.getElementById('donateFooter');
+  var grid      = document.querySelector('.cform--donate .donate__grid');
+  if (!slider || !qrCanvas || !footer) return;
+
+  var toastTimer = null;
+
+  function openQr(address, net) {
+    if (!address || typeof QRCode === 'undefined') return;
+
+    qrCanvas.innerHTML = '';
+    var isDark = !document.body.classList.contains('theme-light');
+
+    /* Фиксируем высоту слайдера ДО добавления QR — чтобы рамка не росла */
+    var listH = listSlide.getBoundingClientRect().height;
+    slider.style.height = listH + 'px';
+
+    new QRCode(qrCanvas, {
+      text:         address,
+      width:        256,
+      height:       256,
+      colorDark:    isDark ? '#4daf6a' : '#1a1c26',
+      colorLight:   isDark ? '#101f12' : '#f2f3f7',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
+
+    /* убираем инлайн размеры которые ставит qrcodejs */
+    setTimeout(function () {
+      var img = qrCanvas.querySelector('img');
+      if (img) {
+        img.removeAttribute('style');
+        img.style.width = '75%';
+        img.style.height = 'auto';
+        img.style.display = 'block';
+        img.style.borderRadius = '4px';
+      }
+    }, 50);
+
+    if (addrEl) addrEl.textContent = net || '';
+    slider.classList.add('qr-open');
+  }
+
+  function closeQr() {
+    slider.classList.remove('qr-open');
+    slider.style.height = '';
+  }
+
+  /* Клики по QR-кнопкам — только когда список НЕ задвинут */
+  if (grid) {
+    grid.addEventListener('click', function (e) {
+      if (slider.classList.contains('qr-open')) return; /* задвинут — игнорируем */
+      var btn = e.target.closest('[data-qr]');
+      if (!btn || btn.getAttribute('aria-label') !== 'QR-код') return;
+      e.stopPropagation();
+      openQr(btn.dataset.qr || btn.dataset.copy, btn.dataset.net || '');
     });
   }
 
+  /* Клик по заблюренному списку — только закрываем QR, всё остальное блокируем */
+  if (listSlide) {
+    listSlide.addEventListener('click', function (e) {
+      if (!slider.classList.contains('qr-open')) return;
+      e.stopPropagation();
+      e.preventDefault();
+      closeQr();
+    }, true); /* capture — перехватываем до дочерних элементов */
+  }
+
+  /* Toast при копировании — только когда список НЕ задвинут */
+  if (grid) {
+    grid.addEventListener('click', function (e) {
+      if (slider.classList.contains('qr-open')) return; /* задвинут — игнорируем */
+      var btn = e.target.closest('.donate__copy[aria-label="Скопировать"]');
+      if (!btn) return;
+      var text = btn.dataset.copy;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(function () {
+        btn.classList.add('copied');
+        setTimeout(function () { btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  }
+})();
+
+/* ═══════════════════════════════════════
+   MARQUEE — бегущая строка для длинных названий кейсов (мобиле)
+═══════════════════════════════════════ */
+(function () {
+  if (window.innerWidth > 860) return;
+
+  function initMarquee() {
+    document.querySelectorAll('.case-item__title').forEach(function (el) {
+      var parent = el.parentElement; /* .case-item__meta */
+      if (!parent) return;
+      var parentW = parent.offsetWidth;
+      var textW   = el.scrollWidth;
+      if (textW > parentW) {
+        var offset = -(textW - parentW);
+        el.style.setProperty('--marquee-offset', offset + 'px');
+        el.classList.add('is-marquee');
+        /* случайный старт чтобы не все анимировались одновременно */
+        el.style.animationDelay = (Math.random() * -4) + 's';
+      } else {
+        el.classList.remove('is-marquee');
+        el.style.removeProperty('--marquee-offset');
+      }
+    });
+  }
+
+  /* запускаем после рендера */
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initConfetti);
+    document.addEventListener('DOMContentLoaded', initMarquee);
   } else {
-    initConfetti();
+    setTimeout(initMarquee, 200);
   }
+  window.addEventListener('resize', initMarquee);
+})();
+
+/* ═══════════════════════════════════════
+   MOBILE DONATE — копирование по клику на плашку валюты
+═══════════════════════════════════════ */
+(function () {
+  if (window.innerWidth > 860) return;
+
+  document.querySelectorAll('.donate__cell').forEach(function (cell) {
+    cell.addEventListener('click', function (e) {
+      /* если кликнули на кнопку копировать — не дублируем */
+      if (e.target.closest('.donate__copy')) return;
+
+      var copyBtn = cell.querySelector('.donate__copy[aria-label="Скопировать"]');
+      if (!copyBtn) return;
+      var text = copyBtn.dataset.copy;
+      if (!text) return;
+
+      navigator.clipboard.writeText(text).then(function () {
+        copyBtn.classList.add('copied');
+        setTimeout(function () { copyBtn.classList.remove('copied'); }, 1500);
+      }).catch(function () {});
+    });
+  });
+})();
+
+
+/* ═══════════════════════════════════════
+   REASONING PLACEHOLDER ANIMATION
+═══════════════════════════════════════ */
+(function () {
+  var reasoningTextEl = document.getElementById('reasoningText');
+  if (!reasoningTextEl) return;
+
+  var phrases = [
+    'Deploying to production',
+    'Compiling sources',
+    'Running tests',
+    'Building artifacts',
+    'Pushing to remote',
+    'Installing dependencies',
+    'Analyzing bundle',
+    'Optimizing assets',
+    'Syncing database',
+    'Generating types',
+    'Linting codebase',
+    'Checking updates'
+  ];
+
+  var currentIndex = 0;
+
+  function updatePhrase() {
+    // Fade out
+    reasoningTextEl.style.transition = 'opacity 0.3s ease';
+    reasoningTextEl.style.opacity = '0';
+    
+    setTimeout(function() {
+      // Меняем текст
+      reasoningTextEl.textContent = phrases[currentIndex];
+      currentIndex = (currentIndex + 1) % phrases.length;
+      
+      // Fade in
+      reasoningTextEl.style.opacity = '1';
+    }, 300);
+  }
+
+  setInterval(updatePhrase, 4000);
+  
+  // Первый запуск
+  reasoningTextEl.textContent = phrases[0];
+  currentIndex = 1;
+})();
+
+
+/* ═══════════════════════════════════════
+   CASES FOLDER INTRO DISMISS
+═══════════════════════════════════════ */
+(function () {
+  var introEl = document.getElementById('casesFolderIntro');
+  var dismissBtn = document.getElementById('casesFolderIntroDismiss');
+  
+  if (!introEl || !dismissBtn) return;
+  
+  function hideIntro() {
+    introEl.classList.add('is-hidden');
+    setTimeout(function() {
+      introEl.style.display = 'none';
+    }, 300);
+  }
+  
+  dismissBtn.addEventListener('click', hideIntro);
+})();
+
+
+/* ═══════════════════════════════════════
+   BINARY GRID ANIMATION
+═══════════════════════════════════════ */
+(function () {
+  const grid = document.getElementById('binaryGrid');
+  if (!grid) return;
+
+  // Вычисляем количество ячеек на основе размера экрана
+  const cellSize = 48;
+  const cols = Math.ceil(window.innerWidth / cellSize);
+  const rows = Math.ceil(window.innerHeight / cellSize);
+  const totalCells = cols * rows;
+
+  // Создаём сетку с 0 и 1
+  for (let i = 0; i < totalCells; i++) {
+    const span = document.createElement('span');
+    span.textContent = Math.random() > 0.5 ? '0' : '1';
+    
+    // Случайная задержка для каждой ячейки (от 0 до 2.6 секунд)
+    const randomDelay = Math.random() * 2.6;
+    // Случайная длительность (от 2 до 4 секунд) — на 35% быстрее
+    const randomDuration = 2 + Math.random() * 2;
+    
+    span.style.animationDelay = `${randomDelay}s`;
+    span.style.animationDuration = `${randomDuration}s`;
+    
+    grid.appendChild(span);
+  }
+
+  // Пересоздаём сетку при изменении размера окна
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      grid.innerHTML = '';
+      const newCols = Math.ceil(window.innerWidth / cellSize);
+      const newRows = Math.ceil(window.innerHeight / cellSize);
+      const newTotal = newCols * newRows;
+      
+      for (let i = 0; i < newTotal; i++) {
+        const span = document.createElement('span');
+        span.textContent = Math.random() > 0.5 ? '0' : '1';
+        const randomDelay = Math.random() * 2.6;
+        const randomDuration = 2 + Math.random() * 2;
+        span.style.animationDelay = `${randomDelay}s`;
+        span.style.animationDuration = `${randomDuration}s`;
+        grid.appendChild(span);
+      }
+    }, 300);
+  });
+})();
+
+/* Mobile-friendly REASONING animation */
+(function () {
+  var el = document.getElementById('reasoningText');
+  if (!el) return;
+  var phrases = ['Deploying to production','Compiling sources','Running tests','Building artifacts','Pushing to remote','Installing dependencies','Analyzing bundle','Optimizing assets','Syncing database','Generating types','Linting codebase','Checking updates'];
+  var idx = 0, timer = null;
+  function update() {
+    el.style.opacity = '0';
+    setTimeout(function() {
+      el.textContent = phrases[idx];
+      idx = (idx + 1) % phrases.length;
+      el.style.opacity = '1';
+    }, 300);
+  }
+  function start() {
+    if (timer) return;
+    el.textContent = phrases[0];
+    el.style.opacity = '1';
+    idx = 1;
+    timer = setInterval(update, 4000);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+  document.addEventListener('touchstart', start, { once: true, passive: true });
 })();
