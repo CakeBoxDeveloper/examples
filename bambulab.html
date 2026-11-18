@@ -614,7 +614,7 @@
           const maskSize=new THREE.Vector3();
           maskBox.getSize(maskSize);
           const maskMaxDim=Math.max(maskSize.x,maskSize.y)||1;
-          const maskTargetSize=1.3; // 130%
+          const maskTargetSize=1.5; // 150% (увеличен с 130%)
           const maskScale=maskTargetSize/maskMaxDim;
           svgMaskGroup.scale.set(maskScale,-maskScale,1);
           svgMaskGroup.position.set(0,0.12,depth/2+0.02);
