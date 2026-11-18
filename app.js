@@ -536,26 +536,16 @@ window.addEventListener('DOMContentLoaded', () => {
   const cv   = document.getElementById('matrixCanvas');
   if (!root || !cv) return;
   const ctx  = cv.getContext('2d');
-  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // НЕ проверяем prefers-reduced-motion — всегда анимируем
+  const calm = false;
 
   // Символы как в rain.py
   const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$&*+-=/<>|ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ'.split('');
 
-  let w = 0, h = 0, dpr = 1, cols = 0, drops = [];
-  let raf = 0, live = false, last = 0;
-  
-  // Динамические параметры — пересчитываются при resize
-  let CELL, COL_GAP, FPS, STEP;
-
-  function updateParams() {
-    const isMobile = window.innerWidth <= 860;
-    CELL    = isMobile ? 40 : 26;
-    COL_GAP = CELL * 2;
-    FPS     = isMobile ? 10 : 20;
-    STEP    = 1000 / FPS;
-  }
-
-  updateParams(); // первоначальная инициализация
+  const CELL    = 26;         // размер ячейки px
+  const COL_GAP = CELL * 2;   // шаг колонок — каждая вторая, не накладываются
+  const FPS     = 20;         // ~как sleep(0.05) в rain.py
+  const STEP    = 1000 / FPS;
 
   // Цвета зависят от темы
   function getTheme() {
@@ -578,6 +568,9 @@ window.addEventListener('DOMContentLoaded', () => {
       dim:    'rgba(0,120,40,0.35)',
     };
   }
+
+  let w = 0, h = 0, dpr = 1, cols = 0, drops = [];
+  let raf = 0, live = false, last = 0;
 
   const pick = () => CHARS[(Math.random() * CHARS.length) | 0];
   const rows = () => Math.ceil(h / CELL);
@@ -679,7 +672,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let t;
   addEventListener('resize', () => {
     clearTimeout(t);
-    t = setTimeout(() => { updateParams(); size(); }, 180);
+    t = setTimeout(() => { size(); }, 180);
   });
 })();
 
