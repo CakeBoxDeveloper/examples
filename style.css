@@ -2071,7 +2071,10 @@ body.theme-light .case-item {
   body.theme-light .contact-folder__page .cform__submit,
   body.theme-light .contact-folder__page .cform__submit--yellow,
   body.theme-light .contact-folder__page .cform__submit--green.btn--primary {
-    background: color-mix(in srgb, var(--accent) 18%, transparent) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
     border-radius: 4px !important;
   }
   /* Убираем все внутренние горизонтальные границы */
@@ -2160,17 +2163,6 @@ body.theme-light .case-item {
   body.theme-light .contact-folder__page .cform__check:has(input:checked) {
     background: rgba(255, 255, 255, 0.7) !important;
     border-color: rgba(0, 0, 0, 0.25) !important;
-  }
-    background: color-mix(in srgb, var(--accent) 6%, transparent) !important;
-  }
-  .contact-folder__page .cform__check:has(input:checked) {
-    background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
-  }
-  body.theme-light .contact-folder__page .cform__check {
-    background: color-mix(in srgb, var(--accent) 8%, transparent) !important;
-  }
-  body.theme-light .contact-folder__page .cform__check:has(input:checked) {
-    background: color-mix(in srgb, var(--accent) 15%, transparent) !important;
   }
 
   /* ── Панель — простая обводка вместо glass-shadow ── */
