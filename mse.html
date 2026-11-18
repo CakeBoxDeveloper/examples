@@ -640,6 +640,35 @@ onValue(workoutsRef, (snapshot) => {
         patternReady = true;
         drawBase();
         const loader=new THREE.SVGLoader();
+        
+        // МАСКА - загружаем тот же SVG для формы
+        loader.load(svgUrl,(data)=>{
+          const svgMaskGroup=new THREE.Group();
+          const svgMaskMat=baseMat.clone();
+          
+          data.paths.forEach(path=>{
+            THREE.SVGLoader.createShapes(path).forEach(shape=>{
+              const g=new THREE.ShapeGeometry(shape); // плоский, без extrude
+              svgMaskGroup.add(new THREE.Mesh(g,svgMaskMat));
+            });
+          });
+          
+          const maskBox=new THREE.Box3().setFromObject(svgMaskGroup);
+          const maskCenter=maskBox.getCenter(new THREE.Vector3());
+          svgMaskGroup.children.forEach(c=>c.geometry.translate(-maskCenter.x,-maskCenter.y,0));
+          
+          const maskSize=new THREE.Vector3();
+          maskBox.getSize(maskSize);
+          const maskMaxDim=Math.max(maskSize.x,maskSize.y)||1;
+          const maskTargetSize=1.5; // 150%
+          const maskScale=maskTargetSize/maskMaxDim;
+          svgMaskGroup.scale.set(maskScale*1.3,-maskScale*1.3,1);
+          svgMaskGroup.position.set(0,0.12,depth/2+0.02);
+          
+          card.add(svgMaskGroup);
+        });
+        
+        // ЛОГО - экструдированный 3D
         loader.load(svgUrl,(data)=>{
           const logoGroup=new THREE.Group();
           const logoMat=new THREE.MeshStandardMaterial({color:new THREE.Color(getHarmonicColor(hueShiftDeg,0.0,0.95)),metalness:0.75,roughness:0.2,side:THREE.DoubleSide});
