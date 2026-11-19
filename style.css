@@ -368,8 +368,8 @@ body:not(.theme-light) .hero__chat::before {
     -webkit-backdrop-filter: blur(1px);
   }
   .hero__chat-blur-edges {
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
     mask-image:
       linear-gradient(to right, #000 0, transparent 20px),
       linear-gradient(to left, #000 0, transparent 20px),
@@ -380,8 +380,8 @@ body:not(.theme-light) .hero__chat::before {
       linear-gradient(to bottom, #000 0, transparent 20px);
   }
   .hero__chat-blur-bottom {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     mask-image: linear-gradient(to top, #000 0, transparent 80px);
     -webkit-mask-image: linear-gradient(to top, #000 0, transparent 80px);
   }
@@ -2043,38 +2043,38 @@ body.theme-light .case-item {
   .contact-folder__page .donate__cell {
     background: rgba(77, 175, 106, 0.12) !important;
     border: 1px solid rgba(77, 175, 106, 0.3) !important;
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   /* Инпуты и textarea — frosted glass с блюром */
   .contact-folder__page .cform__input,
   .contact-folder__page .cform__textarea {
     background: rgba(77, 175, 106, 0.12) !important;
     border: 1px solid rgba(77, 175, 106, 0.3) !important;
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   body.theme-light .contact-folder__page .cform__input,
   body.theme-light .contact-folder__page .cform__textarea {
     background: rgba(255, 255, 255, 0.5) !important;
     border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   /* Светлая тема: кнопки валют */
   body.theme-light .contact-folder__page .donate__cell {
     background: rgba(255, 255, 255, 0.5) !important;
     border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   body.theme-light .contact-folder__page .cform__submit,
   body.theme-light .contact-folder__page .cform__submit--yellow,
   body.theme-light .contact-folder__page .cform__submit--green.btn--primary {
     background: rgba(255, 255, 255, 0.6) !important;
     border: 1px solid rgba(0, 0, 0, 0.2) !important;
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: 4px !important;
   }
   /* Убираем все внутренние горизонтальные границы */
@@ -2104,8 +2104,8 @@ body.theme-light .case-item {
     border: 1px solid rgba(77, 175, 106, 0.25);
     border-radius: 8px;
     background: rgba(77, 175, 106, 0.1);
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: var(--text-muted); cursor: pointer;
     position: relative; overflow: hidden; white-space: nowrap;
     transition: flex 0.25s ease, gap 0.25s ease, border-color 0.18s, color 0.18s, background 0.18s;
@@ -2149,8 +2149,8 @@ body.theme-light .case-item {
   .contact-folder__page .cform__check {
     background: rgba(77, 175, 106, 0.1) !important;
     border: 1px solid rgba(77, 175, 106, 0.25) !important;
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   .contact-folder__page .cform__check:has(input:checked) {
     background: rgba(77, 175, 106, 0.18) !important;
@@ -2672,3 +2672,92 @@ body.theme-light .send-btn {
   }
 }
 
+
+
+/* ═══════════════════════
+   SEND BUTTON FIX
+═══════════════════════ */
+/* Кнопки "Отправить заявку", "Отправить", "Спасибо за поддержку" */
+.hero__send-btn,
+.contact__send-btn,
+.donate__send-btn {
+  position: relative;
+  overflow: hidden;
+  /* Убираем рамку, оставляем только backdrop-filter */
+  border: none !important;
+  outline: none !important;
+}
+
+/* Backdrop-filter эффект который плавно сходит на нет */
+.hero__send-btn::before,
+.contact__send-btn::before,
+.donate__send-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  /* Градиент backdrop-filter: сильный внизу, слабый вверху */
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 30%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 30%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+}
+
+/* Мобильные: упрощённый backdrop для производительности */
+@media (max-width: 860px) {
+  .hero__send-btn::before,
+  .contact__send-btn::before,
+  .donate__send-btn::before {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+/* Тёмная тема: дополнительное зелёное свечение */
+body:not(.theme-light) .hero__send-btn::after,
+body:not(.theme-light) .contact__send-btn::after,
+body:not(.theme-light) .donate__send-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 100% 60% at 50% 100%,
+    rgba(77, 175, 106, 0.15) 0%,
+    rgba(77, 175, 106, 0.08) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+
+/* ═══════════════════════
+   MOBILE SCROLL FIX
+═══════════════════════ */
+/* Фикс для Android navigation bar - добавляем отступ снизу для последней секции */
+@media (max-width: 860px) {
+  .contact {
+    padding-bottom: max(env(safe-area-inset-bottom), 80px);
+  }
+  
+  /* Также фиксим высоту секций чтобы учесть navigation bar */
+  .cases,
+  .contact {
+    min-height: calc(100svh - env(safe-area-inset-bottom, 0px));
+  }
+}
