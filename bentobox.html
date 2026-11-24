@@ -251,11 +251,11 @@
     .timeline-status__date-bubble {
       flex-shrink: 0;
       padding: 8px 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-accent);
-      font-size: 0.56rem;
+      background: hsl(var(--hue), 50%, 25%);
+      border: none;
+      font-size: 0.65rem;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--bg);
       white-space: nowrap;
       position: relative;
       z-index: 2;
@@ -291,18 +291,34 @@
       overflow: hidden;
       align-self: stretch;
       background: repeating-linear-gradient(
-        -45deg,
-        hsla(var(--hue), 65%, 55%, 0.4) 0,
-        hsla(var(--hue), 65%, 55%, 0.4) 10px,
+        45deg,
+        hsl(var(--hue), 50%, 25%) 0,
+        hsl(var(--hue), 50%, 25%) 10px,
         var(--border-accent) 10px,
         var(--border-accent) 20px
-      ) left/200% 100%;
-      animation: stripes-move 2s infinite linear;
+      ) right/200% 100%;
+      animation: stripes-move 6s infinite linear;
+    }
+
+    /* Фейдаут градиент: прозрачный в центре, сплошной светлый цвет у краёв */
+    .timeline-status__line::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(
+        to right,
+        hsl(var(--hue), 50%, 25%) 0%,
+        transparent 20%,
+        transparent 80%,
+        hsl(var(--hue), 50%, 25%) 100%
+      );
     }
 
     @keyframes stripes-move {
       100% {
-        background-position: right;
+        background-position: left;
       }
     }
 
@@ -313,14 +329,13 @@
       gap: 3px;
       padding: 7px 14px;
       border-radius: 0;
-      font-size: 0.49rem;
+      font-size: 0.58rem;
       font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      background: hsla(var(--hue), 55%, 48%, 0.15);
-      color: hsl(var(--hue), 55%, 55%);
-      border-top: 1px solid hsla(var(--hue), 55%, 48%, 0.3);
-      border-bottom: 1px solid hsla(var(--hue), 55%, 48%, 0.3);
+      background: hsl(var(--hue), 50%, 25%);
+      color: var(--bg);
+      border: none;
       position: relative;
       z-index: 2;
       white-space: nowrap;
@@ -328,17 +343,15 @@
     }
 
     .timeline-status__badge--done {
-      background: hsla(120, 55%, 48%, 0.15);
-      color: hsl(120, 55%, 55%);
-      border-top: 1px solid hsla(120, 55%, 48%, 0.3);
-      border-bottom: 1px solid hsla(120, 55%, 48%, 0.3);
+      background: hsl(120, 50%, 25%);
+      color: var(--bg);
+      border: none;
     }
 
     .timeline-status__badge--wip {
-      background: hsla(var(--hue), 55%, 48%, 0.15);
-      color: hsl(var(--hue), 55%, 65%);
-      border-top: 1px solid hsla(var(--hue), 55%, 48%, 0.3);
-      border-bottom: 1px solid hsla(var(--hue), 55%, 48%, 0.3);
+      background: hsl(var(--hue), 50%, 25%);
+      color: var(--bg);
+      border: none;
     }
 
     @media (max-width: 640px) {
