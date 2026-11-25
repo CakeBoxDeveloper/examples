@@ -327,8 +327,8 @@ body.theme-light .hero__chat {
     inset 0 0 0 1.3px color-mix(in srgb, #000 5%, transparent);
 }
 
-/* Тёмная тема: прозрачный центр + цветной блюр по краям */
-/* Базовый лёгкий блюр по всей поверхности */
+/* Прогрессивный блюр как в index(51) */
+/* Тёмная тема: базовый лёгкий блюр по всей поверхности */
 body:not(.theme-light) .hero__chat::before {
   content: '';
   position: absolute; inset: 0; z-index: -1;
@@ -336,7 +336,7 @@ body:not(.theme-light) .hero__chat::before {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
-/* Сильный блюр по краям (маска: left, right, top) */
+/* Сильный блюр по краям (left, right, top) */
 .hero__chat-blur-edges {
   position: absolute; inset: 0; z-index: -1;
   border-radius: 24px; pointer-events: none;
@@ -353,6 +353,7 @@ body:not(.theme-light) .hero__chat::before {
 }
   /* ��������� ����� ����� ��� ��������� */
 /* Усиленное размытие снизу (увеличено) */
+/* Усиленное размытие снизу */
 .hero__chat-blur-bottom {
   position: absolute; inset: 0; z-index: -1;
   border-radius: 24px; pointer-events: none;
@@ -362,7 +363,7 @@ body:not(.theme-light) .hero__chat::before {
   -webkit-mask-image: linear-gradient(to top, #000 0, transparent 256px);
 }
 @media (max-width: 860px) {
-  /* Упрощаем backdrop-filter для производительности */
+  /* Упрощаем backdrop-filter для производительности на мобилке */
   body:not(.theme-light) .hero__chat::before {
     backdrop-filter: blur(1px);
     -webkit-backdrop-filter: blur(1px);
@@ -383,6 +384,9 @@ body:not(.theme-light) .hero__chat::before {
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     mask-image: linear-gradient(to top, #000 0, transparent 80px);
+    -webkit-mask-image: linear-gradient(to top, #000 0, transparent 80px);
+  }
+}
     -webkit-mask-image: linear-gradient(to top, #000 0, transparent 80px);
   }
 }
@@ -957,6 +961,15 @@ body.theme-light .cases-folder__tab:hover:not(.is-active) {
   background: rgba(0,0,0,0.04);
   border-color: rgba(0,0,0,0.22);
 }
+body.theme-light .cases-folder__tab.is-active {
+  background: #888;
+  border-color: #888;
+  color: #f2f3f7;
+}
+body.theme-light .cases-folder__tab:hover:not(.is-active) {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.22);
+}
 
 .cases-folder__tab-icon {
   width: 17px; height: 17px; flex-shrink: 0;
@@ -1046,7 +1059,7 @@ body.theme-light .case-item:hover .case-item__title { color: var(--text); }
 .case-item__btn   { flex-shrink: 0; font-size: 0.65rem; padding: 5px 12px; margin-left: auto; }
 body.theme-light .case-item__title { color: var(--text); }
 
-/* FADE OVERLAYS */
+/* FADE OVERLAYS для cases */
 .cases__fade-top,
 .cases__fade-bot {
   position: absolute; left: 0; right: 0; height: 56px;
@@ -1065,6 +1078,12 @@ body.theme-light .case-item__title { color: var(--text); }
   opacity: 1;
   margin-bottom: 1px;
   border-radius: 0 0 12px 12px;
+}
+
+/* Убираем фейдаут в contact карточках (он перекрывает textarea) */
+.cstack__card .cases__fade-bot,
+.contact-folder__page .cases__fade-bot {
+  display: none;
 }
 
 /* ═══════════════════════
@@ -1092,14 +1111,28 @@ body.theme-light .case-item__title { color: var(--text); }
 }
 .cstack__card {
   position: absolute; top: 0; left: 0; width: 100%; height: 510px;
-  border-radius: 14px; will-change: transform, opacity;
+  border-radius: 14px; 
+  will-change: transform, opacity;
   transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease, box-shadow 0.45s ease;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5); cursor: pointer; transform-origin: top center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5); 
+  cursor: pointer; 
+  transform-origin: top center;
   overflow: hidden; /* скругление применяется ко всему содержимому */
 }
-.cstack__card .cform__wrap { height: 100%; display: flex; flex-direction: column; }
+.cstack__card .cform__wrap { 
+  height: 100%; 
+  display: flex; 
+  flex-direction: column; 
+  border-radius: 14px; /* Явное скругление wrapper */
+  overflow: hidden;
+}
 .cstack__card .cform,
-.cstack__card .cform--donate { flex: 1; overflow-y: auto; scrollbar-width: none; }
+.cstack__card .cform--donate { 
+  flex: 1; 
+  overflow-y: auto; 
+  scrollbar-width: none;
+  border-radius: 0; /* Убираем скругление у внутреннего блока */
+}
 .cstack__card .cform::-webkit-scrollbar,
 .cstack__card .cform--donate::-webkit-scrollbar { display: none; }
 /* donate внутри cstack — не скроллим, слайдер сам управляет */
@@ -1115,7 +1148,9 @@ body.theme-light .case-item__title { color: var(--text); }
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px; background: var(--bg-card);
   border-bottom: none;
-  border-radius: 14px 14px 0 0; flex-shrink: 0;
+  border-radius: 14px 14px 0 0; 
+  flex-shrink: 0;
+  overflow: hidden; /* Принудительное скругление для всего содержимого */
 }
 body.theme-light .cform__header {
   background: #e4e5ec;
@@ -1125,11 +1160,13 @@ body.theme-light .cform__header {
 .cform__header--yellow {
   background: var(--bg-card);
   border-bottom: none;
+  border-radius: 14px 14px 0 0; /* Явное скругление */
 }
 body.theme-light .cform__header--green,
 body.theme-light .cform__header--yellow {
   background: #e4e5ec;
   border-bottom: none;
+  border-radius: 14px 14px 0 0; /* Явное скругление в светлой теме */
 }
 /* Светлая тема: donate */
 body.theme-light .donate__cell {
@@ -1271,6 +1308,36 @@ body.theme-light .cform__check:has(input:checked) {
   padding: 11px 14px; outline: none; resize: vertical;
   transition: border-color var(--ease); width: 100%;
 }
+/* Custom scrollbar для textarea */
+.cform__textarea::-webkit-scrollbar {
+  width: 8px;
+}
+.cform__textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cform__textarea::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+.cform__textarea::-webkit-scrollbar-thumb:hover {
+  background: #3a9458;
+}
+/* Светлая тема: серый scrollbar */
+body.theme-light .cform__textarea::-webkit-scrollbar-thumb {
+  background: #888;
+}
+body.theme-light .cform__textarea::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+/* Firefox scrollbar */
+.cform__textarea {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+body.theme-light .cform__textarea {
+  scrollbar-color: #888 transparent;
+}
+
 .cform__input::placeholder,
 .cform__textarea::placeholder { color: var(--text-dim); }
 .cform__input:focus,
@@ -1715,25 +1782,103 @@ body.theme-light .dl-lottie-wrap {
   filter: brightness(0) opacity(0.5);
 }
 
-/* Пассив — обводка, без тени; плавный переход */
+/* Пассив — БЕЗ обводки, только backdrop-filter */
 .dl-button > div {
   background: var(--bg-card) !important;
-  outline: 1.5px solid var(--accent);
-  outline-offset: -1.5px;
+  outline: none !important;
+  border: none !important;
   box-shadow: none !important;
-  transition: outline-color 0.3s ease, box-shadow 0.3s ease !important;
+  position: relative;
+  overflow: visible;
 }
-/* Актив/done — убираем обводку, добавляем shadow */
+
+/* Плавный градиент фона вместо чёткой линии */
+.dl-button > div {
+  background: linear-gradient(
+    to top,
+    var(--bg-card) 0%,
+    color-mix(in srgb, var(--bg-card) 95%, transparent) 70%,
+    color-mix(in srgb, var(--bg-card) 70%, transparent) 90%,
+    transparent 100%
+  ) !important;
+}
+
+/* Backdrop-filter слой за кнопкой */
+.dl-button > div::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  /* Градиент прозрачности: сильный внизу, слабый вверху */
+  mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 30%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.8) 30%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+}
+
+/* Мобильные: упрощённый backdrop */
+@media (max-width: 860px) {
+  .dl-button > div::before {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+/* Убираем ВСЕ hover и active эффекты */
+.dl-button,
+.dl-button > div {
+  cursor: default !important;
+  pointer-events: auto !important;
+}
+
+.dl-button:hover > div,
+.dl-button:active > div,
+.dl-button:focus > div {
+  transform: none !important;
+  outline: none !important;
+  border: none !important;
+  background: linear-gradient(
+    to top,
+    var(--bg-card) 0%,
+    color-mix(in srgb, var(--bg-card) 95%, transparent) 70%,
+    color-mix(in srgb, var(--bg-card) 70%, transparent) 90%,
+    transparent 100%
+  ) !important;
+}
+
+/* Актив/done — убираем обводку, только shadow */
 .dl-button.active > div,
 .dl-button.done > div {
-  outline-color: transparent !important;
+  outline: none !important;
+  border: none !important;
   box-shadow: 0 6px 20px rgba(0,0,0,0.55) !important;
+  background: linear-gradient(
+    to top,
+    var(--bg-card) 0%,
+    color-mix(in srgb, var(--bg-card) 95%, transparent) 70%,
+    color-mix(in srgb, var(--bg-card) 70%, transparent) 90%,
+    transparent 100%
+  ) !important;
 }
 
 /* feedbackForm — форма растягивается, textarea заполняет всё */
 #feedbackForm { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .cform__group--grow { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-.cform__textarea--grow { flex: 1; resize: none; min-height: 60px; scrollbar-width: none; }
+.cform__textarea--grow { flex: 1; resize: none; min-height: 60px; max-height: 180px; scrollbar-width: none; }
 .cform__textarea--grow::-webkit-scrollbar { display: none; }
 
 /* Фикс: cform__wrap у feedback — сплошной фон без дыр */
@@ -2458,14 +2603,13 @@ body.theme-light .intro-btn:hover {
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  background: #212e22 !important;
+  background: transparent;
   color: #a8c4a8 !important;
   opacity: 1 !important;
 }
 
 /* Светлая тема - кнопки серые */
 body.theme-light .send-btn {
-  background: #d4d5dc !important;
   color: #666 !important;
 }
 
@@ -2749,10 +2893,10 @@ body:not(.theme-light) .donate__send-btn::after {
 /* ═══════════════════════
    MOBILE SCROLL FIX
 ═══════════════════════ */
-/* Фикс для Android navigation bar - добавляем отступ снизу для последней секции */
+/* Фикс для Android navigation bar - добавляем БОЛЬШОЙ отступ снизу для последней секции */
 @media (max-width: 860px) {
   .contact {
-    padding-bottom: max(env(safe-area-inset-bottom), 80px);
+    padding-bottom: max(env(safe-area-inset-bottom, 0px) + 120px, 160px) !important;
   }
   
   /* Также фиксим высоту секций чтобы учесть navigation bar */
@@ -2760,4 +2904,120 @@ body:not(.theme-light) .donate__send-btn::after {
   .contact {
     min-height: calc(100svh - env(safe-area-inset-bottom, 0px));
   }
+}
+
+
+
+/* ═══════════════════════
+   DISABLE HOVER FOR ALL SUBMIT BUTTONS + GRADIENT
+═══════════════════════ */
+/* Разрешаем градиенту выходить за пределы */
+.cform__wrap,
+.cform__btn-wrap,
+.cstack__card,
+.contact-folder__page {
+  overflow: visible !important;
+}
+
+/* Убираем hover и cursor pointer у всех кнопок отправки */
+.cform__submit,
+.cform__submit--yellow,
+.cform__submit--green,
+.cform__submit.btn--primary,
+.send-btn {
+  cursor: default !important;
+  position: relative;
+  overflow: visible !important;
+  /* Базовый цвет кнопки на переднем плане */
+  background: #212e22 !important;
+  z-index: 1;
+}
+
+/* Светлая тема: базовый цвет кнопки */
+body.theme-light .cform__submit,
+body.theme-light .cform__submit--yellow,
+body.theme-light .cform__submit--green,
+body.theme-light .cform__submit.btn--primary,
+body.theme-light .send-btn {
+  background: #d4d5dc !important;
+}
+
+/* Градиент-подложка которая заходит на карточку */
+.cform__submit::before,
+.cform__submit--yellow::before,
+.cform__submit--green::before,
+.cform__submit.btn--primary::before,
+.send-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 200%; /* Растягиваем вверх в 2 раза */
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Градиент от цвета кнопки внизу к цвету карточки вверху */
+  background: linear-gradient(
+    to top,
+    #212e22 0%,
+    #1c2a1c 30%,
+    #18241a 50%,
+    var(--bg-card) 100%
+  );
+}
+
+/* Светлая тема: градиент от светлого цвета кнопки */
+body.theme-light .cform__submit::before,
+body.theme-light .cform__submit--yellow::before,
+body.theme-light .cform__submit--green::before,
+body.theme-light .cform__submit.btn--primary::before,
+body.theme-light .send-btn::before {
+  background: linear-gradient(
+    to top,
+    #d4d5dc 0%,
+    #dcdde2 30%,
+    #e5e6ea 50%,
+    var(--bg-card) 100%
+  );
+}
+
+/* Убираем ВСЕ hover и active эффекты */
+.cform__submit:hover,
+.cform__submit--yellow:hover,
+.cform__submit--green:hover,
+.cform__submit.btn--primary:hover,
+.send-btn:hover,
+.cform__submit:active,
+.cform__submit--yellow:active,
+.cform__submit--green:active,
+.cform__submit.btn--primary:active,
+.send-btn:active {
+  transform: none !important;
+}
+
+/* Светлая тема: убираем hover/active */
+body.theme-light .cform__submit:hover,
+body.theme-light .cform__submit--yellow:hover,
+body.theme-light .cform__submit--green:hover,
+body.theme-light .cform__submit.btn--primary:hover,
+body.theme-light .send-btn:hover,
+body.theme-light .cform__submit:active,
+body.theme-light .cform__submit--yellow:active,
+body.theme-light .cform__submit--green:active,
+body.theme-light .cform__submit.btn--primary:active,
+body.theme-light .send-btn:active {
+  transform: none !important;
+}
+
+/* Убираем hover у кнопки назад в donate */
+.cform__submit--yellow.is-back {
+  cursor: default !important;
+}
+
+.cform__submit--yellow.is-back:hover,
+.cform__submit--yellow.is-back:active {
+  transform: none !important;
+}
+  transform: none !important;
 }
