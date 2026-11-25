@@ -142,6 +142,148 @@
     .page-loader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     .page-loader__lottie { width: 100px; height: 100px; filter: invert(60%) sepia(40%) saturate(400%) hue-rotate(calc(var(--hue) * 1deg - 30deg)) brightness(90%); }
 
+    /* ════════════════════════════════════════
+       ANIMATED TIMELINE STATUS (отдельная строка вне таблицы)
+    ════════════════════════════════════════ */
+    .timeline-status {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+      height: auto;
+    }
+
+    .timeline-status__date-bubble {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      background: hsl(210, 55%, 35%);
+      border: none;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--bg);
+      white-space: nowrap;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Левый пузырь - скругление только слева */
+    .timeline-status__date-bubble:first-child {
+      border-radius: 10px 0 0 10px;
+      border-right: none;
+    }
+
+    /* Правый пузырь - скругление только справа */
+    .timeline-status__date-bubble:last-child {
+      border-radius: 0 10px 10px 0;
+      border-left: none;
+    }
+
+    .timeline-status__center {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+      min-width: 0;
+    }
+
+    .timeline-status__line {
+      flex: 1;
+      height: auto;
+      position: relative;
+      overflow: hidden;
+      align-self: stretch;
+      background: repeating-linear-gradient(
+        45deg,
+        hsl(210, 55%, 35%) 0,
+        hsl(210, 55%, 35%) 10px,
+        var(--border-accent) 10px,
+        var(--border-accent) 20px
+      );
+      background-size: 28.28px 28.28px;
+      animation: stripes-move 2s infinite linear;
+    }
+
+    /* Фейдаут градиент: прозрачный в центре, сплошной цвет у краёв */
+    .timeline-status__line::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(
+        to right,
+        hsl(210, 55%, 35%) 0%,
+        transparent 20%,
+        transparent 80%,
+        hsl(210, 55%, 35%) 100%
+      );
+    }
+
+    @keyframes stripes-move {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 28.28px 0;
+      }
+    }
+
+    .timeline-status__badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 7px 14px;
+      border-radius: 0;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: hsl(210, 55%, 35%);
+      color: var(--bg);
+      border: none;
+      position: relative;
+      z-index: 2;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .timeline-status__badge--done {
+      background: hsl(210, 55%, 35%);
+      color: var(--bg);
+      border: none;
+    }
+
+    .timeline-status__badge--wip {
+      background: hsl(210, 55%, 35%);
+      color: var(--bg);
+      border: none;
+    }
+
+    @media (max-width: 640px) {
+      .timeline-status {
+        padding: 24px 16px;
+        gap: 16px;
+      }
+
+      .timeline-status__date-bubble {
+        padding: 6px 12px;
+        font-size: 0.72rem;
+      }
+
+      .timeline-status__badge {
+        font-size: 0.65rem;
+        padding: 5px 12px;
+      }
+    }
+
     @media (max-width: 480px) {
       :root { --block-w: calc(100vw - 32px); }
       .hero { padding: 16px 16px 8px; }
@@ -209,13 +351,18 @@
           <span class="tech__cell-val">Neural Filters · Generative Fill</span>
         </div>
       </div>
-      <div class="tech__status-wrap">
-        <div class="tech__status">
-          <span class="badge badge--done">Актуально</span>
-        </div>
-      </div>
     </div>
   </section>
+
+  <div class="timeline-status">
+    <div class="timeline-status__date-bubble">Дек 2024</div>
+    <div class="timeline-status__center">
+      <div class="timeline-status__line"></div>
+      <span class="timeline-status__badge timeline-status__badge--done">Актуально</span>
+      <div class="timeline-status__line"></div>
+    </div>
+    <div class="timeline-status__date-bubble">Фев 2025</div>
+  </div>
 
   <article class="article">
     <div class="article__inner">
