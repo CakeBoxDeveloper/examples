@@ -1119,6 +1119,18 @@ ws.onclose = () => {
       const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/77591cc2f0cc579343f95a2418a5c0058739188e/K_Logo%20(1).svg';
       const img = new Image(); img.crossOrigin = 'Anonymous'; img.src = svgUrl;
       let svgLoaded = false;
+      let patternReady = false;
+
+/**
+       * Ручная зона исключения (в пикселях текстуры 1024x1365).
+       * Экземпляры паттерна, которые хотя бы частично заходят в эту область, не отрисовываются.
+       */
+      const manualPatternExclusionZone = {
+        x: 230,
+        y: 300,
+        width: 564,
+        height: 750
+      };
 
       class Sparkle {
         constructor() { this.reset(); }
@@ -1159,27 +1171,25 @@ ws.onclose = () => {
       }
       const sparkles = Array.from({length: 5}, () => new Sparkle());
 
+/**
+       * Проверяет, пересекается ли прямоугольник отдельного экземпляра паттерна
+       * с ручной зоной исключения в центре карточки.
+       */
+      function isPatternItemMasked(x, y, w, h) {
+        const zone = manualPatternExclusionZone;
+        return (
+          x < zone.x + zone.width &&
+          x + w > zone.x &&
+          y < zone.y + zone.height &&
+          y + h > zone.y
+        );
+      }
+
       function drawBase() {
-        if (!svgLoaded) return;
+        if (!patternReady) return;
         const w = cvs.width, h = cvs.height;
-        patCtx.clearRect(0,0,w,h);
-        patCtx.save();
-        patCtx.translate(w/2,h/2); patCtx.rotate(30*Math.PI/180);
-        // Сохраняем пропорции SVG, вписываем в квадрат 180px
-        const cell = 180;
-        const nw = img.naturalWidth || cell;
-        const nh = img.naturalHeight || cell;
-        const ratio = nw / nh;
-        const iW = ratio >= 1 ? cell : cell * ratio;
-        const iH = ratio >= 1 ? cell / ratio : cell;
-        const gX=280,gY=280;
-        for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) {
-          const offX=(r%2!==0)?gX/2:0;
-          patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH);
-        }
-        patCtx.restore();
-        ctx.fillStyle = getHarmonicColor(hueShiftDeg,0.35,0.15);
-        ctx.fillRect(0,0,w,h);
+        ctx.fillStyle=getHarmonicColor(hueShiftDeg,0.35,0.15); ctx.fillRect(0,0,w,h);
+        ctx.save(); ctx.globalAlpha=0.08; ctx.drawImage(patCvs,0,0); ctx.restore();
         ctx.save(); ctx.globalAlpha=0.08; ctx.drawImage(patCvs,0,0); ctx.restore();
         ctx.save();
         const cr=30;
@@ -1301,7 +1311,32 @@ ws.onclose = () => {
       card.add(holoMesh);
 
       img.onload=function(){
-        svgLoaded=true; drawBase();
+        svgLoaded=true;
+        
+        // Отрисовываем паттерн один раз
+        const w = patCvs.width, h = patCvs.height;
+        patCtx.clearRect(0,0,w,h);
+        patCtx.save();
+        patCtx.translate(w/2,h/2);
+        patCtx.rotate(-30*Math.PI/180);
+        const cell=180, nw=img.naturalWidth||cell, nh=img.naturalHeight||cell, ratio=nw/nh;
+        const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
+        for (let r=-15;r<15;r++) {
+          for (let c=-12;c<12;c++) { 
+            const offX=(r%2!==0)?gX/2:0; 
+            const drawX = c * gX + offX - iW / 2;
+            const drawY = r * gY - iH / 2;
+            
+            // Проверяем маску с абсолютными координатами
+            if (isPatternItemMasked(w / 2 + drawX, h / 2 + drawY, iW, iH)) continue;
+            
+            patCtx.drawImage(img,drawX,drawY,iW,iH); 
+          }
+        }
+        patCtx.restore();
+        patternReady = true;
+        
+        drawBase();
         const loader=new THREE.SVGLoader();
         loader.load(svgUrl,(data)=>{
           const logoGroup=new THREE.Group();
@@ -1326,8 +1361,7 @@ ws.onclose = () => {
           const targetSize=1.1;
           const s=targetSize/maxDim;
           logoGroup.scale.set(s,-s,s);
-          logoGroup.position.set(0,0.12,depth/2+0.04);
-          card.add(logoGroup);
+          logoGroup.position.set(0,0.12,depth/2+0.04); logoGroup.rotation.z = -30 * Math.PI / 180; card.add(logoGroup);
         });
       };
 

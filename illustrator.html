@@ -443,6 +443,18 @@
       const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/examples/c8176c83ba0afa5e845385716c1a80fd2b85aab7/adobe-illustrator-svgrepo-com%20(1).svg';
       const img = new Image(); img.crossOrigin = 'Anonymous'; img.src = svgUrl;
       let svgLoaded = false;
+      let patternReady = false;
+
+/**
+       * Ручная зона исключения (в пикселях текстуры 1024x1365).
+       * Экземпляры паттерна, которые хотя бы частично заходят в эту область, не отрисовываются.
+       */
+      const manualPatternExclusionZone = {
+        x: 230,
+        y: 300,
+        width: 564,
+        height: 750
+      };
 
       class Sparkle {
         constructor() { this.reset(); }
@@ -469,16 +481,25 @@
       }
       const sparkles = Array.from({length: 5}, () => new Sparkle());
 
+/**
+       * Проверяет, пересекается ли прямоугольник отдельного экземпляра паттерна
+       * с ручной зоной исключения в центре карточки.
+       */
+      function isPatternItemMasked(x, y, w, h) {
+        const zone = manualPatternExclusionZone;
+        return (
+          x < zone.x + zone.width &&
+          x + w > zone.x &&
+          y < zone.y + zone.height &&
+          y + h > zone.y
+        );
+      }
+
       function drawBase() {
-        if (!svgLoaded) return;
+        if (!patternReady) return;
         const w = cvs.width, h = cvs.height;
-        patCtx.clearRect(0,0,w,h); patCtx.save();
-        patCtx.translate(w/2,h/2); patCtx.rotate(30*Math.PI/180);
-        const cell=180, nw=img.naturalWidth||cell, nh=img.naturalHeight||cell, ratio=nw/nh;
-        const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
-        for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) { const offX=(r%2!==0)?gX/2:0; patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH); }
-        patCtx.restore();
         ctx.fillStyle=getHarmonicColor(hueShiftDeg,0.35,0.15); ctx.fillRect(0,0,w,h);
+        ctx.save(); ctx.globalAlpha=0.08; ctx.drawImage(patCvs,0,0); ctx.restore();
         ctx.save(); ctx.globalAlpha=0.08; ctx.drawImage(patCvs,0,0); ctx.restore();
         ctx.save();
         const cr=30; ctx.beginPath();
@@ -552,47 +573,47 @@
       const holoMesh=new THREE.Mesh(holoGeo,holoMat); holoMesh.position.z=depth/2+0.016; card.add(holoMesh);
 
       img.onload=function(){
-        svgLoaded=true; drawBase();
+        svgLoaded=true;
+        
+        // Отрисовываем паттерн один раз
+        const w = patCvs.width, h = patCvs.height;
+        patCtx.clearRect(0,0,w,h);
+        patCtx.save();
+        patCtx.translate(w/2,h/2);
+        patCtx.rotate(-30*Math.PI/180);
+        const cell=180, nw=img.naturalWidth||cell, nh=img.naturalHeight||cell, ratio=nw/nh;
+        const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
+        for (let r=-15;r<15;r++) {
+          for (let c=-12;c<12;c++) { 
+            const offX=(r%2!==0)?gX/2:0; 
+            const drawX = c * gX + offX - iW / 2;
+            const drawY = r * gY - iH / 2;
+            
+            // Проверяем маску с абсолютными координатами
+            if (isPatternItemMasked(w / 2 + drawX, h / 2 + drawY, iW, iH)) continue;
+            
+            patCtx.drawImage(img,drawX,drawY,iW,iH); 
+          }
+        }
+        patCtx.restore();
+        patternReady = true;
+        
+        drawBase();
         const loader=new THREE.SVGLoader();
         
-        // МАСКА - загружаем тот же SVG для формы
-        loader.load(svgUrl,(data)=>{
-          const svgMaskGroup=new THREE.Group();
-          const svgMaskMat=baseMat.clone();
-          
-          data.paths.forEach(path=>{
-            THREE.SVGLoader.createShapes(path).forEach(shape=>{
-              const g=new THREE.ShapeGeometry(shape); // плоский, без extrude
-              svgMaskGroup.add(new THREE.Mesh(g,svgMaskMat));
-            });
-          });
-          
-          const maskBox=new THREE.Box3().setFromObject(svgMaskGroup);
-          const maskCenter=maskBox.getCenter(new THREE.Vector3());
-          svgMaskGroup.children.forEach(c=>c.geometry.translate(-maskCenter.x,-maskCenter.y,0));
-          
-          const maskSize=new THREE.Vector3();
-          maskBox.getSize(maskSize);
-          const maskMaxDim=Math.max(maskSize.x,maskSize.y)||1;
-          const maskTargetSize=1.5; // 150%
-          const maskScale=maskTargetSize/maskMaxDim;
-          svgMaskGroup.scale.set(maskScale,-maskScale,1);
-          svgMaskGroup.position.set(0,0.12,depth/2+0.02);
-          
-          card.add(svgMaskGroup);
-        });
+        
         
         // ЛOGO - экструдированный 3D
         loader.load(svgUrl,(data)=>{
           const logoGroup=new THREE.Group();
           const logoMat=new THREE.MeshStandardMaterial({color:new THREE.Color(getHarmonicColor(hueShiftDeg,0.65,0.72)),metalness:0.75,roughness:0.2,side:THREE.DoubleSide});
-          data.paths.forEach(path=>{THREE.SVGLoader.createShapes(path).forEach(shape=>{const g=new THREE.ExtrudeGeometry(shape,{depth:13,bevelEnabled:false,steps:1});g.computeVertexNormals();logoGroup.add(new THREE.Mesh(g,logoMat));});});
+          data.paths.forEach(path=>{THREE.SVGLoader.createShapes(path).forEach(shape=>{const g=new THREE.ExtrudeGeometry(shape,{depth:6.5,bevelEnabled:false,steps:1});g.computeVertexNormals();logoGroup.add(new THREE.Mesh(g,logoMat));});});
           const box=new THREE.Box3().setFromObject(logoGroup);
           const center=box.getCenter(new THREE.Vector3());
           logoGroup.children.forEach(c=>c.geometry.translate(-center.x,-center.y,-center.z));
           const size=new THREE.Vector3(); box.getSize(size);
           const maxDim=Math.max(size.x,size.y)||1, targetSize=1.1, s=targetSize/maxDim;
-          logoGroup.scale.set(s,-s,s); logoGroup.position.set(0,0.12,depth/2+0.04); card.add(logoGroup);
+          logoGroup.scale.set(s,-s,s); logoGroup.position.set(0,0.12,depth/2+0.04); logoGroup.rotation.z = 30 * Math.PI / 180; card.add(logoGroup);
         });
       };
 
