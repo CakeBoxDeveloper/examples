@@ -611,6 +611,9 @@ const chosen = await selectModel(query, { temp: 0.3, max: 50 });
   <script>
   // Голографическая карточка
   (function() {
+    let outlineEnabled = true;
+    let onMaskToggleCallback = null;
+
     function init() {
       const wrap = document.getElementById('holowrap');
       if (!wrap || typeof THREE === 'undefined') return;
@@ -618,7 +621,8 @@ const chosen = await selectModel(query, { temp: 0.3, max: 50 });
       if (!W || !H) { requestAnimationFrame(init); return; }
 
       // Бежево-коричневая гамма — hue ~28
-      let hueShiftDeg = 28;      let shimmerOffset = -1.0;
+      let hueShiftDeg = 28;
+      let shimmerOffset = -1.0;
 
       function getHarmonicColor(baseHue, sat, lig, offset = 0) {
         const c = new THREE.Color();
@@ -627,16 +631,23 @@ const chosen = await selectModel(query, { temp: 0.3, max: 50 });
         return '#' + c.getHexString();
       }
 
+      const cardBaseHex = getHarmonicColor(hueShiftDeg, 0.3, 0.14);
+
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
       camera.position.z = 6.5;
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(W, H); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(W, H); 
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       wrap.appendChild(renderer.domElement);
 
       scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-      const mainL = new THREE.DirectionalLight(0xffffff, 2.0); mainL.position.set(5, 5, 8); scene.add(mainL);
-      const sideL = new THREE.DirectionalLight(0xffcc80, 1.0); sideL.position.set(-5, -3, 4); scene.add(sideL);
+      const mainL = new THREE.DirectionalLight(0xffffff, 2.0); 
+      mainL.position.set(5, 5, 8); 
+      scene.add(mainL);
+      const sideL = new THREE.DirectionalLight(0xffcc80, 1.0); 
+      sideL.position.set(-5, -3, 4); 
+      scene.add(sideL);
 
       const cvs = document.createElement('canvas'); cvs.width = 1024; cvs.height = 1365;
       const ctx = cvs.getContext('2d');
@@ -648,10 +659,27 @@ const chosen = await selectModel(query, { temp: 0.3, max: 50 });
       const tex = new THREE.CanvasTexture(cvs); tex.anisotropy = 16;
       const holoTex = new THREE.CanvasTexture(holoCvs); holoTex.anisotropy = 16;
 
-      // SVG — ключ Panacea (уже повёрнут на 45°, ставим как есть)
+      // SVG — ключ Panacea (уже повёрнут на 45°)
       const svgUrl = 'https://raw.githubusercontent.com/CakeBoxDeveloper/Psy/5fe6a798475b75749a5b3b0b6d19dd9eb93812e7/PanaceaKey45Fill.svg';
-      const img = new Image(); img.crossOrigin = 'Anonymous'; img.src = svgUrl;
+      const img = new Image(); 
+      img.crossOrigin = 'Anonymous'; 
+      img.src = svgUrl;
       let svgLoaded = false;
+
+      /**
+       * Ручная зона исключения (в пикселях текстуры 1024x1365).
+       * Ключи, которые хотя бы частично заходят в эту область, не отрисовываются.
+       */
+      const manualPatternExclusionZone = {
+        x: 230,
+        y: 300,
+        width: 564,
+        height: 750
+      };
+
+      onMaskToggleCallback = function () {
+        drawBase();
+      };
 
       class Sparkle {
         constructor() { this.reset(); }
@@ -660,172 +688,415 @@ const chosen = await selectModel(query, { temp: 0.3, max: 50 });
           this.x = pad + Math.random() * (cvs.width - pad * 2);
           this.y = pad + Math.random() * (cvs.height - pad * 2);
           this.maxR = 8 + Math.random() * 10;
-          this.progress = 0; this.speed = 0.008 + Math.random() * 0.01;
-          this.rotation = Math.random() * Math.PI; this.rotSpeed = (Math.random() - 0.5) * 0.015;
+          this.progress = 0; 
+          this.speed = 0.008 + Math.random() * 0.01;
+          this.rotation = Math.random() * Math.PI; 
+          this.rotSpeed = (Math.random() - 0.5) * 0.015;
           this.delay = Math.random() * 180;
         }
-        update() { if (this.delay > 0) { this.delay--; return; } this.progress += this.speed; this.rotation += this.rotSpeed; if (this.progress >= 1) this.reset(); }
-        draw(ctx) {
+        update() { 
+          if (this.delay > 0) { this.delay--; return; } 
+          this.progress += this.speed; 
+          this.rotation += this.rotSpeed; 
+          if (this.progress >= 1) this.reset(); 
+        }
+        draw(targetCtx) {
           if (this.delay > 0 || this.progress <= 0) return;
-          const scale = Math.sin(this.progress * Math.PI), r = this.maxR * scale, ir = r * 0.22;
-          ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
-          ctx.beginPath(); ctx.moveTo(0,-r); ctx.quadraticCurveTo(0,-ir,r,0); ctx.quadraticCurveTo(0,ir,0,r); ctx.quadraticCurveTo(0,ir,-r,0); ctx.quadraticCurveTo(0,-ir,0,-r); ctx.closePath();
-          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.75); ctx.fill();
-          ctx.beginPath(); ctx.arc(0,0,ir*0.7,0,Math.PI*2);
-          ctx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.88); ctx.fill();
-          ctx.restore();
+          const scale = Math.sin(this.progress * Math.PI);
+          const r = this.maxR * scale;
+          const ir = r * 0.22;
+
+          targetCtx.save();
+          targetCtx.translate(this.x, this.y);
+          targetCtx.rotate(this.rotation);
+
+          targetCtx.beginPath();
+          targetCtx.moveTo(0, -r);
+          targetCtx.quadraticCurveTo(0, -ir, r, 0);
+          targetCtx.quadraticCurveTo(0, ir, 0, r);
+          targetCtx.quadraticCurveTo(0, ir, -r, 0);
+          targetCtx.quadraticCurveTo(0, -ir, 0, -r);
+          targetCtx.closePath();
+          targetCtx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.75);
+          targetCtx.fill();
+
+          targetCtx.beginPath();
+          targetCtx.arc(0, 0, ir * 0.7, 0, Math.PI * 2);
+          targetCtx.fillStyle = getHarmonicColor(hueShiftDeg, 1.0, 0.88);
+          targetCtx.fill();
+
+          targetCtx.restore();
         }
       }
-      const sparkles = Array.from({length: 5}, () => new Sparkle());
+
+      const sparkles = Array.from({ length: 5 }, () => new Sparkle());
+
+      /**
+       * Проверяет, пересекается ли прямоугольник отдельного экземпляра паттерна
+       * с ручной зоной исключения в центре карточки.
+       */
+      function isPatternItemMasked(x, y, w, h) {
+        if (!outlineEnabled) return false;
+        const zone = manualPatternExclusionZone;
+        return (
+          x < zone.x + zone.width &&
+          x + w > zone.x &&
+          y < zone.y + zone.height &&
+          y + h > zone.y
+        );
+      }
 
       function drawBase() {
         if (!svgLoaded) return;
-        const w = cvs.width, h = cvs.height;
-        patCtx.clearRect(0,0,w,h); patCtx.save();
-        patCtx.translate(w/2,h/2);
-        // НЕ поворачиваем — SVG уже на 45°
-        const cell=180, nw=img.naturalWidth||cell, nh=img.naturalHeight||cell, ratio=nw/nh;
-        const iW=ratio>=1?cell:cell*ratio, iH=ratio>=1?cell/ratio:cell, gX=280, gY=280;
-        for (let r=-15;r<15;r++) for (let c=-12;c<12;c++) {
-          const offX=(r%2!==0)?gX/2:0;
-          patCtx.drawImage(img,c*gX+offX-iW/2,r*gY-iH/2,iW,iH);
+        const w = cvs.width;
+        const h = cvs.height;
+
+        patCtx.clearRect(0, 0, w, h);
+
+        const cell = 180;
+        const nw = img.naturalWidth || cell;
+        const nh = img.naturalHeight || cell;
+        const ratio = nw / nh;
+        const iW = ratio >= 1 ? cell : cell * ratio;
+        const iH = ratio >= 1 ? cell / ratio : cell;
+        const gX = 280;
+        const gY = 280;
+
+        for (let r = -15; r < 15; r++) {
+          for (let c = -12; c < 12; c++) {
+            const offX = (r % 2 !== 0) ? gX / 2 : 0;
+            const drawX = w / 2 + c * gX + offX - iW / 2;
+            const drawY = h / 2 + r * gY - iH / 2;
+
+            // Пропускаем экземпляры вне карточки и любые экземпляры, хотя бы частично задевающие маску
+            if (drawX + iW < 0 || drawX > w || drawY + iH < 0 || drawY > h) continue;
+            if (isPatternItemMasked(drawX, drawY, iW, iH)) continue;
+
+            patCtx.drawImage(img, drawX, drawY, iW, iH);
+          }
         }
-        patCtx.restore();
-        ctx.fillStyle=getHarmonicColor(hueShiftDeg,0.3,0.14); ctx.fillRect(0,0,w,h);
-        ctx.save(); ctx.globalAlpha=0.1; ctx.drawImage(patCvs,0,0); ctx.restore();
+
+        ctx.fillStyle = cardBaseHex;
+        ctx.fillRect(0, 0, w, h);
+
         ctx.save();
-        const cr=30; ctx.beginPath();
-        ctx.moveTo(cr,0);ctx.lineTo(w-cr,0);ctx.quadraticCurveTo(w,0,w,cr);
-        ctx.lineTo(w,h-cr);ctx.quadraticCurveTo(w,h,w-cr,h);
-        ctx.lineTo(cr,h);ctx.quadraticCurveTo(0,h,0,h-cr);
-        ctx.lineTo(0,cr);ctx.quadraticCurveTo(0,0,cr,0);
-        ctx.closePath(); ctx.clip();
-        ctx.translate(0,h); ctx.rotate(-30*Math.PI/180);
-        const sW=w*3,cur=shimmerOffset*w*3;
-        const sg=ctx.createLinearGradient(cur-sW/2,0,cur+sW/2,0);
-        sg.addColorStop(0,'rgba(255,220,180,0)'); sg.addColorStop(0.5,'rgba(255,220,180,0.05)'); sg.addColorStop(1,'rgba(255,220,180,0)');
-        ctx.fillStyle=sg; ctx.fillRect(-w*3,-h*3,w*7,h*7); ctx.restore();
-        sparkles.forEach(s=>{s.update();s.draw(ctx);}); tex.needsUpdate=true;
+        ctx.globalAlpha = 0.1;
+        ctx.drawImage(patCvs, 0, 0);
+        ctx.restore();
+
+        // Шиммер
+        ctx.save();
+        const cr = 30;
+        ctx.beginPath();
+        ctx.moveTo(cr, 0);
+        ctx.lineTo(w - cr, 0);
+        ctx.quadraticCurveTo(w, 0, w, cr);
+        ctx.lineTo(w, h - cr);
+        ctx.quadraticCurveTo(w, h, w - cr, h);
+        ctx.lineTo(cr, h);
+        ctx.quadraticCurveTo(0, h, 0, h - cr);
+        ctx.lineTo(0, cr);
+        ctx.quadraticCurveTo(0, 0, cr, 0);
+        ctx.closePath();
+        ctx.clip();
+
+        ctx.translate(0, h);
+        ctx.rotate(-30 * Math.PI / 180);
+        const sW = w * 3;
+        const cur = shimmerOffset * w * 3;
+        const sg = ctx.createLinearGradient(cur - sW / 2, 0, cur + sW / 2, 0);
+        sg.addColorStop(0, 'rgba(255,220,180,0)');
+        sg.addColorStop(0.5, 'rgba(255,220,180,0.05)');
+        sg.addColorStop(1, 'rgba(255,220,180,0)');
+        ctx.fillStyle = sg;
+        ctx.fillRect(-w * 3, -h * 3, w * 7, h * 7);
+        ctx.restore();
+
+        sparkles.forEach(s => { s.update(); s.draw(ctx); });
+        tex.needsUpdate = true;
       }
 
-      function updateHolo(rX,rY) {
+      function updateHolo(rX, rY) {
         if (!svgLoaded) return;
-        const w=holoCvs.width,h=holoCvs.height; holoCtx.clearRect(0,0,w,h);
-        if (Math.hypot(rX,rY)<0.001){holoTex.needsUpdate=true;return;}
-        const sp=document.createElement('canvas');sp.width=w;sp.height=h;
-        const sc=sp.getContext('2d'); sc.drawImage(patCvs,0,0);
-        const shift=(rX*0.5)%1;
-        const lg=sc.createLinearGradient(0,0,w,h);
-        [0,45,90,135,180].forEach((o,i)=>{lg.addColorStop(i/4,getHarmonicColor(hueShiftDeg,0.6,0.5,((shift*360+o)%360)));});
-        sc.globalCompositeOperation='source-in'; sc.fillStyle=lg; sc.fillRect(0,0,w,h);
-        const wvCvs=document.createElement('canvas');wvCvs.width=w;wvCvs.height=h;
-        const wvCtx=wvCvs.getContext('2d');
-        wvCtx.save(); wvCtx.translate(w/2,h/2); wvCtx.rotate(45*Math.PI/180);
-        wvCtx.strokeStyle='rgba(220,160,80,0.8)'; wvCtx.lineWidth=2.5;
-        const wSpc=20,rX2=w*2.5,rY2=h*2.5;
-        for(let yp=-rY2;yp<rY2;yp+=wSpc){wvCtx.beginPath();for(let xp=-rX2;xp<rX2;xp+=15){const yo=Math.sin((xp/30)+rX*3)*8;if(xp===-rX2)wvCtx.moveTo(xp,yp+yo);else wvCtx.lineTo(xp,yp+yo);}wvCtx.stroke();}
+        const w = holoCvs.width;
+        const h = holoCvs.height;
+        holoCtx.clearRect(0, 0, w, h);
+
+        if (Math.hypot(rX, rY) < 0.001) {
+          holoTex.needsUpdate = true;
+          return;
+        }
+
+        const sp = document.createElement('canvas');
+        sp.width = w;
+        sp.height = h;
+        const sc = sp.getContext('2d');
+        sc.drawImage(patCvs, 0, 0);
+
+        const shift = (rX * 0.5) % 1;
+        const lg = sc.createLinearGradient(0, 0, w, h);
+        [0, 45, 90, 135, 180].forEach((o, i) => {
+          lg.addColorStop(i / 4, getHarmonicColor(hueShiftDeg, 0.6, 0.5, ((shift * 360 + o) % 360)));
+        });
+        sc.globalCompositeOperation = 'source-in';
+        sc.fillStyle = lg;
+        sc.fillRect(0, 0, w, h);
+
+        const wvCvs = document.createElement('canvas');
+        wvCvs.width = w;
+        wvCvs.height = h;
+        const wvCtx = wvCvs.getContext('2d');
+        wvCtx.save();
+        wvCtx.translate(w / 2, h / 2);
+        wvCtx.rotate(45 * Math.PI / 180);
+        wvCtx.strokeStyle = 'rgba(220,160,80,0.8)';
+        wvCtx.lineWidth = 2.5;
+        const wSpc = 20;
+        const rX2 = w * 2.5;
+        const rY2 = h * 2.5;
+        for (let yp = -rY2; yp < rY2; yp += wSpc) {
+          wvCtx.beginPath();
+          for (let xp = -rX2; xp < rX2; xp += 15) {
+            const yo = Math.sin((xp / 30) + rX * 3) * 8;
+            if (xp === -rX2) wvCtx.moveTo(xp, yp + yo);
+            else wvCtx.lineTo(xp, yp + yo);
+          }
+          wvCtx.stroke();
+        }
         wvCtx.restore();
-        const waveShift=(-rY*0.6)%1;
-        const wg=wvCtx.createLinearGradient(w,0,0,h);
-        [[0,0],[0.3,40],[0.6,90],[1.0,140]].forEach(([s,o])=>{const dyn=(((waveShift+o/360)%1+1)%1)*360;wg.addColorStop(s,getHarmonicColor(hueShiftDeg,0.85,0.55,60+dyn));});
-        wvCtx.globalCompositeOperation='source-in'; wvCtx.fillStyle=wg; wvCtx.fillRect(0,0,w,h);
-        holoCtx.save();holoCtx.globalAlpha=0.25;holoCtx.drawImage(wvCvs,0,0);holoCtx.restore();
-        holoCtx.save();holoCtx.globalAlpha=0.7;holoCtx.drawImage(sp,0,0);holoCtx.restore();
-        holoCtx.drawImage(sp,0,0);
-        const lx=w*(0.5+rX*0.55),ly=h*(0.5+rY*0.55);
-        const rg=holoCtx.createRadialGradient(lx,ly,0,lx,ly,w*1.15);
-        rg.addColorStop(0,'rgba(255,255,255,1)');rg.addColorStop(0.3,'rgba(255,255,255,0.7)');rg.addColorStop(0.6,'rgba(255,255,255,0.3)');rg.addColorStop(1,'rgba(255,255,255,0)');
-        holoCtx.globalCompositeOperation='destination-in'; holoCtx.fillStyle=rg; holoCtx.fillRect(0,0,w,h);
-        const cr=30; holoCtx.globalCompositeOperation='destination-in'; holoCtx.beginPath();
-        holoCtx.moveTo(cr,0);holoCtx.lineTo(w-cr,0);holoCtx.quadraticCurveTo(w,0,w,cr);
-        holoCtx.lineTo(w,h-cr);holoCtx.quadraticCurveTo(w,h,w-cr,h);
-        holoCtx.lineTo(cr,h);holoCtx.quadraticCurveTo(0,h,0,h-cr);
-        holoCtx.lineTo(0,cr);holoCtx.quadraticCurveTo(0,0,cr,0);
-        holoCtx.closePath();holoCtx.fill(); holoCtx.globalCompositeOperation='source-over'; holoTex.needsUpdate=true;
+
+        const waveShift = (-rY * 0.6) % 1;
+        const wg = wvCtx.createLinearGradient(w, 0, 0, h);
+        [[0, 0], [0.3, 40], [0.6, 90], [1.0, 140]].forEach(([s, o]) => {
+          const dyn = (((waveShift + o / 360) % 1 + 1) % 1) * 360;
+          wg.addColorStop(s, getHarmonicColor(hueShiftDeg, 0.85, 0.55, 60 + dyn));
+        });
+        wvCtx.globalCompositeOperation = 'source-in';
+        wvCtx.fillStyle = wg;
+        wvCtx.fillRect(0, 0, w, h);
+
+        holoCtx.save();
+        holoCtx.globalAlpha = 0.25;
+        holoCtx.drawImage(wvCvs, 0, 0);
+        holoCtx.restore();
+
+        holoCtx.save();
+        holoCtx.globalAlpha = 0.7;
+        holoCtx.drawImage(sp, 0, 0);
+        holoCtx.restore();
+
+        holoCtx.drawImage(sp, 0, 0);
+
+        const lx = w * (0.5 + rX * 0.55);
+        const ly = h * (0.5 + rY * 0.55);
+        const rg = holoCtx.createRadialGradient(lx, ly, 0, lx, ly, w * 1.15);
+        rg.addColorStop(0, 'rgba(255,255,255,1)');
+        rg.addColorStop(0.3, 'rgba(255,255,255,0.7)');
+        rg.addColorStop(0.6, 'rgba(255,255,255,0.3)');
+        rg.addColorStop(1, 'rgba(255,255,255,0)');
+        holoCtx.globalCompositeOperation = 'destination-in';
+        holoCtx.fillStyle = rg;
+        holoCtx.fillRect(0, 0, w, h);
+
+        const cr = 30;
+        holoCtx.globalCompositeOperation = 'destination-in';
+        holoCtx.beginPath();
+        holoCtx.moveTo(cr, 0);
+        holoCtx.lineTo(w - cr, 0);
+        holoCtx.quadraticCurveTo(w, 0, w, cr);
+        holoCtx.lineTo(w, h - cr);
+        holoCtx.quadraticCurveTo(w, h, w - cr, h);
+        holoCtx.lineTo(cr, h);
+        holoCtx.quadraticCurveTo(0, h, 0, h - cr);
+        holoCtx.lineTo(0, cr);
+        holoCtx.quadraticCurveTo(0, 0, cr, 0);
+        holoCtx.closePath();
+        holoCtx.fill();
+        holoCtx.globalCompositeOperation = 'source-over';
+        holoTex.needsUpdate = true;
       }
 
-      const cW=2.4,cH=3.2,depth=0.08,cr=0.08;
-      const shape=new THREE.Shape();
-      const [sx,sy]=[-cW/2,-cH/2];
-      shape.moveTo(sx+cr,sy);shape.lineTo(sx+cW-cr,sy);shape.quadraticCurveTo(sx+cW,sy,sx+cW,sy+cr);
-      shape.lineTo(sx+cW,sy+cH-cr);shape.quadraticCurveTo(sx+cW,sy+cH,sx+cW-cr,sy+cH);
-      shape.lineTo(sx+cr,sy+cH);shape.quadraticCurveTo(sx,sy+cH,sx,sy+cH-cr);
-      shape.lineTo(sx,sy+cr);shape.quadraticCurveTo(sx,sy,sx+cr,sy);
-      const geo=new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:true,bevelSegments:5,steps:1,bevelSize:0.015,bevelThickness:0.015});
-      geo.center();geo.computeBoundingBox();
-      const bbox=geo.boundingBox,pos=geo.attributes.position;
-      const uvs=new Float32Array(pos.count*2);
-      for(let i=0;i<pos.count;i++){uvs[i*2]=(pos.getX(i)-bbox.min.x)/(bbox.max.x-bbox.min.x);uvs[i*2+1]=(pos.getY(i)-bbox.min.y)/(bbox.max.y-bbox.min.y);}
-      geo.setAttribute('uv',new THREE.BufferAttribute(uvs,2));
-      const baseMat=new THREE.MeshStandardMaterial({color:new THREE.Color(getHarmonicColor(hueShiftDeg,0.3,0.14)),roughness:0.6,metalness:0.1});
-      const frontMat=new THREE.MeshStandardMaterial({map:tex,roughness:0.9,metalness:0.0});
-      const card=new THREE.Mesh(geo,[frontMat,baseMat]); scene.add(card);
-      const holoGeo=new THREE.PlaneGeometry(cW+0.03,cH+0.03);
-      const holoMat=new THREE.MeshBasicMaterial({map:holoTex,transparent:true,blending:THREE.NormalBlending,depthWrite:false});
-      const holoMesh=new THREE.Mesh(holoGeo,holoMat); holoMesh.position.z=depth/2+0.016; card.add(holoMesh);
+      const cW = 2.4, cH = 3.2, depth = 0.08, cr = 0.08;
+      const shape = new THREE.Shape();
+      const [sx, sy] = [-cW / 2, -cH / 2];
+      shape.moveTo(sx + cr, sy);
+      shape.lineTo(sx + cW - cr, sy);
+      shape.quadraticCurveTo(sx + cW, sy, sx + cW, sy + cr);
+      shape.lineTo(sx + cW, sy + cH - cr);
+      shape.quadraticCurveTo(sx + cW, sy + cH, sx + cW - cr, sy + cH);
+      shape.lineTo(sx + cr, sy + cH);
+      shape.quadraticCurveTo(sx, sy + cH, sx, sy + cH - cr);
+      shape.lineTo(sx, sy + cr);
+      shape.quadraticCurveTo(sx, sy, sx + cr, sy);
+      
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth,
+        bevelEnabled: true,
+        bevelSegments: 5,
+        steps: 1,
+        bevelSize: 0.015,
+        bevelThickness: 0.015
+      });
 
-      img.onload=function(){
-        svgLoaded=true; drawBase();
-        const loader=new THREE.SVGLoader();
-        
-        // МАСКА - загружаем тот же SVG для формы
-        loader.load(svgUrl,(data)=>{
-          const svgMaskGroup=new THREE.Group();
-          const svgMaskMat=baseMat.clone();
-          
-          data.paths.forEach(path=>{
-            THREE.SVGLoader.createShapes(path).forEach(shape=>{
-              const g=new THREE.ShapeGeometry(shape); // плоский, без extrude
-              svgMaskGroup.add(new THREE.Mesh(g,svgMaskMat));
+      geo.center();
+      geo.computeBoundingBox();
+      const bbox = geo.boundingBox;
+      const pos = geo.attributes.position;
+      const uvs = new Float32Array(pos.count * 2);
+      for (let i = 0; i < pos.count; i++) {
+        uvs[i * 2] = (pos.getX(i) - bbox.min.x) / (bbox.max.x - bbox.min.x);
+        uvs[i * 2 + 1] = (pos.getY(i) - bbox.min.y) / (bbox.max.y - bbox.min.y);
+      }
+      geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+
+      const baseMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(cardBaseHex),
+        roughness: 0.6,
+        metalness: 0.1
+      });
+      const frontMat = new THREE.MeshStandardMaterial({
+        map: tex,
+        roughness: 0.9,
+        metalness: 0.0
+      });
+
+      const card = new THREE.Mesh(geo, [frontMat, baseMat]);
+      scene.add(card);
+
+      const holoGeo = new THREE.PlaneGeometry(cW + 0.03, cH + 0.03);
+      const holoMat = new THREE.MeshBasicMaterial({
+        map: holoTex,
+        transparent: true,
+        blending: THREE.NormalBlending,
+        depthWrite: false
+      });
+      const holoMesh = new THREE.Mesh(holoGeo, holoMat);
+      holoMesh.position.z = depth / 2 + 0.016;
+      holoMesh.renderOrder = 2;
+      card.add(holoMesh);
+
+      img.onload = function () {
+        svgLoaded = true;
+        drawBase();
+
+        const loader = new THREE.SVGLoader();
+
+        // ЛОГО - экструдированный 3D
+        loader.load(svgUrl, (data) => {
+          const logoGroup = new THREE.Group();
+          const logoMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(getHarmonicColor(hueShiftDeg, 0.5, 0.72)),
+            metalness: 0.75,
+            roughness: 0.2,
+            side: THREE.DoubleSide
+          });
+
+          data.paths.forEach((path) => {
+            THREE.SVGLoader.createShapes(path).forEach((sShape) => {
+              const g = new THREE.ExtrudeGeometry(sShape, {
+                depth: 40,
+                bevelEnabled: true,
+                bevelSegments: 4,
+                steps: 2,
+                bevelSize: 3,
+                bevelThickness: 3
+              });
+              g.computeVertexNormals();
+              logoGroup.add(new THREE.Mesh(g, logoMat));
             });
           });
-          
-          const maskBox=new THREE.Box3().setFromObject(svgMaskGroup);
-          const maskCenter=maskBox.getCenter(new THREE.Vector3());
-          svgMaskGroup.children.forEach(c=>c.geometry.translate(-maskCenter.x,-maskCenter.y,0));
-          
-          const maskSize=new THREE.Vector3();
-          maskBox.getSize(maskSize);
-          const maskMaxDim=Math.max(maskSize.x,maskSize.y)||1;
-          const maskTargetSize=1.5; // 150%
-          const maskScale=maskTargetSize/maskMaxDim;
-          svgMaskGroup.scale.set(maskScale,-maskScale,1);
-          svgMaskGroup.position.set(0,0.12,depth/2+0.02);
-          
-          card.add(svgMaskGroup);
-        });
-        
-        // ЛОГО - экструдированный 3D
-        loader.load(svgUrl,(data)=>{
-          const logoGroup=new THREE.Group();
-          const logoMat=new THREE.MeshStandardMaterial({color:new THREE.Color(getHarmonicColor(hueShiftDeg,0.5,0.72)),metalness:0.75,roughness:0.2,side:THREE.DoubleSide});
-          data.paths.forEach(path=>{THREE.SVGLoader.createShapes(path).forEach(shape=>{const g=new THREE.ExtrudeGeometry(shape,{depth:40,bevelEnabled:true,bevelSegments:4,steps:2,bevelSize:3,bevelThickness:3});g.computeVertexNormals();logoGroup.add(new THREE.Mesh(g,logoMat));});});
-          const box=new THREE.Box3().setFromObject(logoGroup);
-          const center=box.getCenter(new THREE.Vector3());
-          logoGroup.children.forEach(c=>c.geometry.translate(-center.x,-center.y,-center.z));
-          const size=new THREE.Vector3(); box.getSize(size);
-          const maxDim=Math.max(size.x,size.y)||1, targetSize=1.1, s=targetSize/maxDim;
-          logoGroup.scale.set(s,-s,s); logoGroup.position.set(0,0.12,depth/2+0.04); card.add(logoGroup);
+
+          const box = new THREE.Box3().setFromObject(logoGroup);
+          const center = box.getCenter(new THREE.Vector3());
+          logoGroup.children.forEach((c) => c.geometry.translate(-center.x, -center.y, -center.z));
+
+          const size = new THREE.Vector3();
+          box.getSize(size);
+          const maxDim = Math.max(size.x, size.y) || 1;
+          const targetSize = 1.1;
+          const s = targetSize / maxDim;
+          const logoOffsetY = 0.12;
+
+          logoGroup.scale.set(s, -s, s);
+          logoGroup.position.set(0, logoOffsetY, depth / 2 + 0.04);
+          logoGroup.renderOrder = 4;
+          card.add(logoGroup);
         });
       };
 
-      const MAX_ROT=0.75; let isDrag=false,tRX=0,tRY=0,cRX=0,cRY=0,idle=0;
-      function onDown(){isDrag=true;}
-      function onMove(e){if(!isDrag)return;const cx=e.clientX||(e.touches&&e.touches[0].clientX);const cy=e.clientY||(e.touches&&e.touches[0].clientY);const rect=wrap.getBoundingClientRect();if(cx!==undefined){tRY=Math.max(-MAX_ROT,Math.min(MAX_ROT,((cx-rect.left)/rect.width-0.5)*2*1.0));tRX=Math.max(-MAX_ROT,Math.min(MAX_ROT,((cy-rect.top)/rect.height-0.5)*2*0.9));}}
-      function onUp(){isDrag=false;tRX=0;tRY=0;}
-      wrap.addEventListener('mousedown',onDown); window.addEventListener('mousemove',onMove); window.addEventListener('mouseup',onUp);
-      wrap.addEventListener('touchstart',onDown,{passive:true}); window.addEventListener('touchmove',onMove,{passive:true}); window.addEventListener('touchend',onUp);
+      const MAX_ROT = 0.75;
+      let isDrag = false;
+      let tRX = 0;
+      let tRY = 0;
+      let cRX = 0;
+      let cRY = 0;
+      let idle = 0;
 
-      function animate(){
-        requestAnimationFrame(animate); shimmerOffset+=0.012; if(shimmerOffset>2.0)shimmerOffset=-1.0;
-        drawBase(); baseMat.color.set(getHarmonicColor(hueShiftDeg,0.3,0.14)); idle+=0.015;
-        const atX=isDrag?tRX:Math.sin(idle*0.8)*0.12, atY=isDrag?tRY:Math.cos(idle*0.6)*0.18, lf=isDrag?0.15:0.05;
-        cRX+=(atX-cRX)*lf; cRY+=(atY-cRY)*lf;
-        cRX=Math.max(-MAX_ROT,Math.min(MAX_ROT,cRX)); cRY=Math.max(-MAX_ROT,Math.min(MAX_ROT,cRY));
-        card.rotation.x=cRX; card.rotation.y=cRY; updateHolo(cRY/1.0,cRX/0.9); renderer.render(scene,camera);
+      function onDown() {
+        isDrag = true;
       }
+
+      function onMove(e) {
+        if (!isDrag) return;
+        const cx = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] && e.touches[0].clientX);
+        const cy = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY);
+        const rect = wrap.getBoundingClientRect();
+        if (cx !== undefined && cy !== undefined && rect.width && rect.height) {
+          tRY = Math.max(-MAX_ROT, Math.min(MAX_ROT, ((cx - rect.left) / rect.width - 0.5) * 2 * 1.0));
+          tRX = Math.max(-MAX_ROT, Math.min(MAX_ROT, ((cy - rect.top) / rect.height - 0.5) * 2 * 0.9));
+        }
+      }
+
+      function onUp() {
+        isDrag = false;
+        tRX = 0;
+        tRY = 0;
+      }
+
+      wrap.addEventListener('mousedown', onDown);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+      wrap.addEventListener('touchstart', onDown, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onUp);
+
+      window.addEventListener('resize', function () {
+        const nW = wrap.offsetWidth;
+        const nH = wrap.offsetHeight;
+        if (!nW || !nH) return;
+        camera.aspect = nW / nH;
+        camera.updateProjectionMatrix();
+        renderer.setSize(nW, nH);
+      });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        shimmerOffset += 0.012;
+        if (shimmerOffset > 2.0) shimmerOffset = -1.0;
+
+        drawBase();
+        baseMat.color.set(cardBaseHex);
+
+        idle += 0.015;
+        const atX = isDrag ? tRX : Math.sin(idle * 0.8) * 0.12;
+        const atY = isDrag ? tRY : Math.cos(idle * 0.6) * 0.18;
+        const lf = isDrag ? 0.15 : 0.05;
+
+        cRX += (atX - cRX) * lf;
+        cRY += (atY - cRY) * lf;
+        cRX = Math.max(-MAX_ROT, Math.min(MAX_ROT, cRX));
+        cRY = Math.max(-MAX_ROT, Math.min(MAX_ROT, cRY));
+
+        card.rotation.x = cRX;
+        card.rotation.y = cRY;
+
+        updateHolo(cRY / 1.0, cRX / 0.9);
+        renderer.render(scene, camera);
+      }
+
       animate();
     }
+
     requestAnimationFrame(init);
   })();
   </script>
