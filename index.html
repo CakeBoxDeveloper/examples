@@ -546,6 +546,38 @@
         </div>
       </div>
 
+      <script>
+      // Дисклеймер "О проектах" - показывать только один раз
+      (function() {
+        const intro = document.getElementById('casesFolderIntro');
+        const dismissBtn = document.getElementById('casesFolderIntroDismiss');
+        const STORAGE_KEY = 'portfolioIntroSeen';
+        
+        if (!intro || !dismissBtn) return;
+        
+        // Проверяем localStorage - видел ли пользователь дисклеймер
+        const hasSeenIntro = localStorage.getItem(STORAGE_KEY);
+        
+        if (hasSeenIntro === 'true') {
+          // Если уже видел - скрываем сразу
+          intro.style.display = 'none';
+        }
+        
+        // При клике на кнопку - скрываем и сохраняем в localStorage
+        dismissBtn.addEventListener('click', function() {
+          intro.style.opacity = '0';
+          intro.style.pointerEvents = 'none';
+          
+          setTimeout(() => {
+            intro.style.display = 'none';
+          }, 300);
+          
+          // Сохраняем что пользователь видел дисклеймер
+          localStorage.setItem(STORAGE_KEY, 'true');
+        });
+      })();
+      </script>
+
       <div class="cases-folder__panel">
 
         <!-- 0. Web-разработка -->

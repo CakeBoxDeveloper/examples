@@ -451,24 +451,31 @@
       .tech__cell:nth-child(2n) { border-right: none; }
       .tech__cell:nth-last-child(-n+2) { border-bottom: none; }
       
+      /* Timeline status остаётся горизонтальным на мобильных */
       .timeline-status {
-        flex-direction: column;
-        gap: 16px;
-        padding: 20px 16px;
+        padding: 16px 12px;
+        gap: 8px;
       }
 
       .timeline-status__date-bubble {
-        width: auto;
-        text-align: center;
+        padding: 6px 10px;
+        font-size: 0.6rem;
+        min-width: auto;
       }
 
       .timeline-status__center {
-        width: 100%;
-        order: -1;
+        flex: 1;
+        min-width: 0;
       }
 
       .timeline-status__line {
-        min-width: 40px;
+        min-width: 20px;
+      }
+      
+      .timeline-status__badge {
+        padding: 5px 10px;
+        font-size: 0.58rem;
+        white-space: nowrap;
       }
       
       /* Все картинки по центру на мобильных */

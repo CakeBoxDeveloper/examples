@@ -23,6 +23,18 @@
       ).join('');
     }
 
+    // Принудительно вызываем reflow для предзагрузки анимации
+    // Это устраняет лаг при первом клике
+    button.offsetHeight;
+    
+    // Добавляем небольшую задержку для прогрева браузера
+    requestAnimationFrame(() => {
+      button.style.willChange = 'transform';
+      requestAnimationFrame(() => {
+        button.style.willChange = 'auto';
+      });
+    });
+
     // Клик
     button.addEventListener('click', function(e) {
       if (this.classList.contains('is-sending')) {
@@ -30,7 +42,10 @@
         return;
       }
       
-      this.classList.add('is-sending');
+      // Используем requestAnimationFrame для плавной анимации
+      requestAnimationFrame(() => {
+        this.classList.add('is-sending');
+      });
       
       setTimeout(() => {
         this.classList.remove('is-sending');
