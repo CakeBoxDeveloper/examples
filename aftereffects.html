@@ -284,11 +284,73 @@
       }
     }
 
+    /* IMAGE SKELETON LOADER */
+    .image-placeholder {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      background-color: var(--bg-card);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    .image-placeholder::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      animation: placeholder-shimmer 1.8s infinite;
+      background: linear-gradient(
+        110deg,
+        transparent 22%,
+        hsla(var(--hue), 55%, 55%, 0.12) 48%,
+        transparent 74%
+      );
+      transform: translateX(-100%);
+    }
+
+    @keyframes placeholder-shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .image-placeholder__icon {
+      width: 60%;
+      height: 60%;
+      opacity: 0.5;
+      position: relative;
+      z-index: 1;
+      fill: var(--text-dim);
+    }
+
     @media (max-width: 480px) {
       :root { --block-w: calc(100vw - 32px); }
       .hero { padding: 16px 16px 8px; }
       .tech { padding: 0 16px 48px; }
       .article { padding: 0 16px 72px; }
+      
+      /* Таблица 2х3 на мобильных */
+      .tech__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .tech__cell:nth-child(3n) { border-right: 1px solid var(--border-accent); }
+      .tech__cell:nth-child(2n) { border-right: none; }
+      .tech__cell:nth-last-child(-n+2) { border-bottom: none; }
+
+      /* Мобильный стиль для skeleton loader */
+      .image-placeholder {
+        aspect-ratio: 1 / 1;
+        border-radius: 20px;
+        margin: 16px 0;
+      }
     }
   </style>
 </head>
@@ -380,6 +442,13 @@
       </div>
 
       <p class="article__h1">Основные этапы работы</p>
+
+      <div class="image-placeholder" role="img" aria-label="Загрузка изображения">
+        <svg class="image-placeholder__icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="23.5" cy="18.5" r="4.5" fill="currentColor"/>
+          <path d="M10.5 48 C7.5 48 5.8 44.6 7.6 42.2 L16.2 30.8 C18.1 28.3 21.8 28.3 23.7 30.8 L28.4 37 L35.2 24.4 C37.2 20.8 42.3 20.8 44.3 24.4 L55.4 42.2 C57 44.8 55.2 48 52.1 48 Z" fill="currentColor"/>
+        </svg>
+      </div>
 
       <div class="think-tree">
         <div class="think-tree__node think-tree__node--done">
@@ -480,6 +549,13 @@
         <li>Tracking: planar, 3D camera, mocha AE</li>
         <li>Dynamic Link с Premiere Pro и Audition</li>
       </ul>
+
+      <div class="image-placeholder" role="img" aria-label="Загрузка изображения">
+        <svg class="image-placeholder__icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="23.5" cy="18.5" r="4.5" fill="currentColor"/>
+          <path d="M10.5 48 C7.5 48 5.8 44.6 7.6 42.2 L16.2 30.8 C18.1 28.3 21.8 28.3 23.7 30.8 L28.4 37 L35.2 24.4 C37.2 20.8 42.3 20.8 44.3 24.4 L55.4 42.2 C57 44.8 55.2 48 52.1 48 Z" fill="currentColor"/>
+        </svg>
+      </div>
 
       <p>After Effects выбирают за мощность и гибкость — это универсальное решение для motion design любой сложности. От рекламных роликов до титров фильмов — After Effects остаётся главным инструментом моушн-дизайнеров.</p>
 

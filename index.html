@@ -246,6 +246,43 @@
   <section class="hero" id="hero">
     <canvas id="wireCanvas" class="wire-canvas" aria-hidden="true"></canvas>
     <canvas id="matrixCanvas" class="matrix-canvas" aria-hidden="true"></canvas>
+    <video id="heroVideoDark" class="hero__video hero__video--dark" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+      <source src="https://github.com/CakeBoxDeveloper/examples/raw/main/Dark.webm" type="video/webm">
+    </video>
+    <video id="heroVideoLight" class="hero__video hero__video--light" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+      <source src="https://github.com/CakeBoxDeveloper/examples/raw/main/Light.webm" type="video/webm">
+    </video>
+    <script>
+    // Управление видео-фонами при смене темы
+    (function() {
+      const videoDark = document.getElementById('heroVideoDark');
+      const videoLight = document.getElementById('heroVideoLight');
+      
+      function updateHeroVideo() {
+        const isLight = document.body.classList.contains('theme-light');
+        
+        if (window.innerWidth <= 860) {
+          if (isLight) {
+            if (videoDark) videoDark.pause();
+            if (videoLight) videoLight.play().catch(() => {});
+          } else {
+            if (videoLight) videoLight.pause();
+            if (videoDark) videoDark.play().catch(() => {});
+          }
+        }
+      }
+      
+      // Запуск при загрузке
+      updateHeroVideo();
+      
+      // Слушаем изменения класса theme-light на body
+      const observer = new MutationObserver(updateHeroVideo);
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      
+      // Слушаем ресайз для переключения desktop/mobile
+      window.addEventListener('resize', updateHeroVideo);
+    })();
+    </script>
     <div class="hero__vignette" aria-hidden="true"></div>
     <div class="hero__inner">
 

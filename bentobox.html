@@ -358,6 +358,64 @@
       border: none;
     }
 
+    /* ════════════════════════════════════════
+       IMAGE SKELETON LOADER
+    ════════════════════════════════════════ */
+    .article__img {
+      margin: 28px 0;
+    }
+
+    .image-placeholder {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      background-color: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .image-placeholder::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        110deg,
+        transparent 22%,
+        hsla(var(--hue), 55%, 48%, 0.04) 48%,
+        hsla(var(--hue), 55%, 48%, 0.07) 50%,
+        hsla(var(--hue), 55%, 48%, 0.04) 52%,
+        transparent 78%
+      );
+      transform: translateX(-100%);
+      animation: placeholder-shimmer 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .image-placeholder__icon {
+      width: 60%;
+      max-width: 180px;
+      height: 60%;
+      max-height: 180px;
+      color: var(--text-dim);
+      display: block;
+      position: relative;
+      z-index: 1;
+      opacity: 0.5;
+    }
+
+    @keyframes placeholder-shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
     @media (max-width: 640px) {
       .timeline-status {
         padding: 24px 16px;
@@ -380,6 +438,19 @@
     }
 
     @media (max-width: 480px) {
+      :root { --block-w: calc(100vw - 32px); }
+      .hero { padding: 16px 16px 8px; }
+      .tech { padding: 0 16px 48px; }
+      .article { padding: 0 16px 72px; }
+      
+      /* Таблица 2х3 на мобильных */
+      .tech__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .tech__cell:nth-child(3n) { border-right: 1px solid var(--border-accent); }
+      .tech__cell:nth-child(2n) { border-right: none; }
+      .tech__cell:nth-last-child(-n+2) { border-bottom: none; }
+      
       .timeline-status {
         flex-direction: column;
         gap: 16px;
@@ -399,13 +470,16 @@
       .timeline-status__line {
         min-width: 40px;
       }
-    }
-
-    @media (max-width: 480px) {
-      :root { --block-w: calc(100vw - 32px); }
-      .hero { padding: 16px 16px 8px; }
-      .tech { padding: 0 16px 48px; }
-      .article { padding: 0 16px 72px; }
+      
+      /* Все картинки по центру на мобильных */
+      .article__img {
+        margin: 24px 0;
+      }
+      
+      .image-placeholder {
+        aspect-ratio: 1 / 1;
+        border-radius: 20px;
+      }
     }
   </style>
 </head>
@@ -481,7 +555,7 @@
       <div class="timeline-status__line"></div>
     </div>
 
-    <div class="timeline-status__date-bubble">Янв 2025</div>
+    <div class="timeline-status__date-bubble">Мар 2027</div>
   </div>
 
   <article class="article">
@@ -498,24 +572,31 @@
       <p class="article__h1">Как это работает</p>
       <p>Одна верстка — несколько каналов. Открывается кнопкой из Telegram-бота, добавляется на рабочий стол как PWA, работает в браузере с ПК и мобильного. На главной: анимированный аватар кондитера, счётчики категорий и позиций, кнопки в каталог и соцсети.</p>
 
+      <div class="image-placeholder" role="img" aria-label="Загрузка изображения">
+        <svg class="image-placeholder__icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="23.5" cy="18.5" r="4.5" fill="currentColor"/>
+          <path d="M10.5 48 C7.5 48 5.8 44.6 7.6 42.2 L16.2 30.8 C18.1 28.3 21.8 28.3 23.7 30.8 L28.4 37 L35.2 24.4 C37.2 20.8 42.3 20.8 44.3 24.4 L55.4 42.2 C57 44.8 55.2 48 52.1 48 Z" fill="currentColor"/>
+        </svg>
+      </div>
+
       <!-- KremuaRecs1 — главный экран, по центру -->
-      <figure class="article__img article__img--center">
+      <!-- <figure class="article__img article__img--center">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs1.mp4"
                  autoplay muted loop playsinline preload="auto"></video>
         </div>
-      </figure>
+      </figure> -->
 
       <p>Весь визуальный язык построен на векторной эстетике и web3-эффектах: анимированные иконки, переходы с размытием, голографические обводки. Анимаций много — и большая часть это Lottie, но некоторые слишком сложные для экспорта, поэтому они отрендерены с альфа-каналом и сжаты в webm через VP8.</p>
 
       <!-- KremuaRecs2 — каталог, слева -->
-      <figure class="article__img article__img--left">
+      <!-- <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs2.mp4"
                  autoplay muted loop playsinline preload="auto"></video>
         </div>
         <p class="article__img-caption-text">Каталог — 15 категорий, 26 начинок, сотни комбинаций. Каждая позиция открывает детальную страницу с фото, видео-превью и описанием вкуса.<br><br>Фильтры по категориям работают мгновенно — без перезагрузки, только анимация смены контента.</p>
-      </figure>
+      </figure> -->
 
       <div class="checkpoint">
         <div class="checkpoint__line"></div>
@@ -530,7 +611,7 @@
       <p>Конструктор позволяет собрать торт из нуля: выбрать начинку, добавки и размер. Итоговая комбинация отображается в реальном времени — цена пересчитывается при каждом шаге без обращения к серверу. В конце генерируется технический чертёж торта, который отправляется кондитеру одной кнопкой прямо из бота.</p>
 
       <!-- KremuaRecs4 — конструктор, справа -->
-      <figure class="article__img article__img--right">
+      <!-- <figure class="article__img article__img--right">
         <div class="article__img-caption-text">
           <p>Конструктор снижает нагрузку на владелицу и убирает уточняющие переписки — клиент сам собирает заказ, кондитер получает готовое техзадание.</p>
           <div class="think-tree" style="margin-top: 16px;">
@@ -561,7 +642,7 @@
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs4.mp4"
                  autoplay muted loop playsinline preload="auto"></video>
         </div>
-      </figure>
+      </figure> -->
 
       <div class="checkpoint">
         <div class="checkpoint__line"></div>
@@ -570,6 +651,13 @@
           Механика промокодов
         </div>
         <div class="checkpoint__line"></div>
+      </div>
+
+      <div class="image-placeholder" role="img" aria-label="Загрузка изображения">
+        <svg class="image-placeholder__icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="23.5" cy="18.5" r="4.5" fill="currentColor"/>
+          <path d="M10.5 48 C7.5 48 5.8 44.6 7.6 42.2 L16.2 30.8 C18.1 28.3 21.8 28.3 23.7 30.8 L28.4 37 L35.2 24.4 C37.2 20.8 42.3 20.8 44.3 24.4 L55.4 42.2 C57 44.8 55.2 48 52.1 48 Z" fill="currentColor"/>
+        </svg>
       </div>
 
       <p class="article__h1">Купон: раз в день — бонус</p>
@@ -622,18 +710,18 @@ const isValid = decode(code, key) === today();</code></pre>
       </div>
 
       <!-- KremuaRecs3 — анимации, слева -->
-      <figure class="article__img article__img--left">
+      <!-- <figure class="article__img article__img--left">
         <div class="article__img-wrap">
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs3.mp4"
                  autoplay muted loop playsinline preload="auto"></video>
         </div>
         <p class="article__img-caption-text">Каждая анимация создавалась под конкретный экран — не из стоков, не адаптированная. Всё нарисовано с нуля в After Effects под визуальный язык бренда.<br><br>Аватар кондитера на главной — один из рендеров. Слишком много эффектов для Lottie, поэтому пошли на рендер — выглядит как 3D, весит минимально.</p>
-      </figure>
+      </figure> -->
 
       <p>Всё это работает в рамках одной верстки — без отдельных версий для мобилки и десктопа, без нативных приложений, без лишних зависимостей.</p>
 
       <!-- KremuaRecs5 — ещё один экран, справа -->
-      <figure class="article__img article__img--right">
+      <!-- <figure class="article__img article__img--right">
         <div class="article__img-caption-text">
           <p>Верстка универсальная — одинаково хорошо смотрится на экране смартфона, планшета и монитора. Ни один элемент не выглядит «съехавшим» при переходе между платформами.</p>
           <p>Прирост аудитории шёл стабильно каждый день с момента запуска — без платной рекламы, только через сарафанное радио в чатах и промокодную механику.</p>
@@ -642,7 +730,7 @@ const isValid = decode(code, key) === today();</code></pre>
           <video src="https://raw.githubusercontent.com/CakeBoxDeveloper/examples/main/kremua/KremuaRecs5.mp4"
                  autoplay muted loop playsinline preload="auto"></video>
         </div>
-      </figure>
+      </figure> -->
 
       <div class="checkpoint">
         <div class="checkpoint__line"></div>
@@ -987,8 +1075,22 @@ const isValid = decode(code, key) === today();</code></pre>
       wrap.addEventListener('mousedown',onDown); window.addEventListener('mousemove',onMove); window.addEventListener('mouseup',onUp);
       wrap.addEventListener('touchstart',onDown,{passive:true}); window.addEventListener('touchmove',onMove,{passive:true}); window.addEventListener('touchend',onUp);
 
+      // Intersection Observer для паузы анимации когда карточка не видна
+      let isCardVisible = true;
+      let animationId = null;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          isCardVisible = entry.isIntersecting;
+        });
+      }, { threshold: 0 });
+      observer.observe(wrap);
+
       function animate(){
-        requestAnimationFrame(animate); shimmerOffset+=0.012; if(shimmerOffset>2.0)shimmerOffset=-1.0;
+        if (!isCardVisible) {
+          animationId = requestAnimationFrame(animate);
+          return;
+        }
+        animationId = requestAnimationFrame(animate); shimmerOffset+=0.012; if(shimmerOffset>2.0)shimmerOffset=-1.0;
         drawBase(); baseMat.color.set(getHarmonicColor(hueShiftDeg,0.35,0.15)); idle+=0.015;
         const atX=isDrag?tRX:Math.sin(idle*0.8)*0.12, atY=isDrag?tRY:Math.cos(idle*0.6)*0.18, lf=isDrag?0.15:0.05;
         cRX+=(atX-cRX)*lf; cRY+=(atY-cRY)*lf;

@@ -205,6 +205,54 @@ body.theme-light .section-scroll-btn { color: var(--text); }
 .matrix-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 .hero__vignette { display: none; }
 
+/* ── Hero video backgrounds (mobile only) ── */
+.hero__video {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 1;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.hero__video--dark {
+  display: none;
+}
+
+.hero__video--light {
+  display: none;
+}
+
+/* Показываем тёмное видео в тёмной теме на мобильных */
+@media (max-width: 860px) {
+  .matrix-canvas {
+    display: none !important;
+  }
+  
+  .hero__video {
+    display: block;
+  }
+  
+  body:not(.theme-light) .hero__video--dark {
+    opacity: 1;
+  }
+  
+  body.theme-light .hero__video--light {
+    opacity: 1;
+  }
+  
+  body:not(.theme-light) .hero__video--light {
+    opacity: 0;
+  }
+  
+  body.theme-light .hero__video--dark {
+    opacity: 0;
+  }
+}
+
 /* ═══════════════════════
    HERO
 ═══════════════════════ */

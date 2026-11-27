@@ -345,6 +345,64 @@
       border: none;
     }
 
+    /* ════════════════════════════════════════
+       IMAGE SKELETON LOADER
+    ════════════════════════════════════════ */
+    .article__img {
+      margin: 32px 0;
+    }
+
+    .image-placeholder {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      background-color: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .image-placeholder::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        110deg,
+        transparent 22%,
+        hsla(var(--hue), 55%, 48%, 0.04) 48%,
+        hsla(var(--hue), 55%, 48%, 0.07) 50%,
+        hsla(var(--hue), 55%, 48%, 0.04) 52%,
+        transparent 78%
+      );
+      transform: translateX(-100%);
+      animation: placeholder-shimmer 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .image-placeholder__icon {
+      width: 60%;
+      max-width: 180px;
+      height: 60%;
+      max-height: 180px;
+      color: var(--text-dim);
+      display: block;
+      position: relative;
+      z-index: 1;
+      opacity: 0.5;
+    }
+
+    @keyframes placeholder-shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
     @media (max-width: 640px) {
       .timeline-status {
         padding: 24px 16px;
@@ -367,6 +425,24 @@
       .hero { padding: 16px 16px 8px; }
       .tech { padding: 0 16px 48px; }
       .article { padding: 0 16px 72px; }
+      
+      /* Таблица 2х3 на мобильных */
+      .tech__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .tech__cell:nth-child(3n) { border-right: 1px solid var(--border-accent); }
+      .tech__cell:nth-child(2n) { border-right: none; }
+      .tech__cell:nth-last-child(-n+2) { border-bottom: none; }
+      
+      /* Все картинки по центру на мобильных */
+      .article__img {
+        margin: 24px 0;
+      }
+      
+      .image-placeholder {
+        aspect-ratio: 1 / 1;
+        border-radius: 20px;
+      }
     }
   </style>
 </head>
@@ -437,7 +513,7 @@
       <span class="timeline-status__badge timeline-status__badge--wip">В работе</span>
       <div class="timeline-status__line"></div>
     </div>
-    <div class="timeline-status__date-bubble">Фев 2025</div>
+    <div class="timeline-status__date-bubble">Май 2027</div>
   </div>
 
   <article class="article">
@@ -477,6 +553,13 @@
 
       <p class="article__h1">Шесть AI-моделей с личностями</p>
       <p>Каждая модель — не просто набор промптов. У каждой есть имя, стиль речи, область знаний и характер. Они обучены на реальной литературе: юнгианская психология, нарративная терапия, классическая астрология, Таро Уэйта, нумерология Пифагора, тексты по регрессионной терапии. Датасет формировался вручную — из первоисточников, не из Википедии.</p>
+
+      <div class="image-placeholder" role="img" aria-label="Загрузка изображения">
+        <svg class="image-placeholder__icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="23.5" cy="18.5" r="4.5" fill="currentColor"/>
+          <path d="M10.5 48 C7.5 48 5.8 44.6 7.6 42.2 L16.2 30.8 C18.1 28.3 21.8 28.3 23.7 30.8 L28.4 37 L35.2 24.4 C37.2 20.8 42.3 20.8 44.3 24.4 L55.4 42.2 C57 44.8 55.2 48 52.1 48 Z" fill="currentColor"/>
+        </svg>
+      </div>
 
       <div class="models-grid">
         <div class="model-card">
@@ -518,6 +601,13 @@
           Обучение
         </div>
         <div class="checkpoint__line"></div>
+      </div>
+
+      <div class="image-placeholder" role="img" aria-label="Загрузка изображения">
+        <svg class="image-placeholder__icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="23.5" cy="18.5" r="4.5" fill="currentColor"/>
+          <path d="M10.5 48 C7.5 48 5.8 44.6 7.6 42.2 L16.2 30.8 C18.1 28.3 21.8 28.3 23.7 30.8 L28.4 37 L35.2 24.4 C37.2 20.8 42.3 20.8 44.3 24.4 L55.4 42.2 C57 44.8 55.2 48 52.1 48 Z" fill="currentColor"/>
+        </svg>
       </div>
 
       <p class="article__h1">RAG, индексация и реальная литература</p>

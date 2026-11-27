@@ -1,0 +1,328 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Финальное добавление timeline-status: правильные цвета, статус = цвет прогрессбара
+"""
+
+import os
+import re
+
+# CSS для timeline-status
+def get_timeline_css(is_mse=False):
+    if is_mse:
+        # MSE - серые тона
+        return """
+    /* ════════════════════════════════════════
+       ANIMATED TIMELINE STATUS
+    ════════════════════════════════════════ */
+    .timeline-status {
+      width: 100%;
+      max-width: 640px;
+      margin: 24px auto 0;
+      padding: 0;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+      height: auto;
+    }
+
+    .timeline-status__date-bubble {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      background: hsl(0, 0%, 35%);
+      border: none;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--bg);
+      white-space: nowrap;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+    }
+
+    .timeline-status__date-bubble:first-child {
+      border-radius: 10px 0 0 10px;
+      border-right: none;
+    }
+
+    .timeline-status__date-bubble:last-child {
+      border-radius: 0 10px 10px 0;
+      border-left: none;
+    }
+
+    .timeline-status__center {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+      min-width: 0;
+    }
+
+    .timeline-status__line {
+      flex: 1;
+      height: auto;
+      position: relative;
+      overflow: hidden;
+      align-self: stretch;
+      background: repeating-linear-gradient(
+        45deg,
+        hsl(0, 0%, 35%) 0,
+        hsl(0, 0%, 35%) 10px,
+        hsl(0, 0%, 20%) 10px,
+        hsl(0, 0%, 20%) 20px
+      );
+      background-size: 28.28px 28.28px;
+      animation: stripes-move 2s infinite linear;
+    }
+
+    .timeline-status__line::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(
+        to right,
+        hsl(0, 0%, 35%) 0%,
+        transparent 20%,
+        transparent 80%,
+        hsl(0, 0%, 35%) 100%
+      );
+    }
+
+    @keyframes stripes-move {
+      0% { background-position: 0 0; }
+      100% { background-position: 28.28px 0; }
+    }
+
+    .timeline-status__badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 7px 14px;
+      border-radius: 0;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: hsl(0, 0%, 35%);
+      color: var(--bg);
+      border: none;
+      position: relative;
+      z-index: 2;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .timeline-status__badge--done {
+      background: hsl(120, 55%, 35%);
+      color: var(--bg);
+      border: none;
+    }
+
+    .timeline-status__badge--wip {
+      background: hsl(0, 0%, 35%);
+      color: var(--bg);
+      border: none;
+    }"""
+    else:
+        # Остальные - используют var(--hue)
+        return """
+    /* ════════════════════════════════════════
+       ANIMATED TIMELINE STATUS
+    ════════════════════════════════════════ */
+    .timeline-status {
+      width: 100%;
+      max-width: 640px;
+      margin: 24px auto 0;
+      padding: 0;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+      height: auto;
+    }
+
+    .timeline-status__date-bubble {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      background: hsl(var(--hue), 55%, 35%);
+      border: none;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--bg);
+      white-space: nowrap;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+    }
+
+    .timeline-status__date-bubble:first-child {
+      border-radius: 10px 0 0 10px;
+      border-right: none;
+    }
+
+    .timeline-status__date-bubble:last-child {
+      border-radius: 0 10px 10px 0;
+      border-left: none;
+    }
+
+    .timeline-status__center {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      position: relative;
+      min-width: 0;
+    }
+
+    .timeline-status__line {
+      flex: 1;
+      height: auto;
+      position: relative;
+      overflow: hidden;
+      align-self: stretch;
+      background: repeating-linear-gradient(
+        45deg,
+        hsl(var(--hue), 55%, 35%) 0,
+        hsl(var(--hue), 55%, 35%) 10px,
+        var(--border-accent) 10px,
+        var(--border-accent) 20px
+      );
+      background-size: 28.28px 28.28px;
+      animation: stripes-move 2s infinite linear;
+    }
+
+    .timeline-status__line::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: linear-gradient(
+        to right,
+        hsl(var(--hue), 55%, 35%) 0%,
+        transparent 20%,
+        transparent 80%,
+        hsl(var(--hue), 55%, 35%) 100%
+      );
+    }
+
+    @keyframes stripes-move {
+      0% { background-position: 0 0; }
+      100% { background-position: 28.28px 0; }
+    }
+
+    .timeline-status__badge {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 7px 14px;
+      border-radius: 0;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: hsl(var(--hue), 55%, 35%);
+      color: var(--bg);
+      border: none;
+      position: relative;
+      z-index: 2;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .timeline-status__badge--done {
+      background: hsl(120, 55%, 35%);
+      color: var(--bg);
+      border: none;
+    }
+
+    .timeline-status__badge--wip {
+      background: hsl(var(--hue), 55%, 35%);
+      color: var(--bg);
+      border: none;
+    }"""
+
+# HTML структура
+TIMELINE_HTML = '''
+  <div class="timeline-status">
+    <div class="timeline-status__date-bubble">Дата старта</div>
+
+    <div class="timeline-status__center">
+      <div class="timeline-status__line"></div>
+
+      <span class="timeline-status__badge timeline-status__badge--wip">В РАЗРАБОТКЕ</span>
+
+      <div class="timeline-status__line"></div>
+    </div>
+
+    <div class="timeline-status__date-bubble">Дата окончания</div>
+  </div>'''
+
+files = {
+    'mse.html': True,  # True = MSE (серый)
+    'prism.html': False,
+    'glitch.html': False,
+    'aftereffects.html': False,
+    'bambulab.html': False,
+    'blender.html': False,
+    'cinema4d.html': False,
+    'illustrator.html': False,
+    'maya.html': False,
+    'photoshop.html': False,
+    'panacea.html': False,
+}
+
+updated = 0
+
+print('🎨 Добавляем timeline-status правильно...\n')
+
+for filename, is_mse in files.items():
+    filepath = f'C:\\Users\\I am\\Desktop\\Portfolio\\{filename}'
+    
+    if not os.path.exists(filepath):
+        print(f'⚠️  {filename} - файл не найден')
+        continue
+    
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Шаг 1: Добавляем CSS перед закрывающим </style>
+        css = get_timeline_css(is_mse)
+        
+        if '</style>' in content and 'timeline-status' not in content:
+            # Находим последний </style> и вставляем перед ним
+            style_pos = content.rfind('</style>')
+            content = content[:style_pos] + css + '\n  ' + content[style_pos:]
+            
+            # Шаг 2: Находим первый </section> после <section class="tech"> и добавляем HTML после него
+            # Ищем секцию tech
+            tech_match = re.search(r'<section class="tech">.*?</section>', content, re.DOTALL)
+            if tech_match:
+                tech_end = tech_match.end()
+                content = content[:tech_end] + '\n' + TIMELINE_HTML + content[tech_end:]
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(content)
+            
+            color_note = ' (серые тона)' if is_mse else ''
+            print(f'✅ {filename} - добавлен timeline-status{color_note}')
+            updated += 1
+        else:
+            if 'timeline-status' in content:
+                print(f'⚠️  {filename} - timeline уже есть')
+            else:
+                print(f'⚠️  {filename} - не найден </style>')
+    
+    except Exception as e:
+        print(f'❌ {filename} - ошибка: {e}')
+
+print(f'\n✨ Готово! Обновлено: {updated}/{len(files)}')
